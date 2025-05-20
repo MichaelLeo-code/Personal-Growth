@@ -1,3 +1,4 @@
+// GridStore.ts
 export type Cell = {
   text: string;
   x: number;
@@ -7,6 +8,7 @@ export type Cell = {
 class GridStore {
   private cells: Cell[] = [];
   private listeners: (() => void)[] = [];
+  private selected: Cell | null = null;
 
   getCells(): Cell[] {
     return [...this.cells];
@@ -39,6 +41,15 @@ class GridStore {
       }
     }
     return undefined;
+  }
+
+  selectCell(cell: Cell): void {
+    this.selected = cell;
+    this.notify();
+  }
+
+  getSelected(): Cell | null {
+    return this.selected;
   }
 
   subscribe(listener: () => void): () => void {
