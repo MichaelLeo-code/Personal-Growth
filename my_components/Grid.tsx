@@ -1,18 +1,25 @@
-import React from "react";
+// Grid.tsx
+import React, { useEffect, useState } from "react";
 import { StyleSheet, Text, View } from "react-native";
-
-type Cell = {
-  text: string;
-  x: number;
-  y: number;
-};
+import { Cell, gridStore } from "../store/GridStore";
 
 type GridProps = {
-  cells: Cell[];
+  initialCells: Cell[];
   cellSize?: number;
 };
 
-export const Grid: React.FC<GridProps> = ({ cells, cellSize = 50 }) => {
+export const Grid: React.FC<GridProps> = ({ initialCells, cellSize = 50 }) => {
+  const [cells, setCells] = useState<Cell[]>([]);
+
+  useEffect(() => {
+    initialCells.forEach((cell) => gridStore.addCell(cell));
+    setCells(gridStore.getCells());
+    const unsubscribe = gridStore.subscribe(() => {
+      setCells(gridStore.getCells());
+    });
+    return unsubscribe;
+  }, [initialCells]);
+
   return (
     <View style={styles.grid}>
       {cells.map((cell, index) => (

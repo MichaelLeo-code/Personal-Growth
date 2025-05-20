@@ -1,8 +1,11 @@
+import { FloatingButton } from "@/my_components/FloatingButton";
 import { Grid } from "@/my_components/Grid";
+import { gridStore } from "@/store/GridStore";
 import { ReactNativeZoomableView } from "@openspacelabs/react-native-zoomable-view";
 
 import { DarkTheme, ThemeProvider } from "@react-navigation/native";
 import { useFonts } from "expo-font";
+import { SafeAreaView } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import "react-native-reanimated";
 
@@ -34,10 +37,13 @@ export default function RootLayout() {
           movementSensibility={1.5}
           visualTouchFeedbackEnabled={true} // DEV
         >
-          {/* <SafeAreaView> */}
-          <Grid cells={cellData} />
-          {/* </SafeAreaView> */}
+          <SafeAreaView>
+            <Grid initialCells={cellData} />
+          </SafeAreaView>
         </ReactNativeZoomableView>
+        <FloatingButton
+          onPress={() => gridStore.addCell({ text: "test", y: 5, x: 5 })}
+        />
       </GestureHandlerRootView>
     </ThemeProvider>
   );
