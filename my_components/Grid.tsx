@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import Svg, { Line } from "react-native-svg";
 import { Cell, gridStore } from "../store/GridStore";
 
 type GridProps = {
@@ -28,6 +29,26 @@ export const Grid: React.FC<GridProps> = ({ initialCells, cellSize = 50 }) => {
 
   return (
     <View style={styles.grid}>
+      <Svg style={StyleSheet.absoluteFill}>
+        {cells.map((cell, index) => {
+          if (!cell.parent) return null;
+          const x1 = (cell.parent.x + 0.5) * cellSize;
+          const y1 = (cell.parent.y + 0.5) * cellSize;
+          const x2 = (cell.x + 0.5) * cellSize;
+          const y2 = (cell.y + 0.5) * cellSize;
+          return (
+            <Line
+              key={`line-${index}`}
+              x1={x1}
+              y1={y1}
+              x2={x2}
+              y2={y2}
+              stroke="#fff"
+              strokeWidth="1"
+            />
+          );
+        })}
+      </Svg>
       {cells.map((cell, index) => {
         const isSelected = selected?.x === cell.x && selected?.y === cell.y;
         return (

@@ -1,29 +1,43 @@
-// GridStore.ts
 export type Cell = {
+  id: number;
   text: string;
   x: number;
   y: number;
+  parent?: number;
+  children?: number[];
 };
 
 class GridStore {
-  private cells: Cell[] = [];
+  private cellMap: Map<number, Cell> = new Map();
   private listeners: (() => void)[] = [];
-  private selected: Cell | null = null;
+  private selectedId: number | null = null;
 
   getCells(): Cell[] {
-    return [...this.cells];
+    return Array.from(this.cellMap.values());
   }
 
   addCell(cell: Cell): void {
-    const exists = this.cells.some((c) => c.x === cell.x && c.y === cell.y);
-    if (!exists) {
-      this.cells.push(cell);
-      this.notify();
+    if (this.cellMap.has(cell.id)) return;
+
+    if (cell.parent !== undefined) {
+      const parentCell = this.cellMap.get(cell.parent);
+      if (parentCell) {
+        parentCell.children = [...(parentCell.children || []), cell.id];
+      }
     }
+
+    this.cellMap.set(cell.id, cell);
+    this.notify();
   }
 
   getCellAt(x: number, y: number): Cell | undefined {
-    return this.cells.find((c) => c.x === x && c.y === y);
+    return Array.from(this.cellMap.values()).find(
+      (c) => c.x === x && c.y === y
+    );
+  }
+
+  getCellById(id: number): Cell | undefined {
+    return this.cellMap.get(id);
   }
 
   getNextAdjacentCell(x: number, y: number): Cell | undefined {
@@ -37,19 +51,21 @@ class GridStore {
       const nx = x + dx;
       const ny = y + dy;
       if (!this.getCellAt(nx, ny)) {
-        return { x: nx, y: ny, text: "" };
+        return { id: Date.now(), x: nx, y: ny, text: "" };
       }
     }
     return undefined;
   }
 
   selectCell(cell: Cell): void {
-    this.selected = cell;
+    this.selectedId = cell.id;
     this.notify();
   }
 
   getSelected(): Cell | null {
-    return this.selected;
+    return this.selectedId !== null
+      ? this.cellMap.get(this.selectedId) || null
+      : null;
   }
 
   subscribe(listener: () => void): () => void {

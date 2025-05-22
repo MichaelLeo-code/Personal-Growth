@@ -22,9 +22,9 @@ export default function RootLayout() {
 
   const cellData = [
     { text: "A", x: 0, y: 0 },
-    { text: "B", x: 0, y: 3 },
-    { text: "C", x: 1, y: 2 },
-    { text: "D", x: 5, y: 1 },
+    { text: "B", x: 0, y: 3, parent: { text: "A", x: 0, y: 0 } },
+    { text: "C", x: 1, y: 2, parent: { text: "B", x: 0, y: 3 } },
+    { text: "D", x: 5, y: 1, parent: { text: "A", x: 0, y: 0 } },
   ];
 
   return (

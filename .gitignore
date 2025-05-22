@@ -39,3 +39,4 @@ yarn-error.*
 app-example
 
 yarn.lock
+.yarn/install-state.gz
