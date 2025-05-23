@@ -5,11 +5,31 @@ import { ReactNativeZoomableView } from "@openspacelabs/react-native-zoomable-vi
 
 import { DarkTheme, ThemeProvider } from "@react-navigation/native";
 import { useFonts } from "expo-font";
+import React from "react";
 import { SafeAreaView } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import "react-native-reanimated";
 
+const onAdd = () => {
+  const selectedCellId = gridStore.getSelected()?.id;
+  if (!selectedCellId) return;
+  const cell = gridStore.addNextFreeCell(selectedCellId);
+  if (cell) {
+    gridStore.selectCell(cell);
+  }
+};
+
 export default function RootLayout() {
+  const [selected, setSelected] = React.useState(() => gridStore.getSelected());
+  React.useEffect(() => {
+    const unsubscribe = gridStore.subscribe(() => {
+      setSelected(gridStore.getSelected());
+    });
+    return () => {
+      unsubscribe();
+    };
+  }, []);
+
   // const colorScheme = useColorScheme();
   const [loaded] = useFonts({
     SpaceMono: require("../assets/fonts/SpaceMono-Regular.ttf"),
@@ -21,12 +41,11 @@ export default function RootLayout() {
   }
 
   const cellData = [
-    { text: "A", x: 0, y: 0 },
-    { text: "B", x: 0, y: 3, parent: { text: "A", x: 0, y: 0 } },
-    { text: "C", x: 1, y: 2, parent: { text: "B", x: 0, y: 3 } },
-    { text: "D", x: 5, y: 1, parent: { text: "A", x: 0, y: 0 } },
+    { text: "A", x: 0, y: 0, id: 1 },
+    { text: "B", x: 0, y: 3, id: 2, parent: 1 },
+    { text: "C", x: 1, y: 2, id: 3, parent: 1 },
+    { text: "D", x: 5, y: 1, id: 4, parent: 3 },
   ];
-
   return (
     <ThemeProvider value={DarkTheme}>
       <GestureHandlerRootView>
@@ -41,9 +60,7 @@ export default function RootLayout() {
             <Grid initialCells={cellData} />
           </SafeAreaView>
         </ReactNativeZoomableView>
-        <FloatingButton
-          onPress={() => gridStore.addCell({ text: "test", y: 5, x: 5 })}
-        />
+        {selected && <FloatingButton onPress={() => onAdd()} />}
       </GestureHandlerRootView>
     </ThemeProvider>
   );

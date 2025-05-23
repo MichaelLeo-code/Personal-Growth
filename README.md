@@ -2,10 +2,17 @@ you could also consider react-native-pan-pinch-view
 
 ### Questions
 
+##### GridStore
+
+- next adjacent cell methods
+- assign parent if cell is selected
+
+### Resolved Questions
+
 ##### Model
 
-- reference parent as id or x, y?
-- Reference children's needed?  
+- reference parent as id or x, y? **ID**
+- Reference children's needed? **yes**
   Pros:
 
   - Enables quick lookup of a node's subtree.
@@ -15,8 +22,3 @@ you could also consider react-native-pan-pinch-view
 
   - Needs strict synchronization
   - JSON.stringify becomes problematic.
-
-##### GridStore
-
-- next adjacent cell methods
-- assign parent if cell is selected

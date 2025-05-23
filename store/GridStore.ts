@@ -16,18 +16,28 @@ class GridStore {
     return Array.from(this.cellMap.values());
   }
 
-  addCell(cell: Cell): void {
-    if (this.cellMap.has(cell.id)) return;
+  private nextId = 1;
 
-    if (cell.parent !== undefined) {
-      const parentCell = this.cellMap.get(cell.parent);
+  addCell(cell: Omit<Cell, "id">): Cell | undefined {
+    if (this.getCellAt(cell.x, cell.y)) {
+      console.warn(
+        `Cell at (${cell.x}, ${cell.y}) already exists. Cannot add new cell.`
+      );
+      return undefined;
+    }
+    const id = this.nextId++;
+    const newCell: Cell = { ...cell, id };
+
+    if (newCell.parent !== undefined) {
+      const parentCell = this.cellMap.get(newCell.parent);
       if (parentCell) {
-        parentCell.children = [...(parentCell.children || []), cell.id];
+        parentCell.children = [...(parentCell.children || []), newCell.id];
       }
     }
 
-    this.cellMap.set(cell.id, cell);
+    this.cellMap.set(newCell.id, newCell);
     this.notify();
+    return newCell;
   }
 
   getCellAt(x: number, y: number): Cell | undefined {
@@ -40,21 +50,33 @@ class GridStore {
     return this.cellMap.get(id);
   }
 
-  getNextAdjacentCell(x: number, y: number): Cell | undefined {
+  getNextFreeCellCoordinates(id: number): { x: number; y: number } | undefined {
     const directions = [
       [1, 0],
       [-1, 0],
       [0, 1],
       [0, -1],
     ];
+    const cell = this.getCellById(id);
+    if (!cell)
+      throw new Error(
+        "The cell that you are trying to search neighbours for does not exist"
+      );
     for (const [dx, dy] of directions) {
-      const nx = x + dx;
-      const ny = y + dy;
+      const nx = cell.x + dx;
+      const ny = cell.y + dy;
       if (!this.getCellAt(nx, ny)) {
-        return { id: Date.now(), x: nx, y: ny, text: "" };
+        return { x: nx, y: ny };
       }
     }
     return undefined;
+  }
+
+  addNextFreeCell(id: number): Cell | undefined {
+    const coordinates = this.getNextFreeCellCoordinates(id);
+    if (!coordinates) return undefined;
+    const { x, y } = coordinates;
+    return this.addCell({ x, y, text: "newCell", parent: id });
   }
 
   selectCell(cell: Cell): void {

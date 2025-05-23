@@ -31,9 +31,12 @@ export const Grid: React.FC<GridProps> = ({ initialCells, cellSize = 50 }) => {
     <View style={styles.grid}>
       <Svg style={StyleSheet.absoluteFill}>
         {cells.map((cell, index) => {
-          if (!cell.parent) return null;
-          const x1 = (cell.parent.x + 0.5) * cellSize;
-          const y1 = (cell.parent.y + 0.5) * cellSize;
+          const parentCell = cell.parent
+            ? gridStore.getCellById(cell.parent)
+            : null;
+          if (!parentCell) return null;
+          const x1 = (parentCell.x + 0.5) * cellSize;
+          const y1 = (parentCell.y + 0.5) * cellSize;
           const x2 = (cell.x + 0.5) * cellSize;
           const y2 = (cell.y + 0.5) * cellSize;
           return (
