@@ -1,6 +1,7 @@
 import { FloatingButton } from "@/my_components/FloatingButton";
 import { Grid } from "@/my_components/Grid";
 import { gridStore } from "@/store/GridStore";
+import { CellType } from "@/types/cells";
 import { ReactNativeZoomableView } from "@openspacelabs/react-native-zoomable-view";
 
 import { DarkTheme, ThemeProvider } from "@react-navigation/native";
@@ -13,7 +14,7 @@ import "react-native-reanimated";
 const onAdd = () => {
   const selectedCellId = gridStore.getSelected()?.id;
   if (!selectedCellId) return;
-  const cell = gridStore.addNextFreeCell(selectedCellId);
+  const cell = gridStore.addNextFreeCell(selectedCellId, CellType.Headline);
   if (cell) {
     gridStore.selectCell(cell);
   }

@@ -1,11 +1,15 @@
-export type Cell = {
-  id: number;
-  text: string;
-  x: number;
-  y: number;
-  parent?: number;
-  children?: number[];
-};
+import { Cell, CellType } from "../types/cells";
+
+const directions8 = [
+  [2, 0],
+  [2, 2],
+  [2, -2],
+  [-2, 0],
+  [-2, 2],
+  [-2, -2],
+  [0, 2],
+  [0, -2],
+];
 
 class GridStore {
   private cellMap: Map<number, Cell> = new Map();
@@ -18,7 +22,9 @@ class GridStore {
 
   private nextId = 1;
 
-  addCell(cell: Omit<Cell, "id">): Cell | undefined {
+  addCell(
+    cell: Omit<Cell, "id" | "type"> & { type?: CellType }
+  ): Cell | undefined {
     if (this.getCellAt(cell.x, cell.y)) {
       console.warn(
         `Cell at (${cell.x}, ${cell.y}) already exists. Cannot add new cell.`
@@ -26,7 +32,7 @@ class GridStore {
       return undefined;
     }
     const id = this.nextId++;
-    const newCell: Cell = { ...cell, id };
+    const newCell: Cell = { ...cell, id, type: cell.type || CellType.Headline };
 
     if (newCell.parent !== undefined) {
       const parentCell = this.cellMap.get(newCell.parent);
@@ -51,18 +57,12 @@ class GridStore {
   }
 
   getNextFreeCellCoordinates(id: number): { x: number; y: number } | undefined {
-    const directions = [
-      [1, 0],
-      [-1, 0],
-      [0, 1],
-      [0, -1],
-    ];
     const cell = this.getCellById(id);
     if (!cell)
       throw new Error(
         "The cell that you are trying to search neighbours for does not exist"
       );
-    for (const [dx, dy] of directions) {
+    for (const [dx, dy] of directions8) {
       const nx = cell.x + dx;
       const ny = cell.y + dy;
       if (!this.getCellAt(nx, ny)) {
@@ -72,11 +72,17 @@ class GridStore {
     return undefined;
   }
 
-  addNextFreeCell(id: number): Cell | undefined {
-    const coordinates = this.getNextFreeCellCoordinates(id);
+  addNextFreeCell(nextToId: number, type?: CellType): Cell | undefined {
+    const coordinates = this.getNextFreeCellCoordinates(nextToId);
     if (!coordinates) return undefined;
     const { x, y } = coordinates;
-    return this.addCell({ x, y, text: "newCell", parent: id });
+    return this.addCell({
+      x,
+      y,
+      text: "newCell",
+      parent: nextToId,
+      type: type ? type : CellType.Headline,
+    });
   }
 
   selectCell(cell: Cell): void {

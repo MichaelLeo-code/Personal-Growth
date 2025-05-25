@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from "react";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import Svg, { Line } from "react-native-svg";
-import { Cell, gridStore } from "../store/GridStore";
+import { gridStore } from "../store/GridStore";
+import { BaseCell, Cell } from "../types/cells";
 
 type GridProps = {
-  initialCells: Cell[];
+  initialCells: BaseCell[];
   cellSize?: number;
 };
 
