@@ -43,6 +43,7 @@ class GridStore {
 
     this.cellMap.set(newCell.id, newCell);
     this.notify();
+
     return newCell;
   }
 
@@ -103,7 +104,7 @@ class GridStore {
     };
   }
 
-  private notify() {
+  notify() {
     this.listeners.forEach((listener) => listener());
   }
 }

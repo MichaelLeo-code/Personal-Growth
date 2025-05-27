@@ -1,29 +1,20 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import Svg, { Line } from "react-native-svg";
 import { gridStore } from "../store/GridStore";
-import { BaseCell, Cell } from "../types/cells";
+import { Cell, CellType } from "../types/cells";
 
 type GridProps = {
-  initialCells: BaseCell[];
   cellSize?: number;
+  cells: Cell[];
+  selected?: Cell | null;
 };
 
-export const Grid: React.FC<GridProps> = ({ initialCells, cellSize = 50 }) => {
-  const [cells, setCells] = useState<Cell[]>([]);
-  const [selected, setSelected] = useState<Cell | null>(null);
-
-  useEffect(() => {
-    initialCells.forEach((cell) => gridStore.addCell(cell));
-    setCells(gridStore.getCells());
-    setSelected(gridStore.getSelected());
-    const unsubscribe = gridStore.subscribe(() => {
-      setCells(gridStore.getCells());
-      setSelected(gridStore.getSelected());
-    });
-    return unsubscribe;
-  }, []);
-
+export const Grid: React.FC<GridProps> = ({
+  cellSize = 50,
+  cells,
+  selected,
+}) => {
   const handlePress = (cell: Cell) => {
     gridStore.selectCell(cell);
   };
@@ -55,6 +46,7 @@ export const Grid: React.FC<GridProps> = ({ initialCells, cellSize = 50 }) => {
       </Svg>
       {cells.map((cell, index) => {
         const isSelected = selected?.x === cell.x && selected?.y === cell.y;
+        const sizeMultiplier = cell.type === CellType.Headline ? 1 : 3;
         return (
           <TouchableOpacity
             key={index}
@@ -63,8 +55,8 @@ export const Grid: React.FC<GridProps> = ({ initialCells, cellSize = 50 }) => {
               {
                 left: cell.x * cellSize,
                 top: cell.y * cellSize,
-                width: cellSize,
-                height: cellSize,
+                width: cellSize * sizeMultiplier,
+                height: cellSize * sizeMultiplier,
                 backgroundColor: isSelected ? "#555" : "#000",
               },
             ]}

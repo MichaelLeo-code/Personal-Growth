@@ -1,34 +1,48 @@
-import { FloatingButton } from "@/my_components/FloatingButton";
-import { Grid } from "@/my_components/Grid";
+import { FloatingButton, Grid } from "@/my_components";
 import { gridStore } from "@/store/GridStore";
-import { CellType } from "@/types/cells";
+import { addTask } from "@/store/TaskStore";
+import { Cell, CellType } from "@/types/cells";
 import { ReactNativeZoomableView } from "@openspacelabs/react-native-zoomable-view";
-
 import { DarkTheme, ThemeProvider } from "@react-navigation/native";
 import { useFonts } from "expo-font";
 import React from "react";
+import { useEffect, useState } from "react";
 import { SafeAreaView } from "react-native";
-import { GestureHandlerRootView } from "react-native-gesture-handler";
-import "react-native-reanimated";
+
+let counter = 0;
 
 const onAdd = () => {
+  counter++;
   const selectedCellId = gridStore.getSelected()?.id;
   if (!selectedCellId) return;
-  const cell = gridStore.addNextFreeCell(selectedCellId, CellType.Headline);
+  const type = counter % 2 === 0 ? CellType.Headline : CellType.Tasklist;
+  const cell = gridStore.addNextFreeCell(selectedCellId, type);
+
   if (cell) {
     gridStore.selectCell(cell);
   }
 };
 
+const cellData = [
+  { text: "A", x: 0, y: 0, id: 1 },
+  { text: "B", x: 0, y: 3, id: 2, parent: 1 },
+  { text: "C", x: 1, y: 2, id: 3, parent: 1 },
+  { text: "D", x: 5, y: 1, id: 4, parent: 3 },
+];
+
 export default function RootLayout() {
-  const [selected, setSelected] = React.useState(() => gridStore.getSelected());
-  React.useEffect(() => {
+  const [selected, setSelected] = useState<Cell | null>(null);
+  const [cells, setCells] = useState<Cell[]>([]);
+
+  useEffect(() => {
+    cellData.forEach((cell) => gridStore.addCell(cell));
+    setCells(gridStore.getCells());
+    setSelected(gridStore.getSelected());
     const unsubscribe = gridStore.subscribe(() => {
+      setCells(gridStore.getCells());
       setSelected(gridStore.getSelected());
     });
-    return () => {
-      unsubscribe();
-    };
+    return unsubscribe;
   }, []);
 
   // const colorScheme = useColorScheme();
@@ -41,28 +55,34 @@ export default function RootLayout() {
     return null;
   }
 
-  const cellData = [
-    { text: "A", x: 0, y: 0, id: 1 },
-    { text: "B", x: 0, y: 3, id: 2, parent: 1 },
-    { text: "C", x: 1, y: 2, id: 3, parent: 1 },
-    { text: "D", x: 5, y: 1, id: 4, parent: 3 },
-  ];
   return (
     <ThemeProvider value={DarkTheme}>
-      <GestureHandlerRootView>
-        <ReactNativeZoomableView
-          minZoom={0.1}
-          doubleTapZoomToCenter={false}
-          bindToBorders={false}
-          movementSensibility={1.5}
-          visualTouchFeedbackEnabled={true} // DEV
-        >
-          <SafeAreaView>
-            <Grid initialCells={cellData} />
-          </SafeAreaView>
-        </ReactNativeZoomableView>
-        {selected && <FloatingButton onPress={() => onAdd()} />}
-      </GestureHandlerRootView>
+      <ReactNativeZoomableView
+        minZoom={0.1}
+        doubleTapZoomToCenter={false}
+        bindToBorders={false}
+        movementSensibility={1.5}
+        visualTouchFeedbackEnabled={true} // DEV
+      >
+        <SafeAreaView>
+          <Grid cells={cells} selected={selected} />
+        </SafeAreaView>
+      </ReactNativeZoomableView>
+      {selected && (
+        <>
+          <FloatingButton
+            onPress={() => onAdd()}
+            style={{ bottom: 90 }} // Upper button
+          />
+          <FloatingButton
+            onPress={() =>
+              addTask({ text: "test", completed: false, cost: 10 }, selected.id)
+            }
+            backgroundColor="#a81000"
+            style={{ bottom: 20 }} // Lower button
+          />
+        </>
+      )}
     </ThemeProvider>
   );
 }
