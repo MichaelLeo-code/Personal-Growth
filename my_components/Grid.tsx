@@ -1,8 +1,8 @@
 import React from "react";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
-import Svg, { Line } from "react-native-svg";
 import { gridStore } from "../store/GridStore";
 import { Cell, CellType } from "../types/cells";
+import { CellLines } from "./CellLines";
 
 type GridProps = {
   cellSize?: number;
@@ -19,31 +19,13 @@ export const Grid: React.FC<GridProps> = ({
     gridStore.selectCell(cell);
   };
 
+  const handleButtonPress = (cell: Cell) => {
+    console.log("Button pressed for cell:", cell);
+  };
+
   return (
     <View style={styles.grid}>
-      <Svg style={StyleSheet.absoluteFill}>
-        {cells.map((cell, index) => {
-          const parentCell = cell.parent
-            ? gridStore.getCellById(cell.parent)
-            : null;
-          if (!parentCell) return null;
-          const x1 = (parentCell.x + 0.5) * cellSize;
-          const y1 = (parentCell.y + 0.5) * cellSize;
-          const x2 = (cell.x + 0.5) * cellSize;
-          const y2 = (cell.y + 0.5) * cellSize;
-          return (
-            <Line
-              key={`line-${index}`}
-              x1={x1}
-              y1={y1}
-              x2={x2}
-              y2={y2}
-              stroke="#fff"
-              strokeWidth="1"
-            />
-          );
-        })}
-      </Svg>
+      <CellLines cells={cells} cellSize={cellSize} />
       {cells.map((cell, index) => {
         const isSelected = selected?.x === cell.x && selected?.y === cell.y;
         const sizeMultiplier = cell.type === CellType.Headline ? 1 : 3;
@@ -62,7 +44,17 @@ export const Grid: React.FC<GridProps> = ({
             ]}
             onPress={() => handlePress(cell)}
           >
-            <Text style={styles.text}>{cell.text}</Text>
+            <View style={styles.cellContent}>
+              <Text style={styles.text}>{cell.text}</Text>
+              {cell.type === CellType.Tasklist && (
+                <TouchableOpacity
+                  style={styles.button}
+                  onPress={() => handleButtonPress(cell)}
+                >
+                  <Text style={styles.buttonText}>Action</Text>
+                </TouchableOpacity>
+              )}
+            </View>
           </TouchableOpacity>
         );
       })}
@@ -83,8 +75,24 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
   },
+  cellContent: {
+    alignItems: "center",
+    justifyContent: "center",
+  },
   text: {
     fontSize: 16,
     color: "#fff",
+    marginBottom: 4,
+  },
+  button: {
+    backgroundColor: "#444",
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 4,
+    marginTop: 4,
+  },
+  buttonText: {
+    color: "#fff",
+    fontSize: 12,
   },
 });

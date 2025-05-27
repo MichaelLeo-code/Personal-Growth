@@ -2,6 +2,7 @@ import { CellType } from "@/types/cells";
 import { Task } from "../types/task";
 import { gridStore } from "./GridStore";
 let nextId = 0;
+
 export function addTask(task: Omit<Task, "id">, parent: number): Task | null {
   const id = nextId++;
   const newTask: Task = { ...task, id };
@@ -16,8 +17,9 @@ export function addTask(task: Omit<Task, "id">, parent: number): Task | null {
   gridStore.notify();
 
   if (task.parent === undefined) {
-    const log = gridStore.getCellById(parent)
+    const log = gridStore.getCellById(parent);
     console.log(log);
   }
   return newTask;
 }
+
