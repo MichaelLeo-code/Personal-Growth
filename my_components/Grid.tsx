@@ -1,8 +1,10 @@
-import React from "react";
+import React, { useState } from "react";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { usePopup } from "../my_hooks/usePopup";
 import { gridStore } from "../store/GridStore";
 import { Cell, CellType } from "../types/cells";
 import { CellLines } from "./CellLines";
+import { Popup } from "./popup";
 
 type GridProps = {
   cellSize?: number;
@@ -15,12 +17,26 @@ export const Grid: React.FC<GridProps> = ({
   cells,
   selected,
 }) => {
+  const [selectedCell, setSelectedCell] = useState<Cell | null>(null);
+  const { showPopup, hidePopup, isVisible } = usePopup();
+
   const handlePress = (cell: Cell) => {
     gridStore.selectCell(cell);
   };
 
   const handleButtonPress = (cell: Cell) => {
-    console.log("Button pressed for cell:", cell);
+    setSelectedCell(cell);
+    showPopup(
+      <View>
+        <Text style={styles.modalText}>Cell Text: {cell.text}</Text>
+        <TouchableOpacity
+          style={styles.testButton}
+          onPress={() => console.log("Test log from popup for cell:", cell)}
+        >
+          <Text style={styles.testButtonText}>Test Log</Text>
+        </TouchableOpacity>
+      </View>
+    );
   };
 
   return (
@@ -58,6 +74,26 @@ export const Grid: React.FC<GridProps> = ({
           </TouchableOpacity>
         );
       })}
+      <Popup
+        visible={isVisible}
+        onClose={hidePopup}
+        title="Cell Details"
+        cell={selectedCell}
+      >
+        {selectedCell && (
+          <View>
+            <Text style={styles.modalText}>Cell Text: {selectedCell.text}</Text>
+            <TouchableOpacity
+              style={styles.testButton}
+              onPress={() =>
+                console.log("Test log from popup for cell:", selectedCell)
+              }
+            >
+              <Text style={styles.testButtonText}>Test Log</Text>
+            </TouchableOpacity>
+          </View>
+        )}
+      </Popup>
     </View>
   );
 };
@@ -94,5 +130,19 @@ const styles = StyleSheet.create({
   buttonText: {
     color: "#fff",
     fontSize: 12,
+  },
+  modalText: {
+    fontSize: 16,
+    marginBottom: 20,
+  },
+  testButton: {
+    backgroundColor: "#444",
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    borderRadius: 4,
+  },
+  testButtonText: {
+    color: "#fff",
+    fontSize: 14,
   },
 });
