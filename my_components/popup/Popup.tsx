@@ -1,31 +1,31 @@
 import { Cell } from "@/types/cells";
 import { Modal, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
-type PopupProps = {
-  visible: boolean;
-  onClose: () => void;
+export type PopupProps = {
+  isVisible: boolean;
+  hidePopup: () => void;
   cell: Cell | null;
   title?: string;
   children: React.ReactNode;
 };
 
-export const Popup: React.FC<PopupProps> = ({ visible, onClose, cell }) => {
+export const Popup: React.FC<PopupProps> = ({ isVisible, hidePopup, cell }) => {
   const handleTestLog = () => {
     console.log("Test log from popup for cell:", cell);
   };
 
   return (
     <Modal
-      visible={visible}
+      visible={isVisible}
       transparent={true}
       animationType="fade"
-      onRequestClose={onClose}
+      onRequestClose={hidePopup}
     >
       <View style={styles.modalOverlay}>
         <View style={styles.modalContent}>
           <View style={styles.modalHeader}>
             <Text style={styles.modalTitle}>Cell Details</Text>
-            <TouchableOpacity onPress={onClose} style={styles.closeButton}>
+            <TouchableOpacity onPress={hidePopup} style={styles.closeButton}>
               <Text style={styles.closeButtonText}>×</Text>
             </TouchableOpacity>
           </View>

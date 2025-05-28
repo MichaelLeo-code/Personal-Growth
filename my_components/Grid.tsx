@@ -4,7 +4,7 @@ import { usePopup } from "../my_hooks/usePopup";
 import { gridStore } from "../store/GridStore";
 import { Cell, CellType } from "../types/cells";
 import { CellLines } from "./CellLines";
-import { Popup } from "./popup";
+import { TaskPopup } from "./popup";
 
 type GridProps = {
   cellSize?: number;
@@ -26,17 +26,7 @@ export const Grid: React.FC<GridProps> = ({
 
   const handleButtonPress = (cell: Cell) => {
     setSelectedCell(cell);
-    showPopup(
-      <View>
-        <Text style={styles.modalText}>Cell Text: {cell.text}</Text>
-        <TouchableOpacity
-          style={styles.testButton}
-          onPress={() => console.log("Test log from popup for cell:", cell)}
-        >
-          <Text style={styles.testButtonText}>Test Log</Text>
-        </TouchableOpacity>
-      </View>
-    );
+    showPopup(null);
   };
 
   return (
@@ -74,26 +64,11 @@ export const Grid: React.FC<GridProps> = ({
           </TouchableOpacity>
         );
       })}
-      <Popup
-        visible={isVisible}
-        onClose={hidePopup}
-        title="Cell Details"
+      <TaskPopup
         cell={selectedCell}
-      >
-        {selectedCell && (
-          <View>
-            <Text style={styles.modalText}>Cell Text: {selectedCell.text}</Text>
-            <TouchableOpacity
-              style={styles.testButton}
-              onPress={() =>
-                console.log("Test log from popup for cell:", selectedCell)
-              }
-            >
-              <Text style={styles.testButtonText}>Test Log</Text>
-            </TouchableOpacity>
-          </View>
-        )}
-      </Popup>
+        hidePopup={hidePopup}
+        isVisible={isVisible}
+      />
     </View>
   );
 };
@@ -130,19 +105,5 @@ const styles = StyleSheet.create({
   buttonText: {
     color: "#fff",
     fontSize: 12,
-  },
-  modalText: {
-    fontSize: 16,
-    marginBottom: 20,
-  },
-  testButton: {
-    backgroundColor: "#444",
-    paddingHorizontal: 16,
-    paddingVertical: 8,
-    borderRadius: 4,
-  },
-  testButtonText: {
-    color: "#fff",
-    fontSize: 14,
   },
 });

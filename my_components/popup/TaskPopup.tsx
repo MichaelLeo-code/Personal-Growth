@@ -1,23 +1,24 @@
 import { Cell } from "@/types/cells";
 import { StyleSheet, Text, TouchableOpacity } from "react-native";
-import { usePopup } from "../../my_hooks/usePopup";
-import { Popup } from "./";
+import { Popup, PopupProps } from "./";
 
-type TaskPopupProps = {
+type TaskPopupProps = Omit<PopupProps, "children"> & {
   cell: Cell | null;
 };
 
-export const TaskPopup: React.FC<TaskPopupProps> = ({ cell }) => {
-  const { isVisible, hidePopup } = usePopup();
-
+export const TaskPopup: React.FC<TaskPopupProps> = ({
+  cell,
+  isVisible,
+  hidePopup,
+}) => {
   const handleTestLog = () => {
     console.log("Test log from popup for cell:", cell);
   };
 
   return (
     <Popup
-      visible={isVisible}
-      onClose={hidePopup}
+      isVisible={isVisible}
+      hidePopup={hidePopup}
       title="Cell Details"
       cell={cell}
     >
