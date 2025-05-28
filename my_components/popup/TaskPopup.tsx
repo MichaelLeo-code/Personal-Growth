@@ -1,9 +1,10 @@
-import { Cell } from "@/types/cells";
-import { StyleSheet, Text, TouchableOpacity } from "react-native";
-import { Popup, PopupProps } from "./";
+import { TaskListCell } from "@/types/cells";
+import { Pressable, StyleSheet, Text, View } from "react-native";
+import { TaskLine } from "../editable/TaskLine";
+import { Popup, PopupProps } from "./Popup";
 
 type TaskPopupProps = Omit<PopupProps, "children"> & {
-  cell: Cell | null;
+  cell: TaskListCell;
 };
 
 export const TaskPopup: React.FC<TaskPopupProps> = ({
@@ -11,38 +12,47 @@ export const TaskPopup: React.FC<TaskPopupProps> = ({
   isVisible,
   hidePopup,
 }) => {
-  const handleTestLog = () => {
-    console.log("Test log from popup for cell:", cell);
-  };
+  if (!cell || cell.type !== "tasklist") {
+    return null;
+  }
 
   return (
     <Popup
       isVisible={isVisible}
       hidePopup={hidePopup}
-      title="Cell Details"
-      cell={cell}
+      title={cell.text}
+      showCloseButton={false}
     >
-      <Text style={styles.modalText}>Cell Text: {cell?.text}</Text>
-      <TouchableOpacity style={styles.testButton} onPress={handleTestLog}>
-        <Text style={styles.testButtonText}>Test Log</Text>
-      </TouchableOpacity>
+      <View>
+        {cell.tasks?.map((task) => (
+          <TaskLine key={task.id} parentId={cell.id} task={task} />
+        ))}
+        <TaskLine parentId={cell.id} />
+        <View style={styles.buttonContainer}>
+          <Pressable style={styles.button} onPress={hidePopup}>
+            <Text style={styles.buttonText}>Close</Text>
+          </Pressable>
+        </View>
+      </View>
     </Popup>
   );
 };
 
 const styles = StyleSheet.create({
-  modalText: {
-    fontSize: 16,
-    marginBottom: 20,
+  buttonContainer: {
+    flexDirection: "row",
+    justifyContent: "flex-end",
+    marginTop: 10,
   },
-  testButton: {
+  button: {
     backgroundColor: "#444",
     paddingHorizontal: 16,
     paddingVertical: 8,
     borderRadius: 4,
   },
-  testButtonText: {
+  buttonText: {
     color: "#fff",
     fontSize: 14,
+    textAlign: "center",
   },
 });

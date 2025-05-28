@@ -1,19 +1,20 @@
-import { Cell } from "@/types/cells";
 import { Modal, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
 export type PopupProps = {
   isVisible: boolean;
   hidePopup: () => void;
-  cell: Cell | null;
   title?: string;
   children: React.ReactNode;
+  showCloseButton?: boolean;
 };
 
-export const Popup: React.FC<PopupProps> = ({ isVisible, hidePopup, cell }) => {
-  const handleTestLog = () => {
-    console.log("Test log from popup for cell:", cell);
-  };
-
+export const Popup: React.FC<PopupProps> = ({
+  isVisible,
+  hidePopup,
+  title,
+  children,
+  showCloseButton = true,
+}) => {
   return (
     <Modal
       visible={isVisible}
@@ -24,17 +25,14 @@ export const Popup: React.FC<PopupProps> = ({ isVisible, hidePopup, cell }) => {
       <View style={styles.modalOverlay}>
         <View style={styles.modalContent}>
           <View style={styles.modalHeader}>
-            <Text style={styles.modalTitle}>Cell Details</Text>
-            <TouchableOpacity onPress={hidePopup} style={styles.closeButton}>
-              <Text style={styles.closeButtonText}>×</Text>
-            </TouchableOpacity>
+            <Text style={styles.modalTitle}>{title}</Text>
+            {showCloseButton && (
+              <TouchableOpacity onPress={hidePopup} style={styles.closeButton}>
+                <Text style={styles.closeButtonText}>×</Text>
+              </TouchableOpacity>
+            )}
           </View>
-          <View style={styles.modalBody}>
-            <Text style={styles.modalText}>Cell Text: {cell?.text}</Text>
-            <TouchableOpacity style={styles.testButton} onPress={handleTestLog}>
-              <Text style={styles.testButtonText}>Test Log</Text>
-            </TouchableOpacity>
-          </View>
+          {children}
         </View>
       </View>
     </Modal>
@@ -78,15 +76,5 @@ const styles = StyleSheet.create({
   modalText: {
     fontSize: 16,
     marginBottom: 20,
-  },
-  testButton: {
-    backgroundColor: "#444",
-    paddingHorizontal: 16,
-    paddingVertical: 8,
-    borderRadius: 4,
-  },
-  testButtonText: {
-    color: "#fff",
-    fontSize: 14,
   },
 });
