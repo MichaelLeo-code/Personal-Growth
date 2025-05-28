@@ -1,91 +1,79 @@
-import { addTask } from "@/store/TaskStore";
-import { Task } from "@/types/task";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Pressable, StyleSheet, Text, TextInput, View } from "react-native";
+import { Task } from "../../types";
 
 type TaskLineProps = {
   parentId: number;
+  onTaskChange?: (task: Task) => void;
   task?: Task;
 };
 
-export const TaskLine: React.FC<TaskLineProps> = ({ parentId, task }) => {
-  const [taskText, setTaskText] = useState(task?.text || "");
-  const [isCompleted, setIsCompleted] = useState(task?.completed || false);
-  const [cost, setCost] = useState(task?.cost?.toString() || "");
+export const TaskLine: React.FC<TaskLineProps> = ({
+  parentId,
+  onTaskChange,
+  task: initialTask,
+}) => {
+  const [task, setTask] = useState<Task>({
+    id: 0,
+    text: "",
+    completed: false,
+    cost: 10,
+    parent: parentId,
+    ...initialTask,
+  });
+
+  useEffect(() => {
+    if (initialTask) {
+      setTask(initialTask);
+    }
+  }, [initialTask]);
 
   const handleTextChange = (text: string) => {
-    setTaskText(text);
-    if (task) {
-      // Update existing task
-      addTask({ ...task, text }, parentId);
-    }
+    const newTask = { ...task, text };
+    setTask(newTask);
+    onTaskChange?.(newTask);
   };
 
-  const handleCompletedChange = (completed: boolean) => {
-    setIsCompleted(completed);
-    if (task) {
-      // Update existing task
-      addTask({ ...task, completed }, parentId);
-    }
+  const handleCheckbox = () => {
+    const newTask = { ...task, completed: !task.completed };
+    setTask(newTask);
+    onTaskChange?.(newTask);
   };
 
   const handleCostChange = (newCost: string) => {
-    setCost(newCost);
-    if (task) {
-      // Update existing task
-      const costNumber = parseFloat(newCost) || 0;
-      addTask({ ...task, cost: costNumber }, parentId);
-    }
+    const newTask = { ...task, cost: parseInt(newCost) || 0 };
+    setTask(newTask);
+    onTaskChange?.(newTask);
   };
 
-  const handleDelete = () => {
-    if (task) {
-      // TODO: Implement delete task functionality
-      console.log("Delete task:", task.id);
-    }
-  };
-
-  const handleCreate = () => {
-    if (!task && taskText) {
-      const costNumber = parseFloat(cost) || 0;
-      addTask(
-        { text: taskText, completed: isCompleted, cost: costNumber },
-        parentId
-      );
-      // Reset form
-      setTaskText("");
-      setIsCompleted(false);
-      setCost("");
-    }
+  const onDelete = () => {
+    console.log("toBeImplemented");
   };
 
   return (
     <View style={styles.taskLine}>
       <Pressable
-        style={[styles.checkbox, isCompleted && styles.checkboxChecked]}
-        onPress={() => handleCompletedChange(!isCompleted)}
+        style={[styles.checkbox, task.completed && styles.checkboxChecked]}
+        onPress={() => handleCheckbox()}
       />
       <TextInput
         style={styles.textInput}
-        value={taskText}
+        value={task.text}
         onChangeText={handleTextChange}
         placeholder="Enter task description"
         placeholderTextColor="#666"
-        onSubmitEditing={handleCreate}
       />
       <TextInput
         style={styles.numberInput}
-        value={cost}
+        value={task.cost.toString()}
         onChangeText={handleCostChange}
         placeholder="Cost"
         placeholderTextColor="#666"
         keyboardType="numeric"
       />
-      {task && (
-        <Pressable style={styles.deleteButton} onPress={handleDelete}>
-          <Text style={styles.deleteButtonText}>×</Text>
-        </Pressable>
-      )}
+      <Pressable style={styles.deleteButton} onPress={onDelete}>
+        <Text style={styles.deleteButtonText}>×</Text>
+      </Pressable>
     </View>
   );
 };

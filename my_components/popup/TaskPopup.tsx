@@ -1,4 +1,7 @@
+import { addTask } from "@/store/TaskStore";
+import { Task } from "@/types";
 import { TaskListCell } from "@/types/cells";
+import { useState } from "react";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 import { TaskLine } from "../editable/TaskLine";
 import { Popup, PopupProps } from "./Popup";
@@ -12,9 +15,26 @@ export const TaskPopup: React.FC<TaskPopupProps> = ({
   isVisible,
   hidePopup,
 }) => {
-  if (!cell || cell.type !== "tasklist") {
-    return null;
-  }
+  const [tasks, setTasks] = useState<Task[]>(cell.tasks || []);
+
+  const handleTaskChange = (task: Task) => {
+    setTasks((prev) => {
+      const index = prev.findIndex((t) => t.id === task.id);
+      if (index === -1) {
+        return [...prev, task];
+      }
+      const newTasks = [...prev];
+      newTasks[index] = task;
+      return newTasks;
+    });
+  };
+
+  const handleSave = () => {
+    tasks.forEach((task) => {
+      addTask(task, cell.id);
+    });
+    hidePopup();
+  };
 
   return (
     <Popup
@@ -24,13 +44,21 @@ export const TaskPopup: React.FC<TaskPopupProps> = ({
       showCloseButton={false}
     >
       <View>
-        {cell.tasks?.map((task) => (
-          <TaskLine key={task.id} parentId={cell.id} task={task} />
+        {tasks.map((task) => (
+          <TaskLine
+            key={task.id}
+            parentId={cell.id}
+            task={task}
+            onTaskChange={handleTaskChange}
+          />
         ))}
-        <TaskLine parentId={cell.id} />
+        <TaskLine parentId={cell.id} onTaskChange={handleTaskChange} />
         <View style={styles.buttonContainer}>
           <Pressable style={styles.button} onPress={hidePopup}>
-            <Text style={styles.buttonText}>Close</Text>
+            <Text style={styles.buttonText}>Cancel</Text>
+          </Pressable>
+          <Pressable style={styles.button} onPress={handleSave}>
+            <Text style={styles.buttonText}>Save</Text>
           </Pressable>
         </View>
       </View>

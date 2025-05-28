@@ -64,11 +64,13 @@ export const Grid: React.FC<GridProps> = ({
           </TouchableOpacity>
         );
       })}
-      <TaskPopup
-        cell={selectedCell}
-        hidePopup={hidePopup}
-        isVisible={isVisible}
-      />
+      {selectedCell?.type === CellType.Tasklist && (
+        <TaskPopup
+          cell={selectedCell}
+          hidePopup={hidePopup}
+          isVisible={isVisible}
+        />
+      )}
     </View>
   );
 };
