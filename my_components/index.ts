@@ -1,2 +1,2 @@
 export * from "./FloatingButton";
-export * from "./Grid";
+export * from "./grid/Grid";

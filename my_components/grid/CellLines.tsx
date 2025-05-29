@@ -1,7 +1,7 @@
 import { Cell } from "@/types/cells";
 import { StyleSheet } from "react-native";
 import Svg, { Line } from "react-native-svg";
-import { gridStore } from "../store/GridStore";
+import { gridStore } from "../../store/GridStore";
 
 type Props = {
   cells: Cell[];

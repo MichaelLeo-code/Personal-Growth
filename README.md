@@ -3,7 +3,8 @@ you could also consider react-native-pan-pinch-view
 Current to-do scope:
 
 [ ] occupy the coordinates of larger-than-one-tiles (probably create coordinates store for that)  
-[ ] Create tasks in taskstore cell
+[x] Create tasks in taskstore cell
+[ ] Is TaskLine written in the best practise?
 
 ### Questions
 

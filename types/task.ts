@@ -3,5 +3,4 @@ export type Task = {
   text: string;
   completed: boolean;
   cost: number;
-  parent?: number;
 };

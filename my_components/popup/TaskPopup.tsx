@@ -21,7 +21,7 @@ export const TaskPopup: React.FC<TaskPopupProps> = ({
     setTasks((prev) => {
       const index = prev.findIndex((t) => t.id === task.id);
       if (index === -1) {
-        return [...prev, task];
+        throw new Error("should not try update the task that does not exist");
       }
       const newTasks = [...prev];
       newTasks[index] = task;
@@ -34,6 +34,15 @@ export const TaskPopup: React.FC<TaskPopupProps> = ({
       addTask(task, cell.id);
     });
     hidePopup();
+  };
+
+  const addNew = () => {
+    const newTask = addTask({ text: "", completed: false, cost: 10 }, cell.id);
+    if (newTask) {
+      setTasks((prev) => {
+        return [...prev, newTask];
+      });
+    }
   };
 
   return (
@@ -52,7 +61,9 @@ export const TaskPopup: React.FC<TaskPopupProps> = ({
             onTaskChange={handleTaskChange}
           />
         ))}
-        <TaskLine parentId={cell.id} onTaskChange={handleTaskChange} />
+        <Pressable style={styles.button} onPress={addNew}>
+          <Text style={styles.buttonText}>+</Text>
+        </Pressable>
         <View style={styles.buttonContainer}>
           <Pressable style={styles.button} onPress={hidePopup}>
             <Text style={styles.buttonText}>Cancel</Text>
