@@ -1,5 +1,6 @@
 import React from "react";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { totalCompletedCost, totalCost } from "../../store/TaskStore";
 import { Cell, CellType } from "../../types/cells";
 
 type GridCellProps = {
@@ -24,6 +25,23 @@ const TaskPreview: React.FC<{ text: string; completed: boolean }> = ({
   </View>
 );
 
+const ProgressBar: React.FC<{ completed: number; total: number }> = ({
+  completed,
+  total,
+}) => {
+  const percentage = total === 0 ? 0 : (completed / total) * 100;
+  return (
+    <View style={styles.progressContainer}>
+      <View style={styles.progressBar}>
+        <View style={[styles.progressFill, { width: `${percentage}%` }]} />
+      </View>
+      <Text style={styles.progressText}>
+        {completed}/{total}
+      </Text>
+    </View>
+  );
+};
+
 export const GridCell: React.FC<GridCellProps> = ({
   cell,
   cellSize,
@@ -32,6 +50,8 @@ export const GridCell: React.FC<GridCellProps> = ({
   onButtonPress,
 }) => {
   const sizeMultiplier = cell.type === CellType.Headline ? 1 : 3;
+  const total = totalCost(cell.id);
+  const completed = totalCompletedCost(cell.id);
 
   return (
     <TouchableOpacity
@@ -73,6 +93,7 @@ export const GridCell: React.FC<GridCellProps> = ({
             <Text style={styles.buttonText}>Action</Text>
           </TouchableOpacity>
         )}
+        <ProgressBar completed={completed} total={total} />
       </View>
     </TouchableOpacity>
   );
@@ -144,5 +165,29 @@ const styles = StyleSheet.create({
     fontSize: 10,
     marginTop: 2,
     textAlign: "center",
+  },
+  progressContainer: {
+    width: "100%",
+    flexDirection: "row",
+    alignItems: "center",
+    marginTop: 8,
+    gap: 8,
+  },
+  progressBar: {
+    flex: 1,
+    height: 4,
+    backgroundColor: "#333",
+    borderRadius: 2,
+    overflow: "hidden",
+  },
+  progressFill: {
+    height: "100%",
+    backgroundColor: "#4CAF50",
+  },
+  progressText: {
+    color: "#888",
+    fontSize: 10,
+    minWidth: 40,
+    textAlign: "right",
   },
 });
