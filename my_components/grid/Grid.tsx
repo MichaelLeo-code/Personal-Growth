@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { StyleSheet, View } from "react-native";
 import { usePopup } from "../../my_hooks/usePopup";
-import { gridStore } from "../../store/GridStore";
+import { gridStore } from "../../service/CellService";
 import { Cell, CellType } from "../../types/cells";
 import { TaskPopup } from "../popup";
 import { CellLines } from "./CellLines";

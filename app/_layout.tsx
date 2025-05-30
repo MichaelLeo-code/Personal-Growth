@@ -1,12 +1,10 @@
 import { FloatingButton, Grid } from "@/my_components";
-import { gridStore } from "@/store/GridStore";
-import { addTask } from "@/store/TaskStore";
+import { gridStore } from "@/service/CellService";
 import { Cell, CellType } from "@/types/cells";
 import { ReactNativeZoomableView } from "@openspacelabs/react-native-zoomable-view";
 import { DarkTheme, ThemeProvider } from "@react-navigation/native";
 import { useFonts } from "expo-font";
-import React from "react";
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { SafeAreaView } from "react-native";
 
 let counter = 0;
@@ -75,9 +73,9 @@ export default function RootLayout() {
             style={{ bottom: 90 }} // Upper button
           />
           <FloatingButton
-            onPress={() =>
-              addTask({ text: "test", completed: false, cost: 10 }, selected.id)
-            }
+            onPress={() => {
+              console.log(JSON.stringify(gridStore.getCells(), null, 2));
+            }}
             backgroundColor="#a81000"
             style={{ bottom: 20 }} // Lower button
           />

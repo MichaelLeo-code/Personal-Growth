@@ -1,6 +1,6 @@
 import { CellType, TaskListCell } from "@/types/cells";
 import { Task } from "../types/task";
-import { gridStore } from "./GridStore";
+import { gridStore } from "./CellService";
 let nextId = 0;
 
 function getTaskListCell(parentId: number): TaskListCell | null {
@@ -104,7 +104,7 @@ export function totalCost(parentId: number): number {
 }
 
 export function totalCompletedCost(parentId: number): number {
-  console.log("totalCompletedSum");
+  // console.log("totalCompletedSum");
 
   const parentCell = gridStore.getCellById(parentId);
   if (!parentCell) {
@@ -112,7 +112,7 @@ export function totalCompletedCost(parentId: number): number {
   }
 
   if (parentCell.type === CellType.Tasklist) {
-    // For tasklist cells, only sum their own completed tasks
+    // for tasklist cells, only sum their own completed tasks
     const taskListCell = getTaskListCell(parentId);
     if (!taskListCell?.tasks) {
       return 0;
@@ -122,13 +122,11 @@ export function totalCompletedCost(parentId: number): number {
       .reduce((sum, task) => sum + task.cost, 0);
   }
 
-  // For headline cells, sum all tasklists and their completed tasks
   return (parentCell.children || []).reduce((sum, childId) => {
     const childCell = gridStore.getCellById(childId);
     if (!childCell) return sum;
 
     if (childCell.type === CellType.Tasklist) {
-      // If child is a tasklist, add its completed tasks
       const taskListCell = getTaskListCell(childId);
       if (taskListCell?.tasks) {
         sum += taskListCell.tasks
@@ -136,7 +134,7 @@ export function totalCompletedCost(parentId: number): number {
           .reduce((taskSum, task) => taskSum + task.cost, 0);
       }
     }
-    // Always add costs from children (recursively)
+    // proceed adding the cost of children
     return sum + totalCompletedCost(childId);
   }, 0);
 }

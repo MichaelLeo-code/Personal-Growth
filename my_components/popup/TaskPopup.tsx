@@ -1,7 +1,7 @@
-import { addTask, updateTask } from "@/store/TaskStore";
+import { addTask, updateTask } from "@/service/TaskService";
 import { Task } from "@/types";
 import { TaskListCell } from "@/types/cells";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 import { TaskLine } from "../editable/TaskLine";
 import { Popup, PopupProps } from "./Popup";
@@ -16,6 +16,10 @@ export const TaskPopup: React.FC<TaskPopupProps> = ({
   hidePopup,
 }) => {
   const [tasks, setTasks] = useState<Task[]>(cell.tasks || []);
+
+  useEffect(() => {
+    setTasks(cell.tasks || []);
+  }, [cell]);
 
   const handleTaskChange = (task: Task) => {
     setTasks((prev) => {

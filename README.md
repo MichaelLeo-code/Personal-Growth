@@ -1,10 +1,14 @@
 you could also consider react-native-pan-pinch-view
 
+#### Known issues
+
+- constant totalSum and totalCompletedSum calls
+- tasks are not cell specific
+
 Current to-do scope:
-
-- buttons for headline and tasklist
-- fix updating and adding the tasks
-
+[ ] add localstorage (currently, i want you to implement local storage of the grid, writing it to the JSON file. but keep in mind that it has to follow dependancy injection principle so that we could replace it with database later
+But keep in mind that this is react native app, so it cant use fs library)
+[ ] separate buttons for headline and tasklist
 [ ] occupy the coordinates of larger-than-one-tiles (probably create coordinates store for that)  
 [x] Create tasks in taskstore cell
 [ ] Is TaskLine written in the best practise?
