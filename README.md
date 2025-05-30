@@ -2,6 +2,9 @@ you could also consider react-native-pan-pinch-view
 
 Current to-do scope:
 
+- buttons for headline and tasklist
+- fix updating and adding the tasks
+
 [ ] occupy the coordinates of larger-than-one-tiles (probably create coordinates store for that)  
 [x] Create tasks in taskstore cell
 [ ] Is TaskLine written in the best practise?

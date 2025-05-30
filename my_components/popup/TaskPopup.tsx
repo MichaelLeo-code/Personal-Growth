@@ -1,4 +1,4 @@
-import { addTask } from "@/store/TaskStore";
+import { addTask, updateTask } from "@/store/TaskStore";
 import { Task } from "@/types";
 import { TaskListCell } from "@/types/cells";
 import { useState } from "react";
@@ -31,7 +31,7 @@ export const TaskPopup: React.FC<TaskPopupProps> = ({
 
   const handleSave = () => {
     tasks.forEach((task) => {
-      addTask(task, cell.id);
+      updateTask(task.id, cell.id, task);
     });
     hidePopup();
   };

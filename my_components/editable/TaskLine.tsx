@@ -13,14 +13,12 @@ export const TaskLine: React.FC<TaskLineProps> = ({
   onTaskChange,
   task: initialTask,
 }) => {
-  const [task, setTask] = useState<Task>({
-    id: 0,
-    text: "",
-    completed: false,
-    cost: 10,
-    parent: parentId,
-    ...initialTask,
-  });
+  const [task, setTask] = useState<Task>(() => ({
+    id: initialTask?.id ?? 0,
+    text: initialTask?.text ?? "",
+    completed: initialTask?.completed ?? false,
+    cost: initialTask?.cost ?? 10,
+  }));
 
   useEffect(() => {
     if (initialTask) {
@@ -28,50 +26,42 @@ export const TaskLine: React.FC<TaskLineProps> = ({
     }
   }, [initialTask]);
 
-  const handleTextChange = (text: string) => {
-    const newTask = { ...task, text };
+  const updateTask = (updates: Partial<Task>) => {
+    const newTask = { ...task, ...updates };
     setTask(newTask);
     onTaskChange?.(newTask);
-  };
-
-  const handleCheckbox = () => {
-    const newTask = { ...task, completed: !task.completed };
-    setTask(newTask);
-    onTaskChange?.(newTask);
-  };
-
-  const handleCostChange = (newCost: string) => {
-    const newTask = { ...task, cost: parseInt(newCost) || 0 };
-    setTask(newTask);
-    onTaskChange?.(newTask);
-  };
-
-  const onDelete = () => {
-    console.log("toBeImplemented");
   };
 
   return (
     <View style={styles.taskLine}>
       <Pressable
         style={[styles.checkbox, task.completed && styles.checkboxChecked]}
-        onPress={() => handleCheckbox()}
+        onPress={() => updateTask({ completed: !task.completed })}
       />
       <TextInput
         style={styles.textInput}
         value={task.text}
-        onChangeText={handleTextChange}
+        onChangeText={(text) => updateTask({ text })}
         placeholder="Enter task description"
         placeholderTextColor="#666"
       />
       <TextInput
         style={styles.numberInput}
         value={task.cost.toString()}
-        onChangeText={handleCostChange}
+        onChangeText={(value) => {
+          const cost = parseInt(value);
+          if (!isNaN(cost) && cost >= 0) {
+            updateTask({ cost });
+          }
+        }}
         placeholder="Cost"
         placeholderTextColor="#666"
         keyboardType="numeric"
       />
-      <Pressable style={styles.deleteButton} onPress={onDelete}>
+      <Pressable
+        style={styles.deleteButton}
+        onPress={() => console.log("Delete task:", task.id)}
+      >
         <Text style={styles.deleteButtonText}>×</Text>
       </Pressable>
     </View>

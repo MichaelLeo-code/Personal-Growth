@@ -3,40 +3,31 @@ import { Task } from "../types/task";
 import { gridStore } from "./GridStore";
 let nextId = 0;
 
-function getTaskListCell(
-  parentId: number
-): (TaskListCell & { tasks: Task[] }) | null {
+function getTaskListCell(parentId: number): TaskListCell | null {
   const parentCell = gridStore.getCellById(parentId);
-  console.log(parentCell);
-  if (
-    !parentCell ||
-    parentCell.type !== CellType.Tasklist ||
-    !parentCell.tasks
-  ) {
+  if (!parentCell || parentCell.type !== CellType.Tasklist) {
     return null;
   }
-  return parentCell as TaskListCell & { tasks: Task[] };
+  return parentCell as TaskListCell;
 }
 
 export function addTask(task: Omit<Task, "id">, parentId: number): Task | null {
   const id = nextId++;
   const newTask: Task = { ...task, id };
 
-  console.log("1");
   const parentCell = getTaskListCell(parentId);
   if (!parentCell) {
     return null;
   }
-  console.log("ura");
 
-  parentCell.tasks = [...parentCell.tasks, newTask];
+  parentCell.tasks = [...(parentCell.tasks || []), newTask];
   gridStore.notify();
   return newTask;
 }
 
 export function deleteTask(taskId: number, parentId: number): boolean {
   const parentCell = getTaskListCell(parentId);
-  if (!parentCell) {
+  if (!parentCell?.tasks) {
     return false;
   }
 
@@ -56,7 +47,7 @@ export function updateTask(
   updates: Partial<Omit<Task, "id">>
 ): Task | null {
   const parentCell = getTaskListCell(parentId);
-  if (!parentCell) {
+  if (!parentCell?.tasks) {
     return null;
   }
 
@@ -80,6 +71,7 @@ export function completeTask(
 }
 
 export function totalCost(parentId: number): number {
+  console.log("totalSum");
   const parentCell = gridStore.getCellById(parentId);
   if (!parentCell) {
     return 0;
@@ -112,6 +104,8 @@ export function totalCost(parentId: number): number {
 }
 
 export function totalCompletedCost(parentId: number): number {
+  console.log("totalCompletedSum");
+
   const parentCell = gridStore.getCellById(parentId);
   if (!parentCell) {
     return 0;
@@ -120,7 +114,7 @@ export function totalCompletedCost(parentId: number): number {
   if (parentCell.type === CellType.Tasklist) {
     // For tasklist cells, only sum their own completed tasks
     const taskListCell = getTaskListCell(parentId);
-    if (!taskListCell) {
+    if (!taskListCell?.tasks) {
       return 0;
     }
     return taskListCell.tasks
@@ -136,7 +130,7 @@ export function totalCompletedCost(parentId: number): number {
     if (childCell.type === CellType.Tasklist) {
       // If child is a tasklist, add its completed tasks
       const taskListCell = getTaskListCell(childId);
-      if (taskListCell) {
+      if (taskListCell?.tasks) {
         sum += taskListCell.tasks
           .filter((task) => task.completed)
           .reduce((taskSum, task) => taskSum + task.cost, 0);
