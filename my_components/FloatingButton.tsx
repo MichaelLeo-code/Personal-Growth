@@ -3,9 +3,10 @@ import {
   GestureResponderEvent,
   Pressable,
   StyleSheet,
+  Text,
   ViewStyle,
 } from "react-native";
-import MaterialIcons from "react-native-vector-icons/MaterialIcons";
+import MaterialIcons from "react-native-vector-icons/MaterialCommunityIcons";
 
 type Props = {
   onPress: (event: GestureResponderEvent) => void;
@@ -15,6 +16,7 @@ type Props = {
   backgroundColor?: string;
   pressedColor?: string;
   iconName?: string;
+  label?: string;
 };
 
 export const FloatingButton: React.FC<Props> = ({
@@ -24,34 +26,48 @@ export const FloatingButton: React.FC<Props> = ({
   color = "#fff",
   backgroundColor = "#6200ee",
   pressedColor = "#3700b3",
-  iconName = "add",
+  iconName,
+  label,
 }) => {
+  const isIcon = !!iconName && !label;
+
   return (
     <Pressable
       onPress={onPress}
       style={({ pressed }) => [
-        styles.button,
-        { backgroundColor: pressed ? pressedColor : backgroundColor },
+        styles.baseButton,
+        {
+          backgroundColor: pressed ? pressedColor : backgroundColor,
+          borderRadius: isIcon ? 28 : 8,
+          paddingHorizontal: isIcon ? 0 : 16,
+          width: isIcon ? 56 : undefined,
+          height: isIcon ? 56 : 42,
+        },
         pressed && styles.pressedShadow,
         style,
       ]}
     >
-      <MaterialIcons name={iconName} size={size} color={color} />
+      {label ? (
+        <Text style={[styles.label, { color }]}>{label}</Text>
+      ) : (
+        <MaterialIcons name={iconName!} size={size} color={color} />
+      )}
     </Pressable>
   );
 };
 
 const styles = StyleSheet.create({
-  button: {
+  baseButton: {
     position: "absolute",
     bottom: 24,
     right: 24,
-    width: 56,
-    height: 56,
-    borderRadius: 28,
     justifyContent: "center",
     alignItems: "center",
     elevation: 6,
+  },
+  label: {
+    fontSize: 12,
+    fontWeight: "500",
   },
   pressedShadow: {
     elevation: 2,

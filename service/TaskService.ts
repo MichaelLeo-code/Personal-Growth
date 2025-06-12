@@ -77,12 +77,15 @@ export function totalCost(cellId: number): number {
     return 0;
   }
 
-  if (cell.type === CellType.Tasklist) {
-    if (!cell.tasks) return 0;
-    return cell.tasks.reduce((sum, task) => sum + task.cost, 0);
-  }
+  const countYourself = (): number => {
+    if (cell.type === CellType.Tasklist) {
+      if (!cell.tasks) return 0;
+      return cell.tasks.reduce((sum, task) => sum + task.cost, 0);
+    }
+    return 0;
+  };
 
-  if (cell.type === CellType.Headline) {
+  const countChildren = (): number => {
     return (cell.children || []).reduce((sum, childId) => {
       const childCell = gridStore.getCellById(childId);
       if (!childCell) return sum;
@@ -90,35 +93,42 @@ export function totalCost(cellId: number): number {
       // proceed adding the cost of children
       return sum + totalCost(childId);
     }, 0);
-  }
+  };
 
-  return -1;
+  return countYourself() + countChildren();
 }
 
 export function totalCompletedCost(cellId: number): number {
   // console.log("totalCompletedSum");
 
-  const parentCell = gridStore.getCellById(cellId);
-  if (!parentCell) {
+  const cell = gridStore.getCellById(cellId);
+  if (!cell) {
     return 0;
   }
 
-  if (parentCell.type === CellType.Tasklist) {
-    // for tasklist cells, only sum their own completed tasks
-    const taskListCell = getTaskListCell(cellId);
-    if (!taskListCell?.tasks) {
-      return 0;
+  const countYourself = (): number => {
+    if (cell.type === CellType.Tasklist) {
+      // for tasklist cells, only sum their own completed tasks
+      const taskListCell = getTaskListCell(cellId);
+      if (!taskListCell?.tasks) {
+        return 0;
+      }
+      return taskListCell.tasks
+        .filter((task) => task.completed)
+        .reduce((sum, task) => sum + task.cost, 0);
     }
-    return taskListCell.tasks
-      .filter((task) => task.completed)
-      .reduce((sum, task) => sum + task.cost, 0);
-  }
+    return 0;
+  };
 
-  return (parentCell.children || []).reduce((sum, childId) => {
-    const childCell = gridStore.getCellById(childId);
-    if (!childCell) return sum;
+  const countChildren = (): number => {
+    return (cell.children || []).reduce((sum, childId) => {
+      const childCell = gridStore.getCellById(childId);
+      if (!childCell) return sum;
 
-    // proceed adding the cost of children
-    return sum + totalCompletedCost(childId);
-  }, 0);
+      // proceed adding the cost of children
+      return sum + totalCompletedCost(childId);
+    }, 0);
+  };
+
+  return countYourself() + countChildren();
 }

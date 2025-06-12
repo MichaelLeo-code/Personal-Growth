@@ -6,19 +6,21 @@ import { DarkTheme, ThemeProvider } from "@react-navigation/native";
 import { useFonts } from "expo-font";
 import React, { useEffect, useState } from "react";
 import { SafeAreaView } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
-let counter = 0;
-
-const onAdd = () => {
-  counter++;
+const addCell = (type: CellType) => {
   const selectedCellId = gridStore.getSelected()?.id;
   if (!selectedCellId) return;
-  const type = counter % 2 === 0 ? CellType.Headline : CellType.Tasklist;
   const cell = gridStore.addNextFreeCell(selectedCellId, type);
 
   if (cell) {
     gridStore.selectCell(cell);
   }
+};
+
+const deleteAll = () => {
+  gridStore.deleteAll();
+  gridStore.addCell({ text: "A", x: 0, y: 0 });
 };
 
 const cellData = [
@@ -31,6 +33,8 @@ const cellData = [
 export default function RootLayout() {
   const [selected, setSelected] = useState<Cell | null>(null);
   const [cells, setCells] = useState<Cell[]>([]);
+
+  const insets = useSafeAreaInsets();
 
   useEffect(() => {
     cellData.forEach((cell) => gridStore.addCell(cell));
@@ -55,31 +59,61 @@ export default function RootLayout() {
 
   return (
     <ThemeProvider value={DarkTheme}>
-      <ReactNativeZoomableView
-        minZoom={0.1}
-        doubleTapZoomToCenter={false}
-        bindToBorders={false}
-        movementSensibility={1.5}
-        visualTouchFeedbackEnabled={true} // DEV
-      >
-        <SafeAreaView>
+      <SafeAreaView style={{ flex: 1 }}>
+        <ReactNativeZoomableView
+          minZoom={0.1}
+          doubleTapZoomToCenter={false}
+          bindToBorders={false}
+          movementSensibility={1.5}
+          visualTouchFeedbackEnabled={true} // DEV
+        >
           <Grid cells={cells} selected={selected} />
-        </SafeAreaView>
-      </ReactNativeZoomableView>
-      {selected && (
-        <>
-          <FloatingButton
-            onPress={() => onAdd()}
-            style={{ bottom: 90 }} // Upper button
-          />
-          <FloatingButton
-            onPress={() => {}}
-            backgroundColor="#a81000"
-            style={{ bottom: 20 }} // Lower button
-            iconName="delete"
-          />
-        </>
-      )}
+        </ReactNativeZoomableView>
+        <FloatingButton
+          onPress={() => {
+            deleteAll();
+          }}
+          label="Delete all"
+          backgroundColor="#a81000"
+          style={{
+            right: 20,
+            top: insets.top + 5,
+          }}
+        />
+        {selected && (
+          <>
+            <FloatingButton
+              onPress={() => addCell(CellType.Tasklist)}
+              iconName="text-box-plus-outline"
+              backgroundColor="#4b50e3"
+              style={{
+                right: 20,
+                bottom: insets.bottom + 141,
+              }}
+            />
+            <FloatingButton
+              onPress={() => addCell(CellType.Headline)}
+              iconName="plus"
+              style={{
+                right: 20,
+                bottom: insets.bottom + 73,
+              }}
+            />
+            <FloatingButton
+              onPress={() => {
+                gridStore.deleteCell(selected.id);
+                setSelected(null);
+              }}
+              backgroundColor="#a81000"
+              style={{
+                right: 20,
+                bottom: insets.bottom + 5,
+              }}
+              iconName="delete"
+            />
+          </>
+        )}
+      </SafeAreaView>
     </ThemeProvider>
   );
 }
