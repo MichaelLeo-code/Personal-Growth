@@ -73,11 +73,10 @@ export default function RootLayout() {
             style={{ bottom: 90 }} // Upper button
           />
           <FloatingButton
-            onPress={() => {
-              console.log(JSON.stringify(gridStore.getCells(), null, 2));
-            }}
+            onPress={() => {}}
             backgroundColor="#a81000"
             style={{ bottom: 20 }} // Lower button
+            iconName="delete"
           />
         </>
       )}

@@ -3,7 +3,7 @@ import { Task } from "@/types";
 import { TaskListCell } from "@/types/cells";
 import { useEffect, useState } from "react";
 import { Pressable, StyleSheet, Text, View } from "react-native";
-import { TaskLine } from "../editable/TaskLine";
+import { TaskLine } from "../task/TaskLine";
 import { Popup, PopupProps } from "./Popup";
 
 type TaskPopupProps = Omit<PopupProps, "children"> & {

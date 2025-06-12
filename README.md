@@ -2,8 +2,7 @@ you could also consider react-native-pan-pinch-view
 
 #### Known issues
 
-- constant totalSum and totalCompletedSum calls
-- tasks are not cell specific
+- too much totalSum and totalCompletedSum calls
 
 Current to-do scope:
 [ ] add localstorage (currently, i want you to implement local storage of the grid, writing it to the JSON file. but keep in mind that it has to follow dependancy injection principle so that we could replace it with database later

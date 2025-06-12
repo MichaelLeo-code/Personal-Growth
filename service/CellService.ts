@@ -1,3 +1,4 @@
+import { GridStorage } from "../storage/GridStorage";
 import { Cell, CellType } from "../types/cells";
 
 const directions8 = [
@@ -15,12 +16,40 @@ class GridStore {
   private cellMap: Map<number, Cell> = new Map();
   private listeners: (() => void)[] = [];
   private selectedId: number | null = null;
+  private nextId = 1;
+  private storage: GridStorage;
+
+  constructor(storage: GridStorage) {
+    this.storage = storage;
+    this.loadInitialData();
+  }
+
+  private async loadInitialData() {
+    try {
+      const cells = await this.storage.loadCells();
+      cells.forEach((cell: Cell) => {
+        this.cellMap.set(cell.id, cell);
+        if (cell.id >= this.nextId) {
+          this.nextId = cell.id + 1;
+        }
+      });
+      this.notify();
+    } catch (error) {
+      console.error("Failed to load initial data:", error);
+    }
+  }
+
+  private async saveToStorage() {
+    try {
+      await this.storage.saveCells(this.getCells());
+    } catch (error) {
+      console.error("Failed to save to storage:", error);
+    }
+  }
 
   getCells(): Cell[] {
     return Array.from(this.cellMap.values());
   }
-
-  private nextId = 1;
 
   addCell(
     cell: Omit<Cell, "id" | "type"> & { type?: CellType }
@@ -43,6 +72,7 @@ class GridStore {
 
     this.cellMap.set(newCell.id, newCell);
     this.notify();
+    this.saveToStorage();
 
     return newCell;
   }
@@ -109,4 +139,5 @@ class GridStore {
   }
 }
 
-export const gridStore = new GridStore();
+import { LocalGridStorage } from "../storage";
+export const gridStore = new GridStore(new LocalGridStorage());

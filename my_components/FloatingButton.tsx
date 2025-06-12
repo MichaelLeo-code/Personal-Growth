@@ -3,9 +3,9 @@ import {
   GestureResponderEvent,
   Pressable,
   StyleSheet,
-  Text,
   ViewStyle,
 } from "react-native";
+import MaterialIcons from "react-native-vector-icons/MaterialIcons";
 
 type Props = {
   onPress: (event: GestureResponderEvent) => void;
@@ -14,6 +14,7 @@ type Props = {
   color?: string;
   backgroundColor?: string;
   pressedColor?: string;
+  iconName?: string;
 };
 
 export const FloatingButton: React.FC<Props> = ({
@@ -23,6 +24,7 @@ export const FloatingButton: React.FC<Props> = ({
   color = "#fff",
   backgroundColor = "#6200ee",
   pressedColor = "#3700b3",
+  iconName = "add",
 }) => {
   return (
     <Pressable
@@ -34,7 +36,7 @@ export const FloatingButton: React.FC<Props> = ({
         style,
       ]}
     >
-      <Text style={{ fontSize: size, color, lineHeight: size }}>+</Text>
+      <MaterialIcons name={iconName} size={size} color={color} />
     </Pressable>
   );
 };
