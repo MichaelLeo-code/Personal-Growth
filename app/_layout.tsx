@@ -1,5 +1,5 @@
 import { FloatingButton, Grid } from "@/my_components";
-import { gridStore } from "@/service/CellService";
+import { cellService } from "@/service/cellService";
 import { Cell, CellType } from "@/types/cells";
 import { ReactNativeZoomableView } from "@openspacelabs/react-native-zoomable-view";
 import { DarkTheme, ThemeProvider } from "@react-navigation/native";

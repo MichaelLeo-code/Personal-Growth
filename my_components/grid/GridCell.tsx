@@ -1,6 +1,6 @@
 import React from "react";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
-import { totalCompletedCost, totalCost } from "../../service/TaskService";
+import { totalCompletedCost, totalCost } from "../../service/taskService";
 import { Cell, CellType } from "../../types/cells";
 
 type GridCellProps = {

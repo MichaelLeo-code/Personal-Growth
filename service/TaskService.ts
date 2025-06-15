@@ -1,10 +1,10 @@
 import { CellType, TaskListCell } from "@/types/cells";
 import { Task } from "../types/task";
-import { gridStore } from "./CellService";
+import { cellService } from "./cellService";
 let nextId = 0;
 
 function getTaskListCell(parentId: number): TaskListCell | null {
-  const parentCell = gridStore.getCellById(parentId);
+  const parentCell = cellService.getCellById(parentId);
   if (!parentCell || parentCell.type !== CellType.Tasklist) {
     return null;
   }
@@ -21,7 +21,7 @@ export function addTask(task: Omit<Task, "id">, parentId: number): Task | null {
   }
 
   parentCell.tasks = [...(parentCell.tasks || []), newTask];
-  gridStore.notify();
+  cellService.notify();
   return newTask;
 }
 
@@ -37,7 +37,7 @@ export function deleteTask(taskId: number, parentId: number): boolean {
   }
 
   parentCell.tasks = parentCell.tasks.filter((task) => task.id !== taskId);
-  gridStore.notify();
+  cellService.notify();
   return true;
 }
 
@@ -58,7 +58,7 @@ export function updateTask(
 
   const updatedTask = { ...parentCell.tasks[taskIndex], ...updates };
   parentCell.tasks[taskIndex] = updatedTask;
-  gridStore.notify();
+  cellService.notify();
   return updatedTask;
 }
 
@@ -72,7 +72,7 @@ export function completeTask(
 
 export function totalCost(cellId: number): number {
   // console.log("totalSum");
-  const cell = gridStore.getCellById(cellId);
+  const cell = cellService.getCellById(cellId);
   if (!cell) {
     return 0;
   }
@@ -87,7 +87,7 @@ export function totalCost(cellId: number): number {
 
   const countChildren = (): number => {
     return (cell.children || []).reduce((sum, childId) => {
-      const childCell = gridStore.getCellById(childId);
+      const childCell = cellService.getCellById(childId);
       if (!childCell) return sum;
 
       // proceed adding the cost of children
@@ -101,7 +101,7 @@ export function totalCost(cellId: number): number {
 export function totalCompletedCost(cellId: number): number {
   // console.log("totalCompletedSum");
 
-  const cell = gridStore.getCellById(cellId);
+  const cell = cellService.getCellById(cellId);
   if (!cell) {
     return 0;
   }
@@ -122,7 +122,7 @@ export function totalCompletedCost(cellId: number): number {
 
   const countChildren = (): number => {
     return (cell.children || []).reduce((sum, childId) => {
-      const childCell = gridStore.getCellById(childId);
+      const childCell = cellService.getCellById(childId);
       if (!childCell) return sum;
 
       // proceed adding the cost of children

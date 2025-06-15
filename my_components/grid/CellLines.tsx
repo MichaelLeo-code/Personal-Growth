@@ -1,7 +1,7 @@
 import { Cell } from "@/types/cells";
 import { StyleSheet } from "react-native";
 import Svg, { Line } from "react-native-svg";
-import { gridStore } from "../../service/CellService";
+import { cellService } from "../../service/cellService";
 
 type Props = {
   cells: Cell[];
@@ -13,7 +13,7 @@ export const CellLines: React.FC<Props> = ({ cells, cellSize = 50 }) => {
     <Svg style={StyleSheet.absoluteFill}>
       {cells.map((cell, index) => {
         const parentCell = cell.parent
-          ? gridStore.getCellById(cell.parent)
+          ? cellService.getCellById(cell.parent)
           : null;
         if (!parentCell) return null;
         const x1 = (parentCell.x + 0.5) * cellSize;

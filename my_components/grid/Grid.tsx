@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { StyleSheet, View } from "react-native";
 import { usePopup } from "../../my_hooks/usePopup";
-import { gridStore } from "../../service/CellService";
+import { cellService } from "../../service/cellService";
 import { Cell, CellType } from "../../types/cells";
 import { TaskPopup } from "../popup";
 import { CellLines } from "./CellLines";
@@ -22,7 +22,7 @@ export const Grid: React.FC<GridProps> = ({
   const { showPopup, hidePopup, isVisible } = usePopup();
 
   const handleCellPress = (cell: Cell) => {
-    gridStore.selectCell(cell);
+    cellService.selectCell(cell);
   };
 
   const handleCellButtonPress = (cell: Cell) => {

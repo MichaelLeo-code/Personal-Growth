@@ -14,7 +14,7 @@ const directions8 = [
   [0, -2],
 ];
 
-class GridStore {
+class CellService {
   private cellMap: Map<number, Cell> = new Map();
   private listeners: (() => void)[] = [];
   private selectedId: number | null = null;
@@ -166,4 +166,4 @@ class GridStore {
     this.listeners.forEach((listener) => listener());
   }
 }
-export const gridStore = new GridStore(new LocalGridStorage());
+export const cellService = new CellService(new LocalGridStorage());

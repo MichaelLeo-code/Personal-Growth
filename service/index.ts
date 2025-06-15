@@ -1,2 +1,2 @@
-export * from "./CellService";
-export * from "./TaskService";
+export * from "./cellService";
+export * from "./taskService";
