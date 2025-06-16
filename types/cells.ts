@@ -7,6 +7,10 @@ export interface BaseCell {
   y: number;
   parent?: number;
   children?: number[];
+  size: {
+    x: number;
+    y: number;
+  };
 }
 
 export interface HeadlineCell extends BaseCell {

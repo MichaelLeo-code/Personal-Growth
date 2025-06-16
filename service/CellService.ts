@@ -1,7 +1,8 @@
-import { GridStorage } from "../storage/GridStorage";
+import { GridStorage } from "../storage/gridStorage";
 import { Cell, CellType } from "../types/cells";
 
 import { LocalGridStorage } from "../storage";
+import { coordinateService } from "./";
 
 const directions8 = [
   [2, 0],
@@ -34,6 +35,7 @@ class CellService {
         if (cell.id >= this.nextId) {
           this.nextId = cell.id + 1;
         }
+        coordinateService.occupyArea(cell.x, cell.y, cell.size, cell.id);
       });
       this.notify();
     } catch (error) {
@@ -54,16 +56,29 @@ class CellService {
   }
 
   addCell(
-    cell: Omit<Cell, "id" | "type"> & { type?: CellType }
+    cell: Omit<Cell, "id" | "type" | "size"> & {
+      type?: CellType;
+      size?: { x: number; y: number };
+    }
   ): Cell | undefined {
-    if (this.getCellAt(cell.x, cell.y)) {
+    if (coordinateService.isOccupied(cell.x, cell.y)) {
       console.warn(
-        `Cell at (${cell.x}, ${cell.y}) already exists. Cannot add new cell.`
+        `Cell at (${cell.x}, ${cell.y}) is already occupied. Cannot add new cell.`
       );
       return undefined;
     }
     const id = this.nextId++;
-    const newCell: Cell = { ...cell, id, type: cell.type || CellType.Headline };
+    const cellType = cell.type || CellType.Headline;
+    const cellSize =
+      cell.size || cellType === CellType.Headline
+        ? { x: 1, y: 1 }
+        : { x: 3, y: 3 };
+    const newCell: Cell = {
+      ...cell,
+      id,
+      type: cellType,
+      size: cellSize,
+    };
 
     if (newCell.parent !== undefined) {
       const parentCell = this.cellMap.get(newCell.parent);

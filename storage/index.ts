@@ -1,2 +1,2 @@
-export * from "./GridStorage";
-export * from "./LocalGridStorage";
+export * from "./gridStorage";
+export * from "./localGridStorage";
