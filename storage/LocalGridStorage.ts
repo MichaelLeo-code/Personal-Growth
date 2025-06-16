@@ -1,8 +1,8 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Cell } from "../types/cells";
-import { GridStorage } from "./gridStorage";
+import { gridStorage } from "./gridStorage";
 
-export class LocalGridStorage implements GridStorage {
+export class localGridStorage implements gridStorage {
   private readonly storageKey: string;
 
   constructor(storageKey: string = "grid_cells") {

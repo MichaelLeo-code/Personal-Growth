@@ -58,6 +58,10 @@ class CoordinateService {
     }
     return true;
   }
+
+  clear(): void {
+    this.coordinatesMap.clear();
+  }
 }
 
 export const coordinateService = new CoordinateService();

@@ -1,8 +1,7 @@
-import { GridStorage } from "../storage/gridStorage";
+import { gridStorage, localGridStorage } from "../storage";
 import { Cell, CellType } from "../types/cells";
 
-import { LocalGridStorage } from "../storage";
-import { coordinateService } from "./";
+import { coordinateService } from ".";
 
 const directions8 = [
   [2, 0],
@@ -20,9 +19,9 @@ class CellService {
   private listeners: (() => void)[] = [];
   private selectedId: number | null = null;
   private nextId = 1;
-  private storage: GridStorage;
+  private storage: gridStorage;
 
-  constructor(storage: GridStorage) {
+  constructor(storage: gridStorage) {
     this.storage = storage;
     this.loadInitialData();
   }
@@ -88,6 +87,12 @@ class CellService {
     }
 
     this.cellMap.set(newCell.id, newCell);
+    coordinateService.occupyArea(
+      newCell.x,
+      newCell.y,
+      newCell.size,
+      newCell.id
+    );
     this.notify();
     this.saveToStorage();
 
@@ -113,7 +118,7 @@ class CellService {
     for (const [dx, dy] of directions8) {
       const nx = cell.x + dx;
       const ny = cell.y + dy;
-      if (!this.getCellAt(nx, ny)) {
+      if (!coordinateService.isOccupied(nx, ny)) {
         return { x: nx, y: ny };
       }
     }
@@ -148,7 +153,6 @@ class CellService {
     const cell = this.cellMap.get(id);
     if (!cell) return;
 
-    // Remove from parent's children
     if (cell.parent !== undefined) {
       const parentCell = this.cellMap.get(cell.parent);
       if (parentCell) {
@@ -159,6 +163,12 @@ class CellService {
     }
 
     this.cellMap.delete(id);
+    coordinateService.deleteArea(
+      cell.x,
+      cell.x + cell.size.x - 1,
+      cell.y,
+      cell.y + cell.size.y - 1
+    );
     this.notify();
     this.saveToStorage();
   }
@@ -166,6 +176,7 @@ class CellService {
   deleteAll(): void {
     this.cellMap.clear();
     this.selectedId = null;
+    coordinateService.clear();
     this.notify();
     this.saveToStorage();
   }
@@ -181,4 +192,4 @@ class CellService {
     this.listeners.forEach((listener) => listener());
   }
 }
-export const cellService = new CellService(new LocalGridStorage());
+export const cellService = new CellService(new localGridStorage());
