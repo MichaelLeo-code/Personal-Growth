@@ -1,7 +1,7 @@
 import { gridStorage, localGridStorage } from "../storage";
 import { Cell, CellType } from "../types/cells";
 
-import { coordinateService } from ".";
+import { coordinateService } from "./";
 
 const directions8 = [
   [2, 0],

@@ -3,6 +3,7 @@ class CoordinateService {
   private coordinatesMap: Map<number, Map<number, number>> = new Map();
 
   occupyOne(x: number, y: number, cellId: number): void {
+    console.log(`ONE: Occupying one cell at (${x}, ${y}) for cellId ${cellId}`);
     if (!this.coordinatesMap.has(x)) {
       this.coordinatesMap.set(x, new Map());
     }
@@ -15,9 +16,9 @@ class CoordinateService {
     size: { x: number; y: number },
     cellId: number
   ): void {
-    for (let i = x; i <= size.x; i++) {
-      for (let j = y; j <= size.y; j++) {
-        this.occupyOne(x, y, cellId);
+    for (let i = 0; i < size.x; i++) {
+      for (let j = 0; j < size.y; j++) {
+        this.occupyOne(x + i, y + j, cellId);
       }
     }
   }
@@ -46,6 +47,18 @@ class CoordinateService {
 
   isOccupied(x: number, y: number): boolean {
     return this.coordinatesMap.get(x)?.has(y) ?? false;
+  }
+
+  toString(): string {
+    let output = "";
+
+    for (const [x, innerMap] of this.coordinatesMap) {
+      for (const [y, value] of innerMap) {
+        output += `(${x}, ${y}) => ${value}\n`;
+      }
+    }
+
+    return output || "No occupied coordinates";
   }
 
   isOccupiedArea(x1: number, x2: number, y1: number, y2: number): boolean {
