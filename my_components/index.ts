@@ -1,3 +1,2 @@
-export * from "./DraggableFloatingButton";
-export * from "./FloatingButton";
+export * from "./floating-button";
 export * from "./grid/Grid";
