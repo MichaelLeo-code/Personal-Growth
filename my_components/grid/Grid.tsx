@@ -6,16 +6,19 @@ import { Cell, CellType } from "../../types/cells";
 import { TaskPopup } from "../popup";
 import { CellLines } from "./CellLines";
 import { GridCell } from "./GridCell";
+import { getPreviewCellData, isPreviewPositionValid } from "./PreviewCell";
 
 type GridProps = {
   cellSize?: number;
   cells: Cell[];
   selected?: Cell | null;
-  previewCell?: {
-    x: number;
-    y: number;
-    type: CellType;
-  } | null;
+  previewCell?:
+    | {
+        x: number;
+        y: number;
+        type: CellType;
+      }
+    | undefined;
 };
 
 export const Grid: React.FC<GridProps> = ({
@@ -31,32 +34,12 @@ export const Grid: React.FC<GridProps> = ({
     cellService.selectCell(cell);
   };
 
-  const handleCellButtonPress = (cell: Cell) => {
+  const openPopup = (cell: Cell) => {
     setSelectedCell(cell);
     showPopup(null);
   };
 
-  // Create a preview cell for rendering
-  const previewCellData = previewCell
-    ? ({
-        id: -1, // Temporary ID for preview
-        x: previewCell.x,
-        y: previewCell.y,
-        text: "Preview",
-        type: previewCell.type,
-        size:
-          previewCell.type === CellType.Headline
-            ? { x: 1, y: 1 }
-            : { x: 3, y: 3 },
-      } as Cell)
-    : null;
-
-  // Check if preview position is valid (not occupied)
-  const isPreviewPositionValid = previewCellData
-    ? !cells.some(
-        (cell) => cell.x === previewCellData.x && cell.y === previewCellData.y
-      )
-    : true;
+  const previewCellData = getPreviewCellData(previewCell);
 
   return (
     <View style={styles.grid}>
@@ -68,14 +51,15 @@ export const Grid: React.FC<GridProps> = ({
           cellSize={cellSize}
           isSelected={selected?.x === cell.x && selected?.y === cell.y}
           onPress={handleCellPress}
-          onButtonPress={handleCellButtonPress}
+          onButtonPress={openPopup}
         />
       ))}
       {previewCellData && (
         <View
           style={[
             styles.previewCell,
-            !isPreviewPositionValid && styles.previewCellInvalid,
+            !isPreviewPositionValid(previewCellData) &&
+              styles.previewCellInvalid,
             {
               left: previewCellData.x * cellSize,
               top: previewCellData.y * cellSize,
