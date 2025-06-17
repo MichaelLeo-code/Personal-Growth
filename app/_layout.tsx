@@ -1,26 +1,27 @@
-import { FloatingButton, Grid } from "@/my_components";
+import { DraggableFloatingButton, FloatingButton, Grid } from "@/my_components";
 import { cellService } from "@/service/cellService";
+import { coordinateService } from "@/service/coordinateService";
 import { Cell, CellType } from "@/types/cells";
 import { ReactNativeZoomableView } from "@openspacelabs/react-native-zoomable-view";
 import { DarkTheme, ThemeProvider } from "@react-navigation/native";
 import { useFonts } from "expo-font";
 import React, { useEffect, useState } from "react";
-import { SafeAreaView } from "react-native";
+import { GestureResponderEvent, SafeAreaView } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 const addCell = (type: CellType) => {
-  const selectedCellId = gridStore.getSelected()?.id;
+  const selectedCellId = cellService.getSelected()?.id;
   if (!selectedCellId) return;
-  const cell = gridStore.addNextFreeCell(selectedCellId, type);
+  const cell = cellService.addNextFreeCell(selectedCellId, type);
 
   if (cell) {
-    gridStore.selectCell(cell);
+    cellService.selectCell(cell);
   }
 };
 
 const deleteAll = () => {
-  gridStore.deleteAll();
-  gridStore.addCell({ text: "A", x: 0, y: 0 });
+  cellService.deleteAll();
+  cellService.addCell({ text: "A", x: 0, y: 0 });
 };
 
 const cellData = [
@@ -33,16 +34,91 @@ const cellData = [
 export default function RootLayout() {
   const [selected, setSelected] = useState<Cell | null>(null);
   const [cells, setCells] = useState<Cell[]>([]);
+  const [previewCell, setPreviewCell] = useState<{
+    x: number;
+    y: number;
+    type: CellType;
+  } | null>(null);
+  const [isDragging, setIsDragging] = useState(false);
+  const [dragCellType, setDragCellType] = useState<CellType>(CellType.Headline);
 
   const insets = useSafeAreaInsets();
+  const cellSize = 50; // Default cell size from Grid component
+
+  // Convert screen coordinates to grid coordinates
+  // This is a simplified version - in a real implementation you'd need to account
+  // for the zoomable view's current zoom and pan state
+  const screenToGridCoordinates = (screenX: number, screenY: number) => {
+    // For now, we'll use a simple approach - in practice you'd need to get
+    // the current transform from the zoomable view
+    const adjustedX = screenX;
+    const adjustedY = screenY - insets.top - 60; // Account for safe area and some UI elements
+
+    // Convert to grid coordinates (snap to grid)
+    const gridX = Math.round(adjustedX / cellSize);
+    const gridY = Math.round(adjustedY / cellSize);
+
+    return { x: gridX, y: gridY };
+  };
+
+  const handleDragStart =
+    (type: CellType) => (event: GestureResponderEvent) => {
+      if (!selected) return;
+      setIsDragging(true);
+      setDragCellType(type);
+
+      const { pageX, pageY } = event.nativeEvent;
+      const { x, y } = screenToGridCoordinates(pageX, pageY);
+      setPreviewCell({ x, y, type });
+    };
+
+  const handleDrag = (event: GestureResponderEvent) => {
+    if (!isDragging) return;
+
+    const { pageX, pageY } = event.nativeEvent;
+    const { x, y } = screenToGridCoordinates(pageX, pageY);
+
+    // Always update preview position, regardless of occupancy
+    // The preview will help users see where they're placing the cell
+    setPreviewCell({ x, y, type: dragCellType });
+  };
+
+  const handleDragEnd = (event: GestureResponderEvent) => {
+    if (!isDragging || !previewCell || !selected) {
+      setIsDragging(false);
+      setPreviewCell(null);
+      return;
+    }
+
+    const { pageX, pageY } = event.nativeEvent;
+    const { x, y } = screenToGridCoordinates(pageX, pageY);
+
+    // Check if the position is valid and add the cell
+    if (!coordinateService.isOccupied(x, y)) {
+      const newCell = cellService.addCell({
+        x,
+        y,
+        text: "newCell",
+        parent: selected.id,
+        type: dragCellType,
+      });
+
+      if (newCell) {
+        cellService.selectCell(newCell);
+      }
+    }
+
+    setIsDragging(false);
+    setPreviewCell(null);
+  };
 
   useEffect(() => {
-    cellData.forEach((cell) => gridStore.addCell(cell));
-    setCells(gridStore.getCells());
-    setSelected(gridStore.getSelected());
-    const unsubscribe = gridStore.subscribe(() => {
-      setCells(gridStore.getCells());
-      setSelected(gridStore.getSelected());
+    cellData.forEach((cell) => cellService.addCell(cell));
+    setCells(cellService.getCells());
+    setSelected(cellService.getSelected());
+    const unsubscribe = cellService.subscribe(() => {
+      setCells(cellService.getCells());
+      setSelected(cellService.getSelected());
     });
     return unsubscribe;
   }, []);
@@ -67,7 +143,7 @@ export default function RootLayout() {
           movementSensibility={1.5}
           visualTouchFeedbackEnabled={true} // DEV
         >
-          <Grid cells={cells} selected={selected} />
+          <Grid cells={cells} selected={selected} previewCell={previewCell} />
         </ReactNativeZoomableView>
         <FloatingButton
           onPress={() => {
@@ -82,8 +158,11 @@ export default function RootLayout() {
         />
         {selected && (
           <>
-            <FloatingButton
+            <DraggableFloatingButton
               onPress={() => addCell(CellType.Tasklist)}
+              onLongPressStart={handleDragStart(CellType.Tasklist)}
+              onDrag={handleDrag}
+              onLongPressEnd={handleDragEnd}
               iconName="text-box-plus-outline"
               backgroundColor="#4b50e3"
               style={{
@@ -91,8 +170,11 @@ export default function RootLayout() {
                 bottom: insets.bottom + 141,
               }}
             />
-            <FloatingButton
+            <DraggableFloatingButton
               onPress={() => addCell(CellType.Headline)}
+              onLongPressStart={handleDragStart(CellType.Headline)}
+              onDrag={handleDrag}
+              onLongPressEnd={handleDragEnd}
               iconName="plus"
               style={{
                 right: 20,
@@ -101,7 +183,7 @@ export default function RootLayout() {
             />
             <FloatingButton
               onPress={() => {
-                gridStore.deleteCell(selected.id);
+                cellService.deleteCell(selected.id);
                 setSelected(null);
               }}
               backgroundColor="#a81000"
