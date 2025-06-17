@@ -19,6 +19,7 @@ But keep in mind that this is react native app, so it cant use fs library)
 BUGS:
 [ ] Theme
 [ ] Lines are limited by canvas
+[ ] Progress bar not seen on the small cell
 
 ### Questions
 

@@ -6,19 +6,17 @@ import { Cell, CellType } from "../../types/cells";
 import { TaskPopup } from "../popup";
 import { CellLines } from "./CellLines";
 import { GridCell } from "./GridCell";
-import { getPreviewCellData, isPreviewPositionValid } from "./PreviewCell";
+import { PreviewCell } from "./PreviewCell";
 
 type GridProps = {
   cellSize?: number;
   cells: Cell[];
   selected?: Cell | null;
-  previewCell?:
-    | {
-        x: number;
-        y: number;
-        type: CellType;
-      }
-    | undefined;
+  previewCell: {
+    x: number;
+    y: number;
+    type: CellType;
+  } | null;
 };
 
 export const Grid: React.FC<GridProps> = ({
@@ -39,8 +37,6 @@ export const Grid: React.FC<GridProps> = ({
     showPopup(null);
   };
 
-  const previewCellData = getPreviewCellData(previewCell);
-
   return (
     <View style={styles.grid}>
       <CellLines cells={cells} cellSize={cellSize} />
@@ -54,21 +50,7 @@ export const Grid: React.FC<GridProps> = ({
           onButtonPress={openPopup}
         />
       ))}
-      {previewCellData && (
-        <View
-          style={[
-            styles.previewCell,
-            !isPreviewPositionValid(previewCellData) &&
-              styles.previewCellInvalid,
-            {
-              left: previewCellData.x * cellSize,
-              top: previewCellData.y * cellSize,
-              width: cellSize * previewCellData.size.x,
-              height: cellSize * previewCellData.size.y,
-            },
-          ]}
-        />
-      )}
+      <PreviewCell previewCell={previewCell} cellSize={cellSize} />
       {selectedCell?.type === CellType.Tasklist && (
         <TaskPopup
           cell={selectedCell}
@@ -85,16 +67,5 @@ const styles = StyleSheet.create({
     position: "relative",
     width: "100%",
     height: "100%",
-  },
-  previewCell: {
-    position: "absolute",
-    borderWidth: 2,
-    borderColor: "#4b50e3",
-    backgroundColor: "rgba(75, 80, 227, 0.3)",
-    borderStyle: "dashed",
-  },
-  previewCellInvalid: {
-    borderColor: "#ff4444",
-    backgroundColor: "rgba(255, 68, 68, 0.3)",
-  },
+  }
 });

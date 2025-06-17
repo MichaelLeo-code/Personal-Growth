@@ -177,6 +177,7 @@ class CellService {
     this.cellMap.clear();
     this.selectedId = null;
     coordinateService.clear();
+    this.addCell({ text: "Starting point", x: 0, y: 0 });
     this.notify();
     this.saveToStorage();
   }

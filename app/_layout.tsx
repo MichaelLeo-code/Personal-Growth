@@ -1,7 +1,6 @@
 import { DraggableFloatingButton, FloatingButton, Grid } from "@/my_components";
-import { cellService } from "@/service/cellService";
-import { coordinateService } from "@/service/coordinateService";
-import { Cell, CellType } from "@/types/cells";
+import { cellService, coordinateService } from "@/service";
+import { Cell, CellType } from "@/types";
 import { ReactNativeZoomableView } from "@openspacelabs/react-native-zoomable-view";
 import { DarkTheme, ThemeProvider } from "@react-navigation/native";
 import { useFonts } from "expo-font";
@@ -17,11 +16,6 @@ const addCell = (type: CellType) => {
   if (cell) {
     cellService.selectCell(cell);
   }
-};
-
-const deleteAll = () => {
-  cellService.deleteAll();
-  cellService.addCell({ text: "A", x: 0, y: 0 });
 };
 
 const cellData = [
@@ -147,7 +141,7 @@ export default function RootLayout() {
         </ReactNativeZoomableView>
         <FloatingButton
           onPress={() => {
-            deleteAll();
+            cellService.deleteAll();
           }}
           label="Delete all"
           backgroundColor="#a81000"
