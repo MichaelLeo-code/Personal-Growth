@@ -6,17 +6,14 @@ import { Cell, CellType } from "../../types/cells";
 import { TaskPopup } from "../popup";
 import { CellLines } from "./CellLines";
 import { GridCell } from "./GridCell";
-import { PreviewCell } from "./PreviewCell";
+import { PreviewCell, PreviewCellType } from "./PreviewCell";
 
 type GridProps = {
   cellSize?: number;
   cells: Cell[];
   selected?: Cell | null;
-  previewCell: {
-    x: number;
-    y: number;
-    type: CellType;
-  } | null;
+  previewCell: PreviewCellType | null;
+  previewCell2: PreviewCellType | null;
 };
 
 export const Grid: React.FC<GridProps> = ({
@@ -24,6 +21,7 @@ export const Grid: React.FC<GridProps> = ({
   cells,
   selected,
   previewCell,
+  previewCell2,
 }) => {
   const [selectedCell, setSelectedCell] = useState<Cell | null>(null);
   const { showPopup, hidePopup, isVisible } = usePopup();
@@ -51,6 +49,7 @@ export const Grid: React.FC<GridProps> = ({
         />
       ))}
       <PreviewCell previewCell={previewCell} cellSize={cellSize} />
+      <PreviewCell previewCell={previewCell2} cellSize={cellSize} />
       {selectedCell?.type === CellType.Tasklist && (
         <TaskPopup
           cell={selectedCell}
@@ -67,5 +66,5 @@ const styles = StyleSheet.create({
     position: "relative",
     width: "100%",
     height: "100%",
-  }
+  },
 });

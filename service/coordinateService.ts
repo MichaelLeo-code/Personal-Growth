@@ -3,7 +3,6 @@ class CoordinateService {
   private coordinatesMap: Map<number, Map<number, number>> = new Map();
 
   occupyOne(x: number, y: number, cellId: number): void {
-    console.log(`ONE: Occupying one cell at (${x}, ${y}) for cellId ${cellId}`);
     if (!this.coordinatesMap.has(x)) {
       this.coordinatesMap.set(x, new Map());
     }

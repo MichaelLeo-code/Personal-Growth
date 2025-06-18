@@ -1,4 +1,5 @@
 import { DraggableFloatingButton, FloatingButton, Grid } from "@/my_components";
+import { PreviewCellType } from "@/my_components/grid/PreviewCell";
 import { cellService, coordinateService } from "@/service";
 import { Cell, CellType } from "@/types";
 import { ReactNativeZoomableView } from "@openspacelabs/react-native-zoomable-view";
@@ -28,29 +29,63 @@ const cellData = [
 export default function RootLayout() {
   const [selected, setSelected] = useState<Cell | null>(null);
   const [cells, setCells] = useState<Cell[]>([]);
-  const [previewCell, setPreviewCell] = useState<{
-    x: number;
-    y: number;
-    type: CellType;
-  } | null>(null);
+  const [previewCell, setPreviewCell] = useState<PreviewCellType | null>(null);
+  const [previewCell2, setPreviewCell2] = useState<PreviewCellType | null>(
+    null
+  );
   const [isDragging, setIsDragging] = useState(false);
   const [dragCellType, setDragCellType] = useState<CellType>(CellType.Headline);
+
+  // Store the current transformation state from the zoomable view
+  const [zoomState, setZoomState] = useState({
+    zoomLevel: 1,
+    offsetX: 0,
+    offsetY: 0,
+  });
 
   const insets = useSafeAreaInsets();
   const cellSize = 50; // Default cell size from Grid component
 
-  // Convert screen coordinates to grid coordinates
-  // This is a simplified version - in a real implementation you'd need to account
-  // for the zoomable view's current zoom and pan state
+  // Convert screen coordinates to grid coordinates accounting for zoom and pan
   const screenToGridCoordinates = (screenX: number, screenY: number) => {
-    // For now, we'll use a simple approach - in practice you'd need to get
-    // the current transform from the zoomable view
+    console.log("Drag start at:", { screenX, screenY });
+
+    // Account for safe area and UI elements
     const adjustedX = screenX;
-    const adjustedY = screenY - insets.top - 60; // Account for safe area and some UI elements
+    const adjustedY = screenY - insets.top - 60;
+
+    // Apply inverse transformation to account for zoom and pan
+    // The formula is: original_coordinate = (screen_coordinate - pan_offset) / zoom_level
+    const gridWorldX = (adjustedX - zoomState.offsetX) / zoomState.zoomLevel;
+    const gridWorldY = (adjustedY - zoomState.offsetY) / zoomState.zoomLevel;
+
+    console.log("Grid world coords:", { gridWorldX, gridWorldY });
 
     // Convert to grid coordinates (snap to grid)
-    const gridX = Math.round(adjustedX / cellSize);
-    const gridY = Math.round(adjustedY / cellSize);
+    const gridX = Math.round(gridWorldX / cellSize);
+    const gridY = Math.round(gridWorldY / cellSize);
+
+    return { x: gridX, y: gridY };
+  };
+
+  const screenToGridCoordinates2 = (screenX: number, screenY: number) => {
+    // Account for safe area and UI elements
+    const adjustedX = screenX;
+    const adjustedY = screenY - insets.top - 60;
+
+    // Apply inverse transformation to account for zoom and pan
+    // The formula is: original_coordinate = (screen_coordinate - pan_offset) / zoom_level
+    const gridWorldX =
+      adjustedX / zoomState.zoomLevel -
+      zoomState.offsetX -
+      80 / zoomState.zoomLevel ** 1.6;
+    const gridWorldY =
+      adjustedY / zoomState.zoomLevel -
+      zoomState.offsetY -
+      80 / zoomState.zoomLevel ** 1.6;
+
+    const gridX = Math.round(gridWorldX / cellSize);
+    const gridY = Math.round(gridWorldY / cellSize);
 
     return { x: gridX, y: gridY };
   };
@@ -63,7 +98,9 @@ export default function RootLayout() {
 
       const { pageX, pageY } = event.nativeEvent;
       const { x, y } = screenToGridCoordinates(pageX, pageY);
+      const { x: x2, y: y2 } = screenToGridCoordinates2(pageX, pageY);
       setPreviewCell({ x, y, type });
+      setPreviewCell2({ x: x2, y: y2, type });
     };
 
   const handleDrag = (event: GestureResponderEvent) => {
@@ -71,16 +108,19 @@ export default function RootLayout() {
 
     const { pageX, pageY } = event.nativeEvent;
     const { x, y } = screenToGridCoordinates(pageX, pageY);
+    const { x: x2, y: y2 } = screenToGridCoordinates2(pageX, pageY);
 
     // Always update preview position, regardless of occupancy
     // The preview will help users see where they're placing the cell
     setPreviewCell({ x, y, type: dragCellType });
+    setPreviewCell2({ x: x2, y: y2, type: dragCellType });
   };
 
   const handleDragEnd = (event: GestureResponderEvent) => {
     if (!isDragging || !previewCell || !selected) {
       setIsDragging(false);
       setPreviewCell(null);
+      setPreviewCell2(null);
       return;
     }
 
@@ -104,6 +144,7 @@ export default function RootLayout() {
 
     setIsDragging(false);
     setPreviewCell(null);
+    setPreviewCell2(null);
   };
 
   useEffect(() => {
@@ -136,8 +177,21 @@ export default function RootLayout() {
           bindToBorders={false}
           movementSensibility={1.5}
           visualTouchFeedbackEnabled={true} // DEV
+          onTransform={(transform) => {
+            console.log("Transform values:", transform);
+            setZoomState({
+              zoomLevel: transform.zoomLevel,
+              offsetX: transform.offsetX,
+              offsetY: transform.offsetY,
+            });
+          }}
         >
-          <Grid cells={cells} selected={selected} previewCell={previewCell} />
+          <Grid
+            cells={cells}
+            selected={selected}
+            previewCell={previewCell}
+            previewCell2={previewCell2}
+          />
         </ReactNativeZoomableView>
         <FloatingButton
           onPress={() => {

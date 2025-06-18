@@ -2,12 +2,14 @@ import { coordinateService } from "@/service";
 import { Cell, CellType } from "@/types";
 import { StyleSheet, View } from "react-native";
 
+export type PreviewCellType = {
+  x: number;
+  y: number;
+  type: CellType;
+};
+
 const getPreviewCellData = (
-  previewCell: {
-    x: number;
-    y: number;
-    type: CellType;
-  } | null
+  previewCell: PreviewCellType | null
 ): Cell | undefined => {
   return previewCell
     ? {
