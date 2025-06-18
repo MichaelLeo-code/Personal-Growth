@@ -1,3 +1,4 @@
+import { cellSize } from "@/constants";
 import React, { useState } from "react";
 import { StyleSheet, View } from "react-native";
 import { usePopup } from "../../my_hooks/usePopup";
@@ -9,18 +10,12 @@ import { GridCell } from "./GridCell";
 import { PreviewCell, PreviewCellType } from "./PreviewCell";
 
 type GridProps = {
-  cellSize?: number;
   cells: Cell[];
   selected?: Cell | null;
   previewCell: PreviewCellType | null;
 };
 
-export const Grid: React.FC<GridProps> = ({
-  cellSize = 50,
-  cells,
-  selected,
-  previewCell,
-}) => {
+export const Grid: React.FC<GridProps> = ({ cells, selected, previewCell }) => {
   const [selectedCell, setSelectedCell] = useState<Cell | null>(null);
   const { showPopup, hidePopup, isVisible } = usePopup();
 

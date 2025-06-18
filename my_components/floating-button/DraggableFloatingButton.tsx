@@ -1,6 +1,6 @@
 import React from "react";
 import { GestureResponderEvent, PanResponder, View } from "react-native";
-import { FloatingButton, FloatingButtonProps } from "./";
+import { FloatingButton, FloatingButtonProps } from "./FloatingButton";
 
 type Props = FloatingButtonProps & {
   onLongPressStart?: (event: GestureResponderEvent) => void;

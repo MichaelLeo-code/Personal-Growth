@@ -11,7 +11,7 @@ But keep in mind that this is react native app, so it cant use fs library)
 [x] occupy the coordinates of larger-than-one-tiles (probably create coordinates store for that)  
 [x] Create tasks in taskstore cell
 
-[ ] Add drag and drop
+[x] Add drag and drop
 [ ] Add firestore + auth
 
 [ ] Is TaskLine written in the best practice?

@@ -1,6 +1,6 @@
 import { CellType, TaskListCell } from "@/types/cells";
 import { Task } from "../types/task";
-import { cellService } from "./";
+import { cellService } from "./cellService";
 let nextId = 0;
 
 function getTaskListCell(parentId: number): TaskListCell | null {
