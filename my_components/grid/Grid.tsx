@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { StyleSheet, View } from "react-native";
 import { usePopup } from "../../my_hooks/usePopup";
-import { cellService } from "../../service/cellService";
+import { cellService } from "../../service";
 import { Cell, CellType } from "../../types/cells";
 import { TaskPopup } from "../popup";
 import { CellLines } from "./CellLines";

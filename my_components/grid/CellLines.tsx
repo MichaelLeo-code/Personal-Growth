@@ -1,7 +1,7 @@
 import { Cell } from "@/types/cells";
 import { StyleSheet } from "react-native";
 import Svg, { Line } from "react-native-svg";
-import { cellService } from "../../service/cellService";
+import { cellService } from "../../service";
 
 type Props = {
   cells: Cell[];

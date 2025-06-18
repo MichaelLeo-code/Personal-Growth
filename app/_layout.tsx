@@ -74,6 +74,7 @@ export default function RootLayout() {
         <ReactNativeZoomableView
           minZoom={0.1}
           doubleTapZoomToCenter={false}
+          bindToBorders={false}
           movementSensibility={1.5}
           onTransform={(transform) => {
             setZoomState({
