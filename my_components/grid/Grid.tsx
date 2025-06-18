@@ -13,7 +13,6 @@ type GridProps = {
   cells: Cell[];
   selected?: Cell | null;
   previewCell: PreviewCellType | null;
-  previewCell2: PreviewCellType | null;
 };
 
 export const Grid: React.FC<GridProps> = ({
@@ -21,7 +20,6 @@ export const Grid: React.FC<GridProps> = ({
   cells,
   selected,
   previewCell,
-  previewCell2,
 }) => {
   const [selectedCell, setSelectedCell] = useState<Cell | null>(null);
   const { showPopup, hidePopup, isVisible } = usePopup();
@@ -49,7 +47,6 @@ export const Grid: React.FC<GridProps> = ({
         />
       ))}
       <PreviewCell previewCell={previewCell} cellSize={cellSize} />
-      <PreviewCell previewCell={previewCell2} cellSize={cellSize} />
       {selectedCell?.type === CellType.Tasklist && (
         <TaskPopup
           cell={selectedCell}
