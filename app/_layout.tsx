@@ -6,7 +6,7 @@ import { ReactNativeZoomableView } from "@openspacelabs/react-native-zoomable-vi
 import { DarkTheme, ThemeProvider } from "@react-navigation/native";
 import { useFonts } from "expo-font";
 import React, { useEffect, useState } from "react";
-import { GestureResponderEvent, SafeAreaView } from "react-native";
+import { Dimensions, GestureResponderEvent, SafeAreaView } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 const addCell = (type: CellType) => {
@@ -21,9 +21,9 @@ const addCell = (type: CellType) => {
 
 const cellData = [
   { text: "A", x: 0, y: 0, id: 1 },
-  { text: "B", x: 0, y: 3, id: 2, parent: 1 },
-  { text: "C", x: 1, y: 2, id: 3, parent: 1 },
-  { text: "D", x: 5, y: 1, id: 4, parent: 3 },
+  // { text: "B", x: 0, y: 3, id: 2, parent: 1 },
+  // { text: "C", x: 1, y: 2, id: 3, parent: 1 },
+  // { text: "D", x: 5, y: 1, id: 4, parent: 3 },
 ];
 
 export default function RootLayout() {
@@ -48,7 +48,7 @@ export default function RootLayout() {
 
   // Convert screen coordinates to grid coordinates accounting for zoom and pan
   const screenToGridCoordinates = (screenX: number, screenY: number) => {
-    console.log("Drag start at:", { screenX, screenY });
+    console.log("Drag start at:", { screenX, screenY }, zoomState.zoomLevel);
 
     // Account for safe area and UI elements
     const adjustedX = screenX;
@@ -70,23 +70,17 @@ export default function RootLayout() {
 
   const screenToGridCoordinates2 = (screenX: number, screenY: number) => {
     // Account for safe area and UI elements
-    const adjustedX = screenX;
-    const adjustedY = screenY - insets.top - 60;
+    const adjustedX = screenX - (195 - 195 * zoomState.zoomLevel);
+    const adjustedY =
+      screenY - insets.top - 60 - (381.5 - 381.5 * zoomState.zoomLevel);
 
     // Apply inverse transformation to account for zoom and pan
     // The formula is: original_coordinate = (screen_coordinate - pan_offset) / zoom_level
-    const gridWorldX =
-      adjustedX / zoomState.zoomLevel -
-      zoomState.offsetX -
-      80 / zoomState.zoomLevel ** 1.6;
-    const gridWorldY =
-      adjustedY / zoomState.zoomLevel -
-      zoomState.offsetY -
-      80 / zoomState.zoomLevel ** 1.6;
-
+    const gridWorldX = adjustedX / zoomState.zoomLevel - zoomState.offsetX;
+    const gridWorldY = adjustedY / zoomState.zoomLevel - zoomState.offsetY;
     const gridX = Math.round(gridWorldX / cellSize);
     const gridY = Math.round(gridWorldY / cellSize);
-
+    console.log("CALCULATION:", adjustedX, "/", zoomState.zoomLevel * cellSize);
     return { x: gridX, y: gridY };
   };
 
@@ -114,6 +108,7 @@ export default function RootLayout() {
     // The preview will help users see where they're placing the cell
     setPreviewCell({ x, y, type: dragCellType });
     setPreviewCell2({ x: x2, y: y2, type: dragCellType });
+    console.log("Dragging at:", { x, y }, "Preview:", { x2, y2 });
   };
 
   const handleDragEnd = (event: GestureResponderEvent) => {
@@ -168,6 +163,9 @@ export default function RootLayout() {
     return null;
   }
 
+  const { width, height } = Dimensions.get("window");
+  const appiedHeight = height / 2 - insets.top - 60;
+
   return (
     <ThemeProvider value={DarkTheme}>
       <SafeAreaView style={{ flex: 1 }}>
@@ -175,6 +173,14 @@ export default function RootLayout() {
           minZoom={0.1}
           doubleTapZoomToCenter={false}
           bindToBorders={false}
+          //claude
+          // panEnabled={false}к
+          // disableMomentum={true}
+          // movementSensibility={0}
+          // staticPinPosition={{
+          //   x: width / 2,
+          //   y: height / 2 - 40.5,
+          // }}
           movementSensibility={1.5}
           visualTouchFeedbackEnabled={true} // DEV
           onTransform={(transform) => {
