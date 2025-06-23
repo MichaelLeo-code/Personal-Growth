@@ -3,7 +3,7 @@ import React, { useState } from "react";
 import { StyleSheet, View } from "react-native";
 import { cellService } from "../../service";
 import { Cell } from "../../types/cells";
-import { CellPopup } from "../popup";
+import { PopupSelector } from "../popup";
 import { CellLines } from "./CellLines";
 import { GridCell } from "./grid-cell/GridCell";
 import { PreviewCell, PreviewCellType } from "./PreviewCell";
@@ -47,7 +47,7 @@ export const Grid: React.FC<GridProps> = ({ cells, selected, previewCell }) => {
       ))}
       <PreviewCell previewCell={previewCell} cellSize={cellSize} />
       {selectedCell && (
-        <CellPopup
+        <PopupSelector
           cell={selectedCell}
           hidePopup={hidePopup}
           isVisible={isPopupVisible}

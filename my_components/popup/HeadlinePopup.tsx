@@ -1,5 +1,6 @@
+import { cellService } from "@/service";
 import { HeadlineCell } from "@/types/cells";
-import { StyleSheet } from "react-native";
+import { Pressable, StyleSheet, Text, View } from "react-native";
 import { Popup, PopupProps } from "./Popup";
 
 type HeadlinePopupProps = Omit<PopupProps, "children"> & {
@@ -17,7 +18,14 @@ export const HeadlinePopup: React.FC<HeadlinePopupProps> = ({
       hidePopup={hidePopup}
       title={cell.text}
       showCloseButton={true}
-    ></Popup>
+      onTitleChange={(newTitle) => cellService.renameCell(cell.id, newTitle)}
+    >
+      <View style={styles.buttonContainer}>
+        <Pressable style={styles.button} onPress={hidePopup}>
+          <Text style={styles.buttonText}>Cancel</Text>
+        </Pressable>
+      </View>
+    </Popup>
   );
 };
 

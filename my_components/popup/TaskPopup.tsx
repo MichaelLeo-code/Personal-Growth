@@ -1,3 +1,4 @@
+import { cellService } from "@/service";
 import { addTask, updateTask } from "@/service/taskService";
 import { Task } from "@/types";
 import { TaskListCell } from "@/types/cells";
@@ -55,6 +56,7 @@ export const TaskPopup: React.FC<TaskPopupProps> = ({
       hidePopup={hidePopup}
       title={cell.text}
       showCloseButton={false}
+      onTitleChange={(newTitle) => cellService.renameCell(cell.id, newTitle)}
     >
       <View>
         {tasks.map((task) => (

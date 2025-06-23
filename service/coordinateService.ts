@@ -15,8 +15,8 @@ class CoordinateService {
     size: { x: number; y: number },
     cellId: number
   ): void {
-    for (let i = 0; i < size.x; i++) {
-      for (let j = 0; j < size.y; j++) {
+    for (let i = -1; i <= size.x; i++) {
+      for (let j = -1; j <= size.y; j++) {
         this.occupyOne(x + i, y + j, cellId);
       }
     }

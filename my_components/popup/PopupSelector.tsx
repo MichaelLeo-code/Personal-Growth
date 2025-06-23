@@ -2,13 +2,13 @@ import { Cell, CellType, HeadlineCell, TaskListCell } from "@/types/cells";
 import { HeadlinePopup } from "./HeadlinePopup";
 import { TaskPopup } from "./TaskPopup";
 
-type CellPopupProps = {
+type PopupSelectorProps = {
   cell: Cell;
   isVisible: boolean;
   hidePopup: () => void;
 };
 
-export const CellPopup: React.FC<CellPopupProps> = ({
+export const PopupSelector: React.FC<PopupSelectorProps> = ({
   cell,
   isVisible,
   hidePopup,

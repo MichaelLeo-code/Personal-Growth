@@ -183,6 +183,16 @@ class CellService {
     this.saveToStorage();
   }
 
+  renameCell(id: number, newTitle: string): boolean {
+    const cell = this.cellMap.get(id);
+    if (!cell) return false;
+    cell.text = newTitle;
+    this.cellMap.set(id, cell);
+    this.notify();
+    this.saveToStorage();
+    return true;
+  }
+
   subscribe(listener: () => void): () => void {
     this.listeners.push(listener);
     return () => {

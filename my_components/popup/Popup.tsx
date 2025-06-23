@@ -1,4 +1,12 @@
-import { Modal, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { useState } from "react";
+import {
+  Modal,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
+} from "react-native";
 
 export type PopupProps = {
   isVisible: boolean;
@@ -6,6 +14,7 @@ export type PopupProps = {
   title?: string;
   children?: React.ReactNode;
   showCloseButton?: boolean;
+  onTitleChange?: (newTitle: string) => void;
 };
 
 export const Popup: React.FC<PopupProps> = ({
@@ -14,7 +23,28 @@ export const Popup: React.FC<PopupProps> = ({
   title,
   children,
   showCloseButton = true,
+  onTitleChange,
 }) => {
+  const [isEditingTitle, setIsEditingTitle] = useState(false);
+  const [editedTitle, setEditedTitle] = useState(title || "");
+
+  const handleTitlePress = () => {
+    setEditedTitle(title || "");
+    setIsEditingTitle(true);
+  };
+
+  const handleTitleSubmit = () => {
+    if (onTitleChange) {
+      onTitleChange(editedTitle);
+    }
+    setIsEditingTitle(false);
+  };
+
+  const handleTitleCancel = () => {
+    setEditedTitle(title || "");
+    setIsEditingTitle(false);
+  };
+
   return (
     <Modal
       visible={isVisible}
@@ -25,7 +55,26 @@ export const Popup: React.FC<PopupProps> = ({
       <View style={styles.modalOverlay}>
         <View style={styles.modalContent}>
           <View style={styles.modalHeader}>
-            <Text style={styles.modalTitle}>{title}</Text>
+            {isEditingTitle ? (
+              <View style={styles.titleEditContainer}>
+                <TextInput
+                  style={styles.titleInput}
+                  value={editedTitle}
+                  onChangeText={setEditedTitle}
+                  onSubmitEditing={handleTitleSubmit}
+                  onBlur={handleTitleCancel}
+                  autoFocus={true}
+                  selectTextOnFocus={true}
+                />
+              </View>
+            ) : (
+              <TouchableOpacity
+                onPress={handleTitlePress}
+                style={styles.titleContainer}
+              >
+                <Text style={styles.modalTitle}>{title}</Text>
+              </TouchableOpacity>
+            )}
             {showCloseButton && (
               <TouchableOpacity onPress={hidePopup} style={styles.closeButton}>
                 <Text style={styles.closeButtonText}>×</Text>
@@ -59,9 +108,24 @@ const styles = StyleSheet.create({
     alignItems: "center",
     marginBottom: 20,
   },
+  titleContainer: {
+    flex: 1,
+    marginRight: 10,
+  },
   modalTitle: {
     fontSize: 20,
     fontWeight: "bold",
+  },
+  titleEditContainer: {
+    flex: 1,
+    marginRight: 10,
+  },
+  titleInput: {
+    fontSize: 20,
+    fontWeight: "bold",
+    borderBottomWidth: 1,
+    borderBottomColor: "#ccc",
+    paddingBottom: 2,
   },
   closeButton: {
     padding: 5,
