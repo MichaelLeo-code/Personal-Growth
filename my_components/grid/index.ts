@@ -1,3 +1,3 @@
 export * from "./CellLines";
 export * from "./Grid";
-export * from "./GridCell";
+export * from "./grid-cell/GridCell";

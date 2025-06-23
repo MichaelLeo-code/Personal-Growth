@@ -4,7 +4,7 @@ export type PopupProps = {
   isVisible: boolean;
   hidePopup: () => void;
   title?: string;
-  children: React.ReactNode;
+  children?: React.ReactNode;
   showCloseButton?: boolean;
 };
 

@@ -1,12 +1,11 @@
 import { cellSize } from "@/constants";
 import React, { useState } from "react";
 import { StyleSheet, View } from "react-native";
-import { usePopup } from "../../my_hooks/usePopup";
 import { cellService } from "../../service";
-import { Cell, CellType } from "../../types/cells";
-import { TaskPopup } from "../popup";
+import { Cell } from "../../types/cells";
+import { CellPopup } from "../popup";
 import { CellLines } from "./CellLines";
-import { GridCell } from "./GridCell";
+import { GridCell } from "./grid-cell/GridCell";
 import { PreviewCell, PreviewCellType } from "./PreviewCell";
 
 type GridProps = {
@@ -17,7 +16,7 @@ type GridProps = {
 
 export const Grid: React.FC<GridProps> = ({ cells, selected, previewCell }) => {
   const [selectedCell, setSelectedCell] = useState<Cell | null>(null);
-  const { showPopup, hidePopup, isVisible } = usePopup();
+  const [isPopupVisible, setIsPopupVisible] = useState(false);
 
   const handleCellPress = (cell: Cell) => {
     cellService.selectCell(cell);
@@ -25,7 +24,12 @@ export const Grid: React.FC<GridProps> = ({ cells, selected, previewCell }) => {
 
   const openPopup = (cell: Cell) => {
     setSelectedCell(cell);
-    showPopup(null);
+    setIsPopupVisible(true);
+  };
+
+  const hidePopup = () => {
+    setIsPopupVisible(false);
+    setSelectedCell(null);
   };
 
   return (
@@ -42,11 +46,11 @@ export const Grid: React.FC<GridProps> = ({ cells, selected, previewCell }) => {
         />
       ))}
       <PreviewCell previewCell={previewCell} cellSize={cellSize} />
-      {selectedCell?.type === CellType.Tasklist && (
-        <TaskPopup
+      {selectedCell && (
+        <CellPopup
           cell={selectedCell}
           hidePopup={hidePopup}
-          isVisible={isVisible}
+          isVisible={isPopupVisible}
         />
       )}
     </View>

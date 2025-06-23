@@ -8,7 +8,6 @@ import React from "react";
 import { SafeAreaView } from "react-native";
 
 export default function RootLayout() {
-  // Use the extracted hooks
   const { cells, selected, addCell, deleteSelectedCell, deleteAllCells } =
     useCellManagement();
   const { zoomState, handleTransform } = useZoomState();

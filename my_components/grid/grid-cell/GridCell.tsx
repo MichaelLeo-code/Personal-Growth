@@ -1,7 +1,8 @@
 import React from "react";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
-import { totalCompletedCost, totalCost } from "../../service/taskService";
-import { Cell, CellType } from "../../types/cells";
+import { totalCompletedCost, totalCost } from "../../../service/taskService";
+import { Cell, CellType } from "../../../types/cells";
+import { ProgressBar } from "./ProgressBar";
 
 type GridCellProps = {
   cell: Cell;
@@ -25,23 +26,6 @@ const TaskPreview: React.FC<{ text: string; completed: boolean }> = ({
   </View>
 );
 
-const ProgressBar: React.FC<{ completed: number; total: number }> = ({
-  completed,
-  total,
-}) => {
-  const percentage = total === 0 ? 0 : (completed / total) * 100;
-  return (
-    <View style={styles.progressContainer}>
-      <View style={styles.progressBar}>
-        <View style={[styles.progressFill, { width: `${percentage}%` }]} />
-      </View>
-      <Text style={styles.progressText}>
-        {completed}/{total}
-      </Text>
-    </View>
-  );
-};
-
 export const GridCell: React.FC<GridCellProps> = ({
   cell,
   cellSize,
@@ -52,6 +36,10 @@ export const GridCell: React.FC<GridCellProps> = ({
   const sizeMultiplier = cell.type === CellType.Headline ? 1 : 3;
   const total = totalCost(cell.id);
   const completed = totalCompletedCost(cell.id);
+
+  const handleLongPress = () => {
+    onButtonPress(cell);
+  };
 
   return (
     <TouchableOpacity
@@ -66,6 +54,7 @@ export const GridCell: React.FC<GridCellProps> = ({
         },
       ]}
       onPress={() => onPress(cell)}
+      onLongPress={handleLongPress}
     >
       <View style={styles.cellContent}>
         <Text style={styles.text}>{cell.text}</Text>
@@ -84,14 +73,6 @@ export const GridCell: React.FC<GridCellProps> = ({
               </Text>
             )}
           </View>
-        )}
-        {cell.type === CellType.Tasklist && (
-          <TouchableOpacity
-            style={styles.button}
-            onPress={() => onButtonPress(cell)}
-          >
-            <Text style={styles.buttonText}>Action</Text>
-          </TouchableOpacity>
         )}
         <ProgressBar completed={completed} total={total} />
       </View>
@@ -117,17 +98,6 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: "#fff",
     marginBottom: 4,
-  },
-  button: {
-    backgroundColor: "#444",
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-    borderRadius: 4,
-    marginTop: 4,
-  },
-  buttonText: {
-    color: "#fff",
-    fontSize: 12,
   },
   tasksContainer: {
     width: "100%",
@@ -165,29 +135,5 @@ const styles = StyleSheet.create({
     fontSize: 10,
     marginTop: 2,
     textAlign: "center",
-  },
-  progressContainer: {
-    width: "100%",
-    flexDirection: "row",
-    alignItems: "center",
-    marginTop: 8,
-    gap: 8,
-  },
-  progressBar: {
-    flex: 1,
-    height: 4,
-    backgroundColor: "#333",
-    borderRadius: 2,
-    overflow: "hidden",
-  },
-  progressFill: {
-    height: "100%",
-    backgroundColor: "#4CAF50",
-  },
-  progressText: {
-    color: "#888",
-    fontSize: 10,
-    minWidth: 40,
-    textAlign: "right",
   },
 });

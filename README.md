@@ -13,12 +13,13 @@ But keep in mind that this is react native app, so it cant use fs library)
 
 [x] Add drag and drop
 [ ] Add firestore + auth
+[ ] Name edit for Heading
 
 [ ] Is TaskLine written in the best practice?
 
 BUGS:
 [ ] Theme
-[ ] Lines are limited by canvas
+[x] Lines are limited by canvas
 [ ] Progress bar not seen on the small cell
 
 ### Questions
