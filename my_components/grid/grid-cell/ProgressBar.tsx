@@ -38,8 +38,8 @@ const styles = StyleSheet.create({
   },
   progressText: {
     color: "#888",
-    fontSize: 10,
-    minWidth: 40,
+    fontSize: 8,
+    minWidth: 30,
     textAlign: "right",
   },
 });

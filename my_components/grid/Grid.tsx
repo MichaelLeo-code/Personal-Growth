@@ -1,5 +1,5 @@
 import { cellSize } from "@/constants";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { StyleSheet, View } from "react-native";
 import { cellService } from "../../service";
 import { Cell } from "../../types/cells";
@@ -18,18 +18,36 @@ export const Grid: React.FC<GridProps> = ({ cells, selected, previewCell }) => {
   const [selectedCell, setSelectedCell] = useState<Cell | null>(null);
   const [isPopupVisible, setIsPopupVisible] = useState(false);
 
+  // Clear selectedCell after popup animation completes
+  useEffect(() => {
+    if (!isPopupVisible && selectedCell) {
+      // Give the Modal time to complete its fade animation (typically 300ms)
+      const timer = setTimeout(() => {
+        setSelectedCell(null);
+      }, 350);
+
+      return () => clearTimeout(timer);
+    }
+  }, [isPopupVisible, selectedCell]);
+
   const handleCellPress = (cell: Cell) => {
     cellService.selectCell(cell);
   };
 
   const openPopup = (cell: Cell) => {
+    // If a popup is already open for a different cell, close it first
+    if (selectedCell && selectedCell.id !== cell.id) {
+      setIsPopupVisible(false);
+    }
+    // Set the new popup
     setSelectedCell(cell);
     setIsPopupVisible(true);
   };
 
   const hidePopup = () => {
     setIsPopupVisible(false);
-    setSelectedCell(null);
+    // Don't immediately set selectedCell to null - let the Modal animation complete
+    // The selectedCell will be cleared when a new popup opens or component unmounts
   };
 
   return (
@@ -48,6 +66,7 @@ export const Grid: React.FC<GridProps> = ({ cells, selected, previewCell }) => {
       <PreviewCell previewCell={previewCell} cellSize={cellSize} />
       {selectedCell && (
         <PopupSelector
+          key={selectedCell.id} // Add key to ensure proper re-rendering
           cell={selectedCell}
           hidePopup={hidePopup}
           isVisible={isPopupVisible}

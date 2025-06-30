@@ -13,7 +13,12 @@ But keep in mind that this is react native app, so it cant use fs library)
 
 [x] Add drag and drop
 [ ] Add firestore + auth
-[ ] Name edit for Heading
+[x] Name edit for Heading
+[ ] Move cell on long press
+[ ] Emoji functionality
+[ ] Statistics 
+[ ] Is daily switch - or maybe daily tasks could be on headlines instead
+[ ] Lock icon os subsequent tasklists
 
 [ ] Is TaskLine written in the best practice?
 

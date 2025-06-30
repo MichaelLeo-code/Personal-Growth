@@ -1,10 +1,11 @@
 import { cellSize } from "@/constants";
-import { FloatingActionButtons, Grid } from "@/my_components";
+import { FloatingActionButtons } from "@/containers";
+import { FloatingButton, Grid } from "@/my_components";
 import { useCellManagement, useDragAndDrop, useZoomState } from "@/my_hooks";
 import { ReactNativeZoomableView } from "@openspacelabs/react-native-zoomable-view";
 import { DarkTheme, ThemeProvider } from "@react-navigation/native";
 import { useFonts } from "expo-font";
-import React from "react";
+import React, { useState } from "react";
 import { SafeAreaView } from "react-native";
 
 export default function RootLayout() {
@@ -17,6 +18,7 @@ export default function RootLayout() {
       selected,
       cellSize,
     });
+  const [isEditMode, setIsEditMode] = useState(false);
 
   // Font loading
   const [loaded] = useFonts({
@@ -40,15 +42,22 @@ export default function RootLayout() {
           <Grid cells={cells} selected={selected} previewCell={previewCell} />
         </ReactNativeZoomableView>
 
-        <FloatingActionButtons
-          selected={selected}
-          onAddCell={addCell}
-          onDeleteSelected={deleteSelectedCell}
-          onDeleteAll={deleteAllCells}
-          onDragStart={handleDragStart}
-          onDrag={handleDrag}
-          onDragEnd={handleDragEnd}
+        <FloatingButton
+          onPress={() => setIsEditMode(!isEditMode)}
+          iconName="note-edit-outline"
         />
+
+        {isEditMode && (
+          <FloatingActionButtons
+            selected={selected}
+            onAddCell={addCell}
+            onDeleteSelected={deleteSelectedCell}
+            onDeleteAll={deleteAllCells}
+            onDragStart={handleDragStart}
+            onDrag={handleDrag}
+            onDragEnd={handleDragEnd}
+          />
+        )}
       </SafeAreaView>
     </ThemeProvider>
   );
