@@ -1,6 +1,6 @@
 import { cellSize } from "@/constants";
 import React, { useEffect, useState } from "react";
-import { StyleSheet, View } from "react-native";
+import { GestureResponderEvent, StyleSheet, View } from "react-native";
 import { cellService } from "../../service";
 import { Cell } from "../../types/cells";
 import { PopupSelector } from "../popup";
@@ -12,9 +12,19 @@ type GridProps = {
   cells: Cell[];
   selected?: Cell | null;
   previewCell: PreviewCellType | null;
+  onCellLongPress?: (cell: Cell) => (event: GestureResponderEvent) => void;
+  onCellMove?: (event: GestureResponderEvent) => void;
+  onCellMoveEnd?: (event: GestureResponderEvent) => void;
 };
 
-export const Grid: React.FC<GridProps> = ({ cells, selected, previewCell }) => {
+export const Grid: React.FC<GridProps> = ({
+  cells,
+  selected,
+  previewCell,
+  onCellLongPress,
+  onCellMove,
+  onCellMoveEnd,
+}) => {
   const [selectedCell, setSelectedCell] = useState<Cell | null>(null);
   const [isPopupVisible, setIsPopupVisible] = useState(false);
 
@@ -50,8 +60,30 @@ export const Grid: React.FC<GridProps> = ({ cells, selected, previewCell }) => {
     // The selectedCell will be cleared when a new popup opens or component unmounts
   };
 
+  const handleCellLongPress = (cell: Cell) => {
+    if (onCellLongPress) {
+      // The onCellLongPress returns a function that expects an event
+      // We need to create a wrapper that calls it
+      const moveHandler = onCellLongPress(cell);
+      // Create a fake event to start the move - this will be refined
+      const fakeEvent = {
+        nativeEvent: {
+          pageX: 0,
+          pageY: 0,
+        },
+      } as any;
+      moveHandler(fakeEvent);
+    } else {
+      console.log("test");
+    }
+  };
+
   return (
-    <View style={styles.grid}>
+    <View
+      style={styles.grid}
+      onTouchMove={onCellMove}
+      onTouchEnd={onCellMoveEnd}
+    >
       <CellLines cells={cells} cellSize={cellSize} />
       {cells.map((cell, index) => (
         <GridCell
@@ -61,7 +93,7 @@ export const Grid: React.FC<GridProps> = ({ cells, selected, previewCell }) => {
           isSelected={selected?.x === cell.x && selected?.y === cell.y}
           onPress={handleCellPress}
           onDoublePress={openPopup}
-          onLongPress={() => console.log("test")}
+          onLongPress={(cell) => handleCellLongPress(cell)}
         />
       ))}
       <PreviewCell previewCell={previewCell} cellSize={cellSize} />
