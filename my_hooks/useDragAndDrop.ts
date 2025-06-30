@@ -4,6 +4,7 @@ import { Cell, CellType } from "@/types";
 import { useState } from "react";
 import { Dimensions, GestureResponderEvent } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { createScreenToGridCoordinates } from "./utils/coordinateUtils";
 
 interface ZoomState {
   zoomLevel: number;
@@ -30,20 +31,14 @@ export const useDragAndDrop = ({
   const { width, height } = Dimensions.get("window");
   const safeHeight = height - insets.top - insets.bottom;
 
-  const screenToGridCoordinates = (screenX: number, screenY: number) => {
-    const adjustedX = screenX - (width / 2) * (1 - zoomState.zoomLevel);
-    const adjustedY =
-      screenY -
-      insets.top -
-      insets.bottom -
-      (safeHeight / 2) * (1 - zoomState.zoomLevel);
-
-    const gridWorldX = adjustedX / zoomState.zoomLevel - zoomState.offsetX;
-    const gridWorldY = adjustedY / zoomState.zoomLevel - zoomState.offsetY;
-    const gridX = Math.round(gridWorldX / cellSize);
-    const gridY = Math.round(gridWorldY / cellSize);
-    return { x: gridX, y: gridY };
-  };
+  const screenToGridCoordinates = createScreenToGridCoordinates(
+    width,
+    safeHeight,
+    insets.top,
+    insets.bottom,
+    zoomState,
+    cellSize
+  );
 
   const handleDragStart =
     (type: CellType) => (event: GestureResponderEvent) => {

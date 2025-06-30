@@ -12,7 +12,7 @@ type GridProps = {
   cells: Cell[];
   selected?: Cell | null;
   previewCell: PreviewCellType | null;
-  movingCellId?: number;
+  isMoving?: boolean;
   onCellLongPress?: (cell: Cell) => (event: GestureResponderEvent) => void;
   onCellMove?: (event: GestureResponderEvent) => void;
   onCellMoveEnd?: (event: GestureResponderEvent) => void;
@@ -22,7 +22,7 @@ export const Grid: React.FC<GridProps> = ({
   cells,
   selected,
   previewCell,
-  movingCellId,
+  isMoving = false,
   onCellLongPress,
   onCellMove,
   onCellMoveEnd,
@@ -67,6 +67,7 @@ export const Grid: React.FC<GridProps> = ({
       // The onCellLongPress returns a function that expects an event
       // We need to create a wrapper that calls it
       const moveHandler = onCellLongPress(cell);
+
       // Create a fake event to start the move - this will be refined
       const fakeEvent = {
         nativeEvent: {
@@ -93,7 +94,7 @@ export const Grid: React.FC<GridProps> = ({
           cell={cell}
           cellSize={cellSize}
           isSelected={selected?.x === cell.x && selected?.y === cell.y}
-          isDimmed={movingCellId === cell.id}
+          isDimmed={isMoving && selected?.id === cell.id}
           onPress={handleCellPress}
           onDoublePress={openPopup}
           onLongPress={(cell) => handleCellLongPress(cell)}

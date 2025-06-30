@@ -25,7 +25,7 @@ export default function RootLayout() {
     });
   const {
     previewCell: movePreviewCell,
-    movingCellId,
+    isMoving,
     handleMoveStart,
     handleMove,
     handleMoveEnd,
@@ -58,7 +58,7 @@ export default function RootLayout() {
             cells={cells}
             selected={selected}
             previewCell={previewCell || movePreviewCell}
-            movingCellId={movingCellId}
+            isMoving={isMoving}
             onCellLongPress={handleMoveStart}
             onCellMove={handleMove}
             onCellMoveEnd={handleMoveEnd}

@@ -65,7 +65,7 @@ export const GridCell: React.FC<GridCellProps> = ({
           width: cellSize * sizeMultiplier,
           height: cellSize * sizeMultiplier,
           backgroundColor: isSelected ? "#555" : "#000",
-          opacity: isDimmed ? 0.3 : 1,
+          opacity: isDimmed ? 0.2 : 1,
         },
       ]}
       onPress={handlePress}

@@ -4,6 +4,7 @@ import { Cell } from "@/types";
 import { useCallback, useEffect, useState } from "react";
 import { Dimensions, GestureResponderEvent } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { createScreenToGridCoordinates } from "./utils/coordinateUtils";
 
 interface ZoomState {
   zoomLevel: number;
@@ -18,7 +19,6 @@ interface UseCellMoveProps {
 
 export const useCellMove = ({ zoomState, cellSize }: UseCellMoveProps) => {
   const [previewCell, setPreviewCell] = useState<PreviewCellType | null>(null);
-  const [isMoving, setIsMoving] = useState(false);
   const [movingCell, setMovingCell] = useState<Cell | null>(null);
   const [originalPosition, setOriginalPosition] = useState<{
     x: number;
@@ -29,64 +29,50 @@ export const useCellMove = ({ zoomState, cellSize }: UseCellMoveProps) => {
   const { width, height } = Dimensions.get("window");
   const safeHeight = height - insets.top - insets.bottom;
 
-  const screenToGridCoordinates = (screenX: number, screenY: number) => {
-    const adjustedX = screenX - (width / 2) * (1 - zoomState.zoomLevel);
-    const adjustedY =
-      screenY -
-      insets.top -
-      insets.bottom -
-      (safeHeight / 2) * (1 - zoomState.zoomLevel);
+  const screenToGridCoordinates = createScreenToGridCoordinates(
+    width,
+    safeHeight,
+    insets.top,
+    insets.bottom,
+    zoomState,
+    cellSize
+  );
 
-    const gridWorldX = adjustedX / zoomState.zoomLevel - zoomState.offsetX;
-    const gridWorldY = adjustedY / zoomState.zoomLevel - zoomState.offsetY;
-    const gridX = Math.round(gridWorldX / cellSize);
-    const gridY = Math.round(gridWorldY / cellSize);
-    return { x: gridX, y: gridY };
-  };
+  // Utility function to restore cell to original position
+  const restoreOriginalPosition = useCallback(
+    (cell: Cell, position: { x: number; y: number }) => {
+      coordinateService.occupyArea(position.x, position.y, cell.size, cell.id);
+    },
+    []
+  );
 
-  // Cleanup function to restore coordinates in case of unexpected state
-  const cleanupMoveState = useCallback(() => {
-    if (isMoving && movingCell && originalPosition) {
-      coordinateService.occupyArea(
-        originalPosition.x,
-        originalPosition.y,
-        movingCell.size,
-        movingCell.id
-      );
+  // Cleanup function to reset all move-related state
+  const resetMoveState = useCallback(() => {
+    if (movingCell && originalPosition) {
+      restoreOriginalPosition(movingCell, originalPosition);
     }
-    setIsMoving(false);
     setMovingCell(null);
     setPreviewCell(null);
     setOriginalPosition(null);
-  }, [isMoving, movingCell, originalPosition]);
+  }, [movingCell, originalPosition, restoreOriginalPosition]);
 
   // Cleanup on unmount
   useEffect(() => {
     return () => {
-      if (isMoving && movingCell && originalPosition) {
-        coordinateService.occupyArea(
-          originalPosition.x,
-          originalPosition.y,
-          movingCell.size,
-          movingCell.id
-        );
+      if (movingCell && originalPosition) {
+        restoreOriginalPosition(movingCell, originalPosition);
       }
     };
-  }, [isMoving, movingCell, originalPosition]);
+  }, [movingCell, originalPosition, restoreOriginalPosition]);
 
-  // Also cleanup if the moving cell somehow gets deleted or changes
+  // Cleanup if the moving cell gets deleted during move
   useEffect(() => {
-    if (isMoving && movingCell) {
-      const currentCell = cellService.getCellById(movingCell.id);
-      if (!currentCell) {
-        // Cell was deleted during move, cleanup
-        cleanupMoveState();
-      }
+    if (movingCell && !cellService.getCellById(movingCell.id)) {
+      resetMoveState();
     }
-  }, [isMoving, movingCell, cleanupMoveState]);
+  }, [movingCell, resetMoveState]);
 
   const handleMoveStart = (cell: Cell) => (event: GestureResponderEvent) => {
-    setIsMoving(true);
     setMovingCell(cell);
     setOriginalPosition({ x: cell.x, y: cell.y });
 
@@ -99,29 +85,16 @@ export const useCellMove = ({ zoomState, cellSize }: UseCellMoveProps) => {
   };
 
   const handleMove = (event: GestureResponderEvent) => {
-    if (!isMoving || !movingCell) return;
+    if (!movingCell) return;
 
     const { pageX, pageY } = event.nativeEvent;
     const { x, y } = screenToGridCoordinates(pageX, pageY);
-
     setPreviewCell({ x, y, type: movingCell.type });
   };
 
   const handleMoveEnd = (event: GestureResponderEvent) => {
-    if (!isMoving || !movingCell || !originalPosition) {
-      // Restore coordinates if we have the data
-      if (movingCell && originalPosition) {
-        coordinateService.occupyArea(
-          originalPosition.x,
-          originalPosition.y,
-          movingCell.size,
-          movingCell.id
-        );
-      }
-      setIsMoving(false);
-      setMovingCell(null);
-      setPreviewCell(null);
-      setOriginalPosition(null);
+    if (!movingCell || !originalPosition) {
+      resetMoveState();
       return;
     }
 
@@ -135,38 +108,22 @@ export const useCellMove = ({ zoomState, cellSize }: UseCellMoveProps) => {
         // Move the cell to the new position
         const success = cellService.moveCell(movingCell.id, x, y);
         if (success) {
-          // The moveCell function will handle occupying the new coordinates
           // Select the moved cell to keep it selected
           cellService.selectCell({ ...movingCell, x, y });
         } else {
           // If move failed, restore original coordinates
-          coordinateService.occupyArea(
-            originalPosition.x,
-            originalPosition.y,
-            movingCell.size,
-            movingCell.id
-          );
+          restoreOriginalPosition(movingCell, originalPosition);
         }
       } else {
         // Position is occupied, restore original coordinates
-        coordinateService.occupyArea(
-          originalPosition.x,
-          originalPosition.y,
-          movingCell.size,
-          movingCell.id
-        );
+        restoreOriginalPosition(movingCell, originalPosition);
       }
     } else {
       // Same position, restore original coordinates
-      coordinateService.occupyArea(
-        originalPosition.x,
-        originalPosition.y,
-        movingCell.size,
-        movingCell.id
-      );
+      restoreOriginalPosition(movingCell, originalPosition);
     }
 
-    setIsMoving(false);
+    // Reset state
     setMovingCell(null);
     setPreviewCell(null);
     setOriginalPosition(null);
@@ -174,8 +131,7 @@ export const useCellMove = ({ zoomState, cellSize }: UseCellMoveProps) => {
 
   return {
     previewCell,
-    isMoving,
-    movingCellId: movingCell?.id,
+    isMoving: !!movingCell,
     handleMoveStart,
     handleMove,
     handleMoveEnd,
