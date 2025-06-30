@@ -8,6 +8,7 @@ type GridCellProps = {
   cell: Cell;
   cellSize: number;
   isSelected: boolean;
+  isDimmed?: boolean;
   onPress: (cell: Cell) => void;
   onDoublePress: (cell: Cell) => void;
   onLongPress: (cell: Cell) => void;
@@ -31,6 +32,7 @@ export const GridCell: React.FC<GridCellProps> = ({
   cell,
   cellSize,
   isSelected,
+  isDimmed = false,
   onPress,
   onDoublePress,
   onLongPress,
@@ -63,6 +65,7 @@ export const GridCell: React.FC<GridCellProps> = ({
           width: cellSize * sizeMultiplier,
           height: cellSize * sizeMultiplier,
           backgroundColor: isSelected ? "#555" : "#000",
+          opacity: isDimmed ? 0.3 : 1,
         },
       ]}
       onPress={handlePress}

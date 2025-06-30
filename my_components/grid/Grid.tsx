@@ -12,6 +12,7 @@ type GridProps = {
   cells: Cell[];
   selected?: Cell | null;
   previewCell: PreviewCellType | null;
+  movingCellId?: number;
   onCellLongPress?: (cell: Cell) => (event: GestureResponderEvent) => void;
   onCellMove?: (event: GestureResponderEvent) => void;
   onCellMoveEnd?: (event: GestureResponderEvent) => void;
@@ -21,6 +22,7 @@ export const Grid: React.FC<GridProps> = ({
   cells,
   selected,
   previewCell,
+  movingCellId,
   onCellLongPress,
   onCellMove,
   onCellMoveEnd,
@@ -91,6 +93,7 @@ export const Grid: React.FC<GridProps> = ({
           cell={cell}
           cellSize={cellSize}
           isSelected={selected?.x === cell.x && selected?.y === cell.y}
+          isDimmed={movingCellId === cell.id}
           onPress={handleCellPress}
           onDoublePress={openPopup}
           onLongPress={(cell) => handleCellLongPress(cell)}
