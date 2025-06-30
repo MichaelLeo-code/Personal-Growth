@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useRef } from "react";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { totalCompletedCost, totalCost } from "../../../service/taskService";
 import { Cell, CellType } from "../../../types/cells";
@@ -9,7 +9,8 @@ type GridCellProps = {
   cellSize: number;
   isSelected: boolean;
   onPress: (cell: Cell) => void;
-  onButtonPress: (cell: Cell) => void;
+  onDoublePress: (cell: Cell) => void;
+  onLongPress: (cell: Cell) => void;
 };
 
 const TaskPreview: React.FC<{ text: string; completed: boolean }> = ({
@@ -31,14 +32,25 @@ export const GridCell: React.FC<GridCellProps> = ({
   cellSize,
   isSelected,
   onPress,
-  onButtonPress,
+  onDoublePress,
+  onLongPress,
 }) => {
   const sizeMultiplier = cell.type === CellType.Headline ? 1 : 3;
   const total = totalCost(cell.id);
   const completed = totalCompletedCost(cell.id);
+  const lastTap = useRef<number>(0);
 
-  const handleLongPress = () => {
-    onButtonPress(cell);
+  const handlePress = () => {
+    const now = Date.now();
+    const DOUBLE_PRESS_DELAY = 300;
+
+    if (now - lastTap.current < DOUBLE_PRESS_DELAY) {
+      onDoublePress(cell);
+    } else {
+      onPress(cell);
+    }
+
+    lastTap.current = now;
   };
 
   return (
@@ -53,8 +65,8 @@ export const GridCell: React.FC<GridCellProps> = ({
           backgroundColor: isSelected ? "#555" : "#000",
         },
       ]}
-      onPress={() => onPress(cell)}
-      onLongPress={handleLongPress}
+      onPress={handlePress}
+      onLongPress={() => onLongPress(cell)}
     >
       <View style={styles.cellContent}>
         <Text style={styles.text}>{cell.text}</Text>

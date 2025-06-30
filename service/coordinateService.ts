@@ -32,10 +32,10 @@ class CoordinateService {
     }
   }
 
-  deleteArea(x1: number, x2: number, y1: number, y2: number): void {
-    for (let x = x1; x <= x2; x++) {
-      for (let y = y1; y <= y2; y++) {
-        this.deleteOne(x, y);
+  deleteArea(x: number, y: number, size: { x: number; y: number }): void {
+    for (let i = -1; i <= size.x; i++) {
+      for (let j = -1; j <= size.y; j++) {
+        this.deleteOne(x + i, y + j);
       }
     }
   }

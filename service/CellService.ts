@@ -163,12 +163,7 @@ class CellService {
     }
 
     this.cellMap.delete(id);
-    coordinateService.deleteArea(
-      cell.x,
-      cell.x + cell.size.x - 1,
-      cell.y,
-      cell.y + cell.size.y - 1
-    );
+    coordinateService.deleteArea(cell.x, cell.y, cell.size);
     this.notify();
     this.saveToStorage();
   }
@@ -187,6 +182,31 @@ class CellService {
     const cell = this.cellMap.get(id);
     if (!cell) return false;
     cell.text = newTitle;
+    this.cellMap.set(id, cell);
+    this.notify();
+    this.saveToStorage();
+    return true;
+  }
+
+  moveCell(id: number, newX: number, newY: number): boolean {
+    const cell = this.cellMap.get(id);
+    if (!cell) return false;
+
+    const existingCellId = coordinateService.getCellIdAt(newX, newY);
+    if (existingCellId !== undefined && existingCellId !== id) {
+      console.warn(
+        `Cannot move cell to (${newX}, ${newY}) - position is occupied by cell ${existingCellId}`
+      );
+      return false;
+    }
+
+    coordinateService.deleteArea(cell.x, cell.y, cell.size);
+
+    cell.x = newX;
+    cell.y = newY;
+
+    coordinateService.occupyArea(cell.x, cell.y, cell.size, cell.id);
+
     this.cellMap.set(id, cell);
     this.notify();
     this.saveToStorage();

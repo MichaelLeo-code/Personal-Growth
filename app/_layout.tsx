@@ -1,6 +1,6 @@
 import { cellSize } from "@/constants";
 import { FloatingActionButtons } from "@/containers";
-import { FloatingButton, Grid } from "@/my_components";
+import { Grid } from "@/my_components";
 import { useCellManagement, useDragAndDrop, useZoomState } from "@/my_hooks";
 import { ReactNativeZoomableView } from "@openspacelabs/react-native-zoomable-view";
 import { DarkTheme, ThemeProvider } from "@react-navigation/native";
@@ -18,7 +18,7 @@ export default function RootLayout() {
       selected,
       cellSize,
     });
-  const [isEditMode, setIsEditMode] = useState(false);
+  const [isEditMode, setIsEditMode] = useState(true);
 
   // Font loading
   const [loaded] = useFonts({
@@ -42,10 +42,10 @@ export default function RootLayout() {
           <Grid cells={cells} selected={selected} previewCell={previewCell} />
         </ReactNativeZoomableView>
 
-        <FloatingButton
+        {/* <FloatingButton
           onPress={() => setIsEditMode(!isEditMode)}
           iconName="note-edit-outline"
-        />
+        /> */}
 
         {isEditMode && (
           <FloatingActionButtons

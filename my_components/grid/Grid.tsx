@@ -60,7 +60,8 @@ export const Grid: React.FC<GridProps> = ({ cells, selected, previewCell }) => {
           cellSize={cellSize}
           isSelected={selected?.x === cell.x && selected?.y === cell.y}
           onPress={handleCellPress}
-          onButtonPress={openPopup}
+          onDoublePress={openPopup}
+          onLongPress={() => console.log("test")}
         />
       ))}
       <PreviewCell previewCell={previewCell} cellSize={cellSize} />
