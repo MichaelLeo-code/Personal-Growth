@@ -1,6 +1,7 @@
 import { cellSize } from "@/constants";
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { GestureResponderEvent, StyleSheet, View } from "react-native";
+import { usePopup } from "../../my_hooks";
 import { cellService } from "../../service";
 import { Cell } from "../../types/cells";
 import { PopupSelector } from "../popup";
@@ -27,42 +28,16 @@ export const Grid: React.FC<GridProps> = ({
   onCellMove,
   onCellMoveEnd,
 }) => {
-  const [popupInstance, setPopupInstance] = useState<Cell | null>(null);
-  const [isPopupVisible, setIsPopupVisible] = useState(false);
+  const {
+    isVisible: isPopupVisible,
+    popupInstance,
+    showPopup,
+    hidePopup,
+  } = usePopup();
   const [startCoordinates, setStartCoordinates] = useState<{
     x: number;
     y: number;
   } | null>(null);
-
-  // Clear popupInstance after popup animation completes
-  useEffect(() => {
-    if (!isPopupVisible) {
-      const timer = setTimeout(() => {
-        setPopupInstance(null);
-      }, 350);
-
-      return () => clearTimeout(timer);
-    }
-  }, [isPopupVisible]);
-
-  const handleCellPress = (cell: Cell) => {
-    cellService.selectCell(cell);
-  };
-
-  const openPopup = (cell: Cell) => {
-    // If a popup is already open for a different cell, close it first
-    if (popupInstance && popupInstance.id !== cell.id) {
-      setPopupInstance(null);
-    }
-    setIsPopupVisible(true);
-    setPopupInstance(cell);
-  };
-
-  const hidePopup = () => {
-    setIsPopupVisible(false);
-    // Don't immediately set popupInstance to null - let the Modal animation complete
-    // The popupInstance will be cleared when a new popup opens or component unmounts
-  };
 
   const handleCellLongPress = (cell: Cell) => {
     if (onCellMoveStart) {
@@ -105,8 +80,8 @@ export const Grid: React.FC<GridProps> = ({
           cellSize={cellSize}
           isSelected={selected?.x === cell.x && selected?.y === cell.y}
           isDimmed={isMoving && selected?.id === cell.id}
-          onPress={handleCellPress}
-          onDoublePress={openPopup}
+          onPress={(cell) => cellService.selectCell(cell)}
+          onDoublePress={(cell) => showPopup(cell)}
           onLongPress={(cell) => handleCellLongPress(cell)}
         />
       ))}
@@ -116,7 +91,7 @@ export const Grid: React.FC<GridProps> = ({
           key={popupInstance.id} // Add key to ensure proper re-rendering
           cell={popupInstance}
           hidePopup={hidePopup}
-          isVisible={!!isPopupVisible}
+          isVisible={isPopupVisible}
         />
       )}
     </View>
