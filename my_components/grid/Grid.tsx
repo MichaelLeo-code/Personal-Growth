@@ -27,20 +27,19 @@ export const Grid: React.FC<GridProps> = ({
   onCellMove,
   onCellMoveEnd,
 }) => {
-  const [selectedCell, setSelectedCell] = useState<Cell | null>(null);
+  const [popupInstance, setPopupInstance] = useState<Cell | null>(null);
   const [isPopupVisible, setIsPopupVisible] = useState(false);
 
-  // Clear selectedCell after popup animation completes
+  // Clear popupInstance after popup animation completes
   useEffect(() => {
-    if (!isPopupVisible && selectedCell) {
-      // Give the Modal time to complete its fade animation (typically 300ms)
+    if (!isPopupVisible) {
       const timer = setTimeout(() => {
-        setSelectedCell(null);
+        setPopupInstance(null);
       }, 350);
 
       return () => clearTimeout(timer);
     }
-  }, [isPopupVisible, selectedCell]);
+  }, [isPopupVisible]);
 
   const handleCellPress = (cell: Cell) => {
     cellService.selectCell(cell);
@@ -48,22 +47,31 @@ export const Grid: React.FC<GridProps> = ({
 
   const openPopup = (cell: Cell) => {
     // If a popup is already open for a different cell, close it first
-    if (selectedCell && selectedCell.id !== cell.id) {
-      setIsPopupVisible(false);
+    if (popupInstance && popupInstance.id !== cell.id) {
+      setPopupInstance(null);
     }
-    // Set the new popup
-    setSelectedCell(cell);
     setIsPopupVisible(true);
+    setPopupInstance(cell);
   };
 
   const hidePopup = () => {
     setIsPopupVisible(false);
-    // Don't immediately set selectedCell to null - let the Modal animation complete
-    // The selectedCell will be cleared when a new popup opens or component unmounts
+    // Don't immediately set popupInstance to null - let the Modal animation complete
+    // The popupInstance will be cleared when a new popup opens or component unmounts
   };
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      console.log(isMoving, selected?.id);
+    }, 1500);
+
+    return () => clearInterval(interval); // Cleanup on unmount
+  }, [isMoving, selected]);
 
   const handleCellLongPress = (cell: Cell) => {
     if (onCellLongPress) {
+      cellService.selectCell(cell);
+
       // The onCellLongPress returns a function that expects an event
       // We need to create a wrapper that calls it
       const moveHandler = onCellLongPress(cell);
@@ -101,12 +109,12 @@ export const Grid: React.FC<GridProps> = ({
         />
       ))}
       <PreviewCell previewCell={previewCell} cellSize={cellSize} />
-      {selectedCell && (
+      {popupInstance && (
         <PopupSelector
-          key={selectedCell.id} // Add key to ensure proper re-rendering
-          cell={selectedCell}
+          key={popupInstance.id} // Add key to ensure proper re-rendering
+          cell={popupInstance}
           hidePopup={hidePopup}
-          isVisible={isPopupVisible}
+          isVisible={!!isPopupVisible}
         />
       )}
     </View>
