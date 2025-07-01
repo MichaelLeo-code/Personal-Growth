@@ -1,6 +1,12 @@
-import { coordinateService } from "@/service";
+import { cellService, coordinateService } from "@/service";
 import { Cell, CellType } from "@/types";
+import {
+  calculateSvgDimensions,
+  createLineBetweenCells,
+  LineData,
+} from "@/utils";
 import { StyleSheet, View } from "react-native";
+import Svg, { Line } from "react-native-svg";
 
 export type PreviewCellType = {
   x: number;
@@ -32,26 +38,97 @@ const isPreviewPositionValid = (previewCellData: Cell) => {
 type Props = {
   previewCell: { x: number; y: number; type: CellType } | null;
   cellSize: number;
+  selected?: Cell | null;
+  isMoving?: boolean;
 };
 
-export const PreviewCell: React.FC<Props> = ({ previewCell, cellSize }) => {
+export const PreviewCell: React.FC<Props> = ({
+  previewCell,
+  cellSize,
+  selected,
+  isMoving = false,
+}) => {
   const previewCellData = getPreviewCellData(previewCell);
 
+  // Determine which cell should be the source of the line
+  const sourceCell =
+    isMoving && selected?.parent
+      ? cellService.getCellById(selected.parent)
+      : selected;
+
+  // Calculate line to parent/selected cell if both source cell and preview cell exist
+  const parentLine: LineData | null =
+    sourceCell && previewCellData
+      ? createLineBetweenCells(sourceCell, previewCellData, cellSize)
+      : null;
+
+  // Calculate lines to children if we're moving a cell with children
+  const childrenLines: LineData[] =
+    isMoving && selected?.children && previewCellData
+      ? selected.children
+          .map((childId) => {
+            const childCell = cellService.getCellById(childId);
+            return childCell
+              ? createLineBetweenCells(previewCellData, childCell, cellSize)
+              : null;
+          })
+          .filter((line): line is LineData => line !== null)
+      : [];
+
+  // Combine all lines
+  const allLines: LineData[] = [parentLine, ...childrenLines].filter(
+    (line): line is LineData => line !== null
+  );
+
+  // Calculate SVG dimensions using shared utility
+  const { svgDimensions, adjustedLines } = calculateSvgDimensions(allLines);
+
   return (
-    previewCellData && (
-      <View
-        style={[
-          styles.previewCell,
-          !isPreviewPositionValid(previewCellData) && styles.previewCellInvalid,
-          {
-            left: previewCellData.x * cellSize,
-            top: previewCellData.y * cellSize,
-            width: cellSize * previewCellData.size.x,
-            height: cellSize * previewCellData.size.y,
-          },
-        ]}
-      />
-    )
+    <>
+      {previewCellData && (
+        <View
+          style={[
+            styles.previewCell,
+            !isPreviewPositionValid(previewCellData) &&
+              styles.previewCellInvalid,
+            {
+              left: previewCellData.x * cellSize,
+              top: previewCellData.y * cellSize,
+              width: cellSize * previewCellData.size.x,
+              height: cellSize * previewCellData.size.y,
+            },
+          ]}
+        />
+      )}
+      {adjustedLines.length > 0 && (
+        <Svg
+          style={[
+            StyleSheet.absoluteFill,
+            {
+              left: svgDimensions.left,
+              top: svgDimensions.top,
+              width: svgDimensions.width,
+              height: svgDimensions.height,
+            },
+          ]}
+          width={svgDimensions.width}
+          height={svgDimensions.height}
+        >
+          {adjustedLines.map((line, index) => (
+            <Line
+              key={index}
+              x1={line.x1}
+              y1={line.y1}
+              x2={line.x2}
+              y2={line.y2}
+              stroke="#4b50e3"
+              strokeWidth="2"
+              strokeDasharray="5,5"
+            />
+          ))}
+        </Svg>
+      )}
+    </>
   );
 };
 

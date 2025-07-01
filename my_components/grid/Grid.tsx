@@ -85,7 +85,12 @@ export const Grid: React.FC<GridProps> = ({
           onLongPress={(cell) => handleCellLongPress(cell)}
         />
       ))}
-      <PreviewCell previewCell={previewCell} cellSize={cellSize} />
+      <PreviewCell
+        previewCell={previewCell}
+        cellSize={cellSize}
+        selected={selected}
+        isMoving={isMoving}
+      />
       {popupInstance && (
         <PopupSelector
           key={popupInstance.id} // Add key to ensure proper re-rendering
