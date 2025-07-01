@@ -37,6 +37,7 @@ export const useAuth = () => {
         email,
         password
       );
+      console.log("User signed up:", result);
       return { success: true, user: result.user };
     } catch (error: any) {
       return { success: false, error: error.message };
