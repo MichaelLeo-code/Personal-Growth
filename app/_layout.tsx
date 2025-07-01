@@ -1,6 +1,6 @@
 import { cellSize } from "@/constants";
 import { FloatingActionButtons } from "@/containers";
-import { Grid } from "@/my_components";
+import { Grid, LogoutButton } from "@/my_components";
 import {
   useCellManagement,
   useCellMove,
@@ -64,6 +64,8 @@ export default function RootLayout() {
             onCellMoveEnd={handleMoveEnd}
           />
         </ReactNativeZoomableView>
+
+        <LogoutButton />
 
         {/* <FloatingButton
           onPress={() => setIsEditMode(!isEditMode)}

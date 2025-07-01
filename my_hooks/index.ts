@@ -1,3 +1,4 @@
+export { useAuth } from "./useAuth";
 export { useCellManagement } from "./useCellManagement";
 export { useCellMove } from "./useCellMove";
 export { useDragAndDrop } from "./useDragAndDrop";
