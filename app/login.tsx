@@ -1,7 +1,7 @@
-import React from "react";
-import { View, StyleSheet } from "react-native";
 import { LoginScreen } from "@/my_components";
 import { DarkTheme, ThemeProvider } from "@react-navigation/native";
+import React from "react";
+import { StyleSheet, View } from "react-native";
 
 export default function LoginPage() {
   return (

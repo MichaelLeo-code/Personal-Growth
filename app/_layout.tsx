@@ -1,8 +1,8 @@
-import React from "react";
-import { SafeAreaView, ActivityIndicator } from "react-native";
 import { useAuth } from "@/my_hooks";
 import { DarkTheme, ThemeProvider } from "@react-navigation/native";
 import { useFonts } from "expo-font";
+import React from "react";
+import { ActivityIndicator, SafeAreaView } from "react-native";
 import LoginPage from "./login";
 import MainApp from "./main";
 
@@ -17,7 +17,14 @@ export default function RootLayout() {
   if (!loaded || authLoading) {
     return (
       <ThemeProvider value={DarkTheme}>
-        <SafeAreaView style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: '#000' }}>
+        <SafeAreaView
+          style={{
+            flex: 1,
+            justifyContent: "center",
+            alignItems: "center",
+            backgroundColor: "#000",
+          }}
+        >
           <ActivityIndicator size="large" color="#007AFF" />
         </SafeAreaView>
       </ThemeProvider>

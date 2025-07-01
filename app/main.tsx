@@ -1,5 +1,3 @@
-import React, { useState } from "react";
-import { SafeAreaView } from "react-native";
 import { cellSize } from "@/constants";
 import { FloatingActionButtons } from "@/containers";
 import { Grid, LogoutButton } from "@/my_components";
@@ -10,6 +8,8 @@ import {
   useZoomState,
 } from "@/my_hooks";
 import { ReactNativeZoomableView } from "@openspacelabs/react-native-zoomable-view";
+import React, { useState } from "react";
+import { SafeAreaView } from "react-native";
 
 export default function MainApp() {
   const { cells, selected, addCell, deleteSelectedCell, deleteAllCells } =
