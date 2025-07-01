@@ -114,3 +114,78 @@ export const createLineBetweenCells = (
     y2: to.y,
   };
 };
+
+/**
+ * Calculate SVG bounds that include both lines and cell bounds with padding
+ * @param lines Array of line coordinates
+ * @param cells Array of cells to include in bounds calculation
+ * @param cellSize Size of each grid cell in pixels
+ * @param padding Padding to add around the content
+ * @returns SVG dimensions and adjusted line coordinates
+ */
+export const calculateSvgDimensionsWithCells = (
+  lines: LineData[],
+  cells: { x: number; y: number; size: { x: number; y: number } }[],
+  cellSize: number,
+  padding: number = 0
+): {
+  svgDimensions: SvgDimensions;
+  adjustedLines: (LineData & { key: string })[];
+} => {
+  if (lines.length === 0 && cells.length === 0) {
+    return {
+      svgDimensions: {
+        left: 0,
+        top: 0,
+        width: 1000,
+        height: 1000,
+      },
+      adjustedLines: [],
+    };
+  }
+
+  let minX = Infinity;
+  let maxX = -Infinity;
+  let minY = Infinity;
+  let maxY = -Infinity;
+
+  // Include cell bounds in calculation
+  cells.forEach((cell) => {
+    const cellMinX = cell.x * cellSize;
+    const cellMaxX = (cell.x + cell.size.x) * cellSize;
+    const cellMinY = cell.y * cellSize;
+    const cellMaxY = (cell.y + cell.size.y) * cellSize;
+
+    minX = Math.min(minX, cellMinX);
+    maxX = Math.max(maxX, cellMaxX);
+    minY = Math.min(minY, cellMinY);
+    maxY = Math.max(maxY, cellMaxY);
+  });
+
+  // Include line bounds in calculation
+  lines.forEach((line) => {
+    minX = Math.min(minX, line.x1, line.x2);
+    maxX = Math.max(maxX, line.x1, line.x2);
+    minY = Math.min(minY, line.y1, line.y2);
+    maxY = Math.max(maxY, line.y1, line.y2);
+  });
+
+  // Apply padding
+  const svgDimensions: SvgDimensions = {
+    left: minX - padding,
+    top: minY - padding,
+    width: maxX - minX + padding * 2,
+    height: maxY - minY + padding * 2,
+  };
+
+  // Adjust line coordinates relative to SVG bounds and add keys
+  const adjustedLines = lines.map((line, index) => ({
+    x1: line.x1 - svgDimensions.left,
+    y1: line.y1 - svgDimensions.top,
+    x2: line.x2 - svgDimensions.left,
+    y2: line.y2 - svgDimensions.top,
+    key: `line-${index}`,
+  }));
+
+  return { svgDimensions, adjustedLines };
+};
