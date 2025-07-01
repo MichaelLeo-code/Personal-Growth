@@ -59,6 +59,7 @@ export default function RootLayout() {
             selected={selected}
             previewCell={previewCell || movePreviewCell}
             isMoving={isMoving}
+            zoomState={zoomState}
             onCellLongPress={handleMoveStart}
             onCellMove={handleMove}
             onCellMoveEnd={handleMoveEnd}

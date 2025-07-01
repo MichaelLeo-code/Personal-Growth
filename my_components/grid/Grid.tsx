@@ -1,18 +1,32 @@
 import { cellSize } from "@/constants";
 import React, { useEffect, useState } from "react";
-import { GestureResponderEvent, StyleSheet, View } from "react-native";
+import {
+  Dimensions,
+  GestureResponderEvent,
+  StyleSheet,
+  View,
+} from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { cellService } from "../../service";
 import { Cell } from "../../types/cells";
+import { createGridToScreenCoordinates } from "../../utils/coordinateUtils";
 import { PopupSelector } from "../popup";
 import { CellLines } from "./CellLines";
 import { GridCell } from "./grid-cell/GridCell";
 import { PreviewCell, PreviewCellType } from "./PreviewCell";
+
+interface ZoomState {
+  zoomLevel: number;
+  offsetX: number;
+  offsetY: number;
+}
 
 type GridProps = {
   cells: Cell[];
   selected?: Cell | null;
   previewCell: PreviewCellType | null;
   isMoving?: boolean;
+  zoomState: ZoomState;
   onCellLongPress?: (cell: Cell) => (event: GestureResponderEvent) => void;
   onCellMove?: (event: GestureResponderEvent) => void;
   onCellMoveEnd?: (event: GestureResponderEvent) => void;
@@ -23,12 +37,28 @@ export const Grid: React.FC<GridProps> = ({
   selected,
   previewCell,
   isMoving = false,
+  zoomState,
   onCellLongPress,
   onCellMove,
   onCellMoveEnd,
 }) => {
   const [popupInstance, setPopupInstance] = useState<Cell | null>(null);
   const [isPopupVisible, setIsPopupVisible] = useState(false);
+
+  // Get screen dimensions and safe area insets at component level
+  const { width, height } = Dimensions.get("window");
+  const insets = useSafeAreaInsets();
+  const safeHeight = height - insets.top - insets.bottom;
+
+  // Create coordinate converter
+  const gridToScreenCoordinates = createGridToScreenCoordinates(
+    width,
+    safeHeight,
+    insets.top,
+    insets.bottom,
+    zoomState,
+    cellSize
+  );
 
   // Clear popupInstance after popup animation completes
   useEffect(() => {
@@ -76,14 +106,22 @@ export const Grid: React.FC<GridProps> = ({
       // We need to create a wrapper that calls it
       const moveHandler = onCellLongPress(cell);
 
-      // Create a fake event to start the move - this will be refined
-      const fakeEvent = {
+      // Calculate the center of the cell in screen coordinates
+      const cellCenterX = cell.x + (cell.size?.x || 1) / 2;
+      const cellCenterY = cell.y + (cell.size?.y || 1) / 2;
+      const { pageX, pageY } = gridToScreenCoordinates(
+        cellCenterX,
+        cellCenterY
+      );
+
+      // Create event with proper coordinates
+      const properEvent = {
         nativeEvent: {
-          pageX: 0,
-          pageY: 0,
+          pageX,
+          pageY,
         },
       } as any;
-      moveHandler(fakeEvent);
+      moveHandler(properEvent);
     } else {
       console.log("test");
     }
