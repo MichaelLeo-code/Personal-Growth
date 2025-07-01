@@ -33,3 +33,14 @@ export const createScreenToGridCoordinates =
       y: Math.round(gridWorldY / cellSize),
     };
   };
+
+export const adjustForCellCenter = (
+  x: number,
+  y: number,
+  size: { x: number; y: number }
+) => {
+  return {
+    x: x - Math.floor(size.x / 2),
+    y: y - Math.floor(size.y / 2),
+  };
+};

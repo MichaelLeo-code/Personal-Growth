@@ -4,7 +4,7 @@ import { Cell, CellType } from "@/types";
 import { useState } from "react";
 import { Dimensions, GestureResponderEvent } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { createScreenToGridCoordinates } from "./utils/coordinateUtils";
+import { createScreenToGridCoordinates } from "../utils/coordinateUtils";
 
 interface ZoomState {
   zoomLevel: number;

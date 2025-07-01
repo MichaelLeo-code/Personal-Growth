@@ -1,10 +1,13 @@
 import { PreviewCellType } from "@/my_components/grid/PreviewCell";
 import { cellService, coordinateService } from "@/service";
 import { Cell } from "@/types";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useState } from "react";
 import { Dimensions, GestureResponderEvent } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { createScreenToGridCoordinates } from "./utils/coordinateUtils";
+import {
+  adjustForCellCenter,
+  createScreenToGridCoordinates,
+} from "../utils/coordinateUtils";
 
 interface ZoomState {
   zoomLevel: number;
@@ -38,50 +41,32 @@ export const useCellMove = ({ zoomState, cellSize }: UseCellMoveProps) => {
     cellSize
   );
 
-  // Utility function to restore cell to original position
-  const restoreOriginalPosition = useCallback(
-    (cell: Cell, position: { x: number; y: number }) => {
-      coordinateService.occupyArea(position.x, position.y, cell.size, cell.id);
-    },
-    []
-  );
-
-  // Cleanup function to reset all move-related state
-  const resetMoveState = useCallback(() => {
-    if (movingCell && originalPosition) {
-      restoreOriginalPosition(movingCell, originalPosition);
-    }
+  const cleanUp = useCallback(() => {
     setMovingCell(null);
     setPreviewCell(null);
     setOriginalPosition(null);
-  }, [movingCell, originalPosition, restoreOriginalPosition]);
+  }, []);
 
-  // Cleanup on unmount
-  useEffect(() => {
-    return () => {
-      if (movingCell && originalPosition) {
-        restoreOriginalPosition(movingCell, originalPosition);
-      }
-    };
-  }, [movingCell, originalPosition, restoreOriginalPosition]);
-
-  // Cleanup if the moving cell gets deleted during move
-  useEffect(() => {
-    if (movingCell && !cellService.getCellById(movingCell.id)) {
-      resetMoveState();
+  const restoreOriginalPosition = useCallback(() => {
+    if (movingCell && originalPosition) {
+      const { x, y } = originalPosition;
+      coordinateService.occupyArea(x, y, movingCell.size, movingCell.id);
     }
-  }, [movingCell, resetMoveState]);
+    cleanUp();
+  }, [movingCell, originalPosition, cleanUp]);
 
   const handleMoveStart = (cell: Cell) => (event: GestureResponderEvent) => {
     setMovingCell(cell);
     setOriginalPosition({ x: cell.x, y: cell.y });
 
-    // Temporarily free up the original coordinates
     coordinateService.deleteArea(cell.x, cell.y, cell.size);
 
     const { pageX, pageY } = event.nativeEvent;
     const { x, y } = screenToGridCoordinates(pageX, pageY);
-    setPreviewCell({ x, y, type: cell.type });
+    setPreviewCell({
+      ...adjustForCellCenter(x, y, cell.size),
+      type: cell.type,
+    });
   };
 
   const handleMove = (event: GestureResponderEvent) => {
@@ -89,44 +74,36 @@ export const useCellMove = ({ zoomState, cellSize }: UseCellMoveProps) => {
 
     const { pageX, pageY } = event.nativeEvent;
     const { x, y } = screenToGridCoordinates(pageX, pageY);
-    setPreviewCell({ x, y, type: movingCell.type });
+    setPreviewCell({
+      ...adjustForCellCenter(x, y, movingCell.size),
+      type: movingCell.type,
+    });
   };
 
   const handleMoveEnd = (event: GestureResponderEvent) => {
     if (!movingCell || !originalPosition) {
-      resetMoveState();
+      restoreOriginalPosition();
       return;
     }
 
     const { pageX, pageY } = event.nativeEvent;
-    const { x, y } = screenToGridCoordinates(pageX, pageY);
+    const { x: gridX, y: gridY } = screenToGridCoordinates(pageX, pageY);
+    const { x, y } = adjustForCellCenter(gridX, gridY, movingCell.size);
 
-    // Check if the new position is different from the original position
-    if (x !== originalPosition.x || y !== originalPosition.y) {
-      // Check if the new position is available
-      if (!coordinateService.isOccupied(x, y)) {
-        // Move the cell to the new position
-        const success = cellService.moveCell(movingCell.id, x, y);
-        if (success) {
-          // Select the moved cell to keep it selected
-          cellService.selectCell({ ...movingCell, x, y });
-        } else {
-          // If move failed, restore original coordinates
-          restoreOriginalPosition(movingCell, originalPosition);
-        }
+    if (!coordinateService.isOccupied(x, y)) {
+      const success = cellService.moveCell(movingCell.id, x, y);
+      if (success) {
+        cellService.selectCell({ ...movingCell, x, y });
       } else {
-        // Position is occupied, restore original coordinates
-        restoreOriginalPosition(movingCell, originalPosition);
+        // if move failed, restore original coordinates
+        restoreOriginalPosition();
       }
     } else {
-      // Same position, restore original coordinates
-      restoreOriginalPosition(movingCell, originalPosition);
+      // position is occupied, restore original coordinates
+      restoreOriginalPosition();
     }
 
-    // Reset state
-    setMovingCell(null);
-    setPreviewCell(null);
-    setOriginalPosition(null);
+    cleanUp();
   };
 
   return {

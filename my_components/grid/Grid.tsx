@@ -13,7 +13,7 @@ type GridProps = {
   selected?: Cell | null;
   previewCell: PreviewCellType | null;
   isMoving?: boolean;
-  onCellLongPress?: (cell: Cell) => (event: GestureResponderEvent) => void;
+  onCellMoveStart?: (cell: Cell) => (event: GestureResponderEvent) => void;
   onCellMove?: (event: GestureResponderEvent) => void;
   onCellMoveEnd?: (event: GestureResponderEvent) => void;
 };
@@ -23,7 +23,7 @@ export const Grid: React.FC<GridProps> = ({
   selected,
   previewCell,
   isMoving = false,
-  onCellLongPress,
+  onCellMoveStart,
   onCellMove,
   onCellMoveEnd,
 }) => {
@@ -64,29 +64,19 @@ export const Grid: React.FC<GridProps> = ({
     // The popupInstance will be cleared when a new popup opens or component unmounts
   };
 
-  useEffect(() => {
-    const interval = setInterval(() => {
-      console.log(isMoving, selected?.id);
-    }, 1500);
-
-    return () => clearInterval(interval); // Cleanup on unmount
-  }, [isMoving, selected]);
-
   const handleCellLongPress = (cell: Cell) => {
-    if (onCellLongPress) {
+    if (onCellMoveStart) {
       cellService.selectCell(cell);
 
-      // The onCellLongPress returns a function that expects an event
-      // We need to create a wrapper that calls it with stored coordinates
-      const moveHandler = onCellLongPress(cell);
+      // onCellLongPress returns a function that expects an event
+      const moveHandler = onCellMoveStart(cell);
 
-      // Use stored coordinates from onTouchStart, or fallback to (0,0)
       const eventWithCoordinates = {
         nativeEvent: {
           pageX: startCoordinates?.x || 0,
           pageY: startCoordinates?.y || 0,
         },
-      } as any;
+      } as GestureResponderEvent;
       moveHandler(eventWithCoordinates);
     } else {
       console.log("test");
@@ -94,7 +84,6 @@ export const Grid: React.FC<GridProps> = ({
   };
 
   const handleTouchStart = (event: GestureResponderEvent) => {
-    // Store the initial touch coordinates
     setStartCoordinates({
       x: event.nativeEvent.pageX,
       y: event.nativeEvent.pageY,
