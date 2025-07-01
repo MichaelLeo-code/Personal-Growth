@@ -29,6 +29,10 @@ export const Grid: React.FC<GridProps> = ({
 }) => {
   const [popupInstance, setPopupInstance] = useState<Cell | null>(null);
   const [isPopupVisible, setIsPopupVisible] = useState(false);
+  const [startCoordinates, setStartCoordinates] = useState<{
+    x: number;
+    y: number;
+  } | null>(null);
 
   // Clear popupInstance after popup animation completes
   useEffect(() => {
@@ -73,25 +77,34 @@ export const Grid: React.FC<GridProps> = ({
       cellService.selectCell(cell);
 
       // The onCellLongPress returns a function that expects an event
-      // We need to create a wrapper that calls it
+      // We need to create a wrapper that calls it with stored coordinates
       const moveHandler = onCellLongPress(cell);
 
-      // Create a fake event to start the move - this will be refined
-      const fakeEvent = {
+      // Use stored coordinates from onTouchStart, or fallback to (0,0)
+      const eventWithCoordinates = {
         nativeEvent: {
-          pageX: 0,
-          pageY: 0,
+          pageX: startCoordinates?.x || 0,
+          pageY: startCoordinates?.y || 0,
         },
       } as any;
-      moveHandler(fakeEvent);
+      moveHandler(eventWithCoordinates);
     } else {
       console.log("test");
     }
   };
 
+  const handleTouchStart = (event: GestureResponderEvent) => {
+    // Store the initial touch coordinates
+    setStartCoordinates({
+      x: event.nativeEvent.pageX,
+      y: event.nativeEvent.pageY,
+    });
+  };
+
   return (
     <View
       style={styles.grid}
+      onTouchStart={handleTouchStart}
       onTouchMove={onCellMove}
       onTouchEnd={onCellMoveEnd}
     >
