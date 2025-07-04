@@ -25,22 +25,20 @@ class CellService {
 
   constructor(storage: gridStorage) {
     this.storage = storage;
-    
-    // Set up auth state listener to update storage when user changes
+
+    if (FIREBASE_AUTH.currentUser) {
+      this.loadInitialData();
+    }
+
     onAuthStateChanged(FIREBASE_AUTH, (user) => {
       console.log("Auth state changed:", user?.uid || "null");
       this.setUser(user);
-      
-      // Reload data when user changes (but only if we had no user before or different user)
+
       if (user && this.cellMap.size === 0) {
         this.loadInitialData();
       }
     });
-    
-    // Try to load data immediately if user is already available
-    if (FIREBASE_AUTH.currentUser) {
-      this.loadInitialData();
-    }
+
   }
 
   setUser(user: User | null): void {
