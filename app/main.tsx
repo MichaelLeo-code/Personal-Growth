@@ -1,6 +1,6 @@
 import { cellSize } from "@/constants";
 import { FloatingActionButtons } from "@/containers";
-import { Grid, LogoutButton } from "@/my_components";
+import { Grid, LogoutButton, SyncStatusIndicator } from "@/my_components";
 import {
   useCellManagement,
   useCellMove,
@@ -9,7 +9,7 @@ import {
 } from "@/my_hooks";
 import { ReactNativeZoomableView } from "@openspacelabs/react-native-zoomable-view";
 import React, { useState } from "react";
-import { SafeAreaView } from "react-native";
+import { SafeAreaView, StyleSheet, View } from "react-native";
 
 export default function MainApp() {
   const { cells, selected, addCell, deleteSelectedCell, deleteAllCells } =
@@ -35,6 +35,10 @@ export default function MainApp() {
 
   return (
     <SafeAreaView style={{ flex: 1 }}>
+      <View style={styles.header}>
+        <SyncStatusIndicator />
+        <LogoutButton />
+      </View>
       <ReactNativeZoomableView
         minZoom={0.1}
         doubleTapZoomToCenter={false}
@@ -74,3 +78,16 @@ export default function MainApp() {
     </SafeAreaView>
   );
 }
+
+const styles = StyleSheet.create({
+  header: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    backgroundColor: "#f8f9fa",
+    borderBottomWidth: 1,
+    borderBottomColor: "#e9ecef",
+  },
+});
