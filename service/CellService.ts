@@ -2,7 +2,6 @@ import { FIREBASE_AUTH } from "@/firebase";
 import { Cell, CellType } from "../types/cells";
 import { storageService } from "./storageService";
 
-import { onAuthStateChanged } from "firebase/auth";
 import { coordinateService } from "./coordinateService";
 
 const directions8 = [
@@ -28,12 +27,8 @@ class CellService {
       this.loadInitialData();
     }
 
-    // Set up auth state listener to reload data when user changes
-    onAuthStateChanged(FIREBASE_AUTH, (user) => {
-      console.log("CellService: Auth state changed:", user?.uid || "null");
-
-      // Reload data when user changes (but only if we had no user before or different user)
-      if (user && this.cellMap.size === 0) {
+    storageService.onAuthChange(() => {
+      if (FIREBASE_AUTH.currentUser && this.cellMap.size === 0) {
         this.loadInitialData();
       }
     });
@@ -234,14 +229,6 @@ class CellService {
 
   notify() {
     this.listeners.forEach((listener) => listener());
-  }
-
-  /**
-   * Get the storage instance for sync operations
-   * @internal - only for sync service use
-   */
-  getStorage() {
-    return storageService.getStorage();
   }
 }
 
