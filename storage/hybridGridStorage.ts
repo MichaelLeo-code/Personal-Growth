@@ -37,12 +37,14 @@ export class HybridGridStorage implements gridStorage {
   }
 
   setUser(user: User | null): void {
-    if (!this.remoteStorage && user) {
-      this.remoteStorage = new FirestoreGridStorage(user, this.STORAGE_KEY);
-    } else if (this.remoteStorage && !user) {
+    if (user) {
+      if (this.remoteStorage) {
+        this.remoteStorage.setUser(user);
+      } else {
+        this.remoteStorage = new FirestoreGridStorage(user, this.STORAGE_KEY);
+      }
+    } else {
       this.remoteStorage = null;
-    } else if (this.remoteStorage && user) {
-      this.remoteStorage.setUser(user);
     }
 
     this.syncMetadata = {
@@ -65,13 +67,8 @@ export class HybridGridStorage implements gridStorage {
   }
 
   private async loadSyncMetadata(): Promise<void> {
-    try {
-      // For now, we'll store metadata in memory
-      // In a real implementation, you'd load from AsyncStorage with a different key
-      console.log("Loading sync metadata (placeholder)");
-    } catch {
-      console.log("No sync metadata found, starting fresh");
-    }
+    // For now, we'll store metadata in memory
+    // In a real implementation, you'd load from AsyncStorage with a different key
   }
 
   private async saveSyncMetadata(): Promise<void> {
@@ -79,9 +76,6 @@ export class HybridGridStorage implements gridStorage {
     // For now, we'll keep it in memory
   }
 
-  /**
-   * Always save to local storage first (offline-first approach)
-   */
   async saveCells(cells: Cell[]): Promise<void> {
     try {
       // Always save locally first
@@ -100,9 +94,6 @@ export class HybridGridStorage implements gridStorage {
     }
   }
 
-  /**
-   * Always load from local storage first
-   */
   async loadCells(): Promise<Cell[]> {
     try {
       // Always load from local storage first
