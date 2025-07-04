@@ -1,5 +1,5 @@
 import { Cell } from "../types/cells";
-import { gridStorage } from "./gridStorage";
+import { gridStorage } from "./gridStorageRenamed";
 import { HybridGridStorage } from "./hybridGridStorage";
 
 /**

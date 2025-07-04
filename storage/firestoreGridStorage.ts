@@ -11,7 +11,7 @@ import {
 } from "firebase/firestore";
 import { FIREBASE_DB } from "../firebase";
 import { Cell } from "../types/cells";
-import { gridStorage } from "./gridStorage";
+import { gridStorage } from "./gridStorageRenamed";
 
 export class FirestoreGridStorage implements gridStorage {
   private readonly collectionName: string;

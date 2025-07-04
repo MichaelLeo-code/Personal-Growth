@@ -1,7 +1,7 @@
 import { User } from "firebase/auth";
 import { Cell } from "../types/cells";
 import { FirestoreGridStorage } from "./firestoreGridStorage";
-import { gridStorage } from "./gridStorage";
+import { gridStorage } from "./gridStorageRenamed";
 import { localGridStorage } from "./localGridStorage";
 
 interface SyncMetadata {
