@@ -1,3 +1,4 @@
+import deepEqual from "fast-deep-equal";
 import { User } from "firebase/auth";
 import {
   collection,
@@ -14,21 +15,18 @@ import { gridStorage } from "./gridStorage";
 
 export class FirestoreGridStorage implements gridStorage {
   private readonly collectionName: string;
-  private user: User; // No null allowed
+  private user: User;
 
   constructor(user: User, collectionName: string = "cells") {
-    // No null allowed
     this.collectionName = collectionName;
     this.user = user;
   }
 
   setUser(user: User): void {
-    // No null allowed
     this.user = user;
   }
 
   private getUserCollection() {
-    // No null check needed - user is guaranteed to exist
     return collection(FIREBASE_DB, "users", this.user.uid, this.collectionName);
   }
 
@@ -36,39 +34,32 @@ export class FirestoreGridStorage implements gridStorage {
     try {
       const userCollection = this.getUserCollection();
 
-      // Get existing documents to compare
       const existingDocs = await getDocs(userCollection);
       const newCellIds = new Set(cells.map((cell) => cell.id.toString()));
 
-      // Find cells to delete (exist in Firestore but not in new cells array)
+      // cells to delete in cloud
       const cellsToDelete = existingDocs.docs.filter(
         (doc) => !newCellIds.has(doc.id)
       );
 
-      // Find cells to update or create
+      // cells to update or create in cloud
       const cellsToSave = cells.filter((cell) => {
         const cellId = cell.id.toString();
         const existingDoc = existingDocs.docs.find((doc) => doc.id === cellId);
 
         if (!existingDoc) {
-          // New cell - needs to be saved
           return true;
         }
 
-        // Compare existing data with new data (excluding updatedAt field)
-        const existingData = existingDoc.data();
-        const { updatedAt, ...existingCellData } = existingData;
+        const { updatedAt, ...existingData } = existingDoc.data();
 
-        // Simple deep comparison - you might want to use a library like lodash for more complex comparisons
-        return JSON.stringify(existingCellData) !== JSON.stringify(cell);
+        return deepEqual(JSON.stringify(existingData), JSON.stringify(cell));
       });
 
-      // Execute deletions
       const deletePromises = cellsToDelete.map((docToDelete) =>
         deleteDoc(docToDelete.ref)
       );
 
-      // Execute updates/creates
       const savePromises = cellsToSave.map((cell) => {
         const docRef = doc(userCollection, cell.id.toString());
         return setDoc(docRef, {
@@ -77,7 +68,6 @@ export class FirestoreGridStorage implements gridStorage {
         });
       });
 
-      // Run all operations
       await Promise.all([...deletePromises, ...savePromises]);
 
       console.log(
@@ -97,10 +87,8 @@ export class FirestoreGridStorage implements gridStorage {
 
       const cells: Cell[] = [];
       querySnapshot.forEach((doc) => {
-        const data = doc.data();
-        // Remove the updatedAt field before returning the cell
-        const { updatedAt, ...cellData } = data;
-        cells.push(cellData as Cell);
+        const { updatedAt, ...data } = doc.data();
+        cells.push(data as Cell);
       });
 
       return cells;
@@ -110,9 +98,6 @@ export class FirestoreGridStorage implements gridStorage {
     }
   }
 
-  /**
-   * Clear all cells for the current user
-   */
   async clearCells(): Promise<void> {
     try {
       const userCollection = this.getUserCollection();

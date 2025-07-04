@@ -37,10 +37,13 @@ export class HybridGridStorage implements gridStorage {
   }
 
   setUser(user: User | null): void {
-    // Create or destroy remote storage based on user state
-    this.remoteStorage = user
-      ? new FirestoreGridStorage(user, this.STORAGE_KEY)
-      : null;
+    if (!this.remoteStorage && user) {
+      this.remoteStorage = new FirestoreGridStorage(user, this.STORAGE_KEY);
+    } else if (this.remoteStorage && !user) {
+      this.remoteStorage = null;
+    } else if (this.remoteStorage && user) {
+      this.remoteStorage.setUser(user);
+    }
 
     this.syncMetadata = {
       lastSyncTime: null,
