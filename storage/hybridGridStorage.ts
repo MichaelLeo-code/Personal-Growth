@@ -12,16 +12,19 @@ interface SyncMetadata {
 
 export class HybridGridStorage implements gridStorage {
   private localStorage: localGridStorage;
-  private remoteStorage: FirestoreGridStorage;
+  private remoteStorage: FirestoreGridStorage | null;
   private syncMetadata: SyncMetadata;
   private readonly syncMetadataKey: string;
   private syncTimer: any = null;
   private readonly SYNC_INTERVAL = 30000; // 30 seconds
   private readonly FORCE_SYNC_THRESHOLD = 300000; // 5 minutes
+  private readonly STORAGE_KEY: string = "cells";
 
-  constructor(user: User | null, storageKey: string = "grid_cells") {
-    this.localStorage = new localGridStorage(storageKey);
-    this.remoteStorage = new FirestoreGridStorage(user, storageKey);
+  constructor(user: User | null, storageKey?: string) {
+    this.localStorage = new localGridStorage(storageKey ?? this.STORAGE_KEY);
+    this.remoteStorage = user
+      ? new FirestoreGridStorage(user, storageKey ?? this.STORAGE_KEY)
+      : null;
     this.syncMetadataKey = `${storageKey}_sync_metadata`;
     this.syncMetadata = {
       lastSyncTime: null,
@@ -34,8 +37,11 @@ export class HybridGridStorage implements gridStorage {
   }
 
   setUser(user: User | null): void {
-    this.remoteStorage.setUser(user);
-    // Reset sync metadata when user changes
+    // Create or destroy remote storage based on user state
+    this.remoteStorage = user
+      ? new FirestoreGridStorage(user, this.STORAGE_KEY)
+      : null;
+
     this.syncMetadata = {
       lastSyncTime: null,
       pendingChanges: false,
@@ -139,6 +145,10 @@ export class HybridGridStorage implements gridStorage {
    * Force sync to remote storage
    */
   async forceSyncToRemote(): Promise<void> {
+    if (!this.remoteStorage) {
+      throw new Error("Cannot force sync: user not authenticated");
+    }
+
     const cells = await this.localStorage.loadCells();
     await this.syncToRemote(cells);
   }
@@ -147,6 +157,12 @@ export class HybridGridStorage implements gridStorage {
    * Sync current local data to remote storage
    */
   private async syncToRemote(cells: Cell[]): Promise<void> {
+    // Simply skip if no remote storage available - not an error!
+    if (!this.remoteStorage) {
+      console.log("Skipping remote sync: user not authenticated");
+      return;
+    }
+
     if (!(await this.isOnline())) {
       throw new Error("Cannot sync to remote: device is offline");
     }
@@ -170,8 +186,15 @@ export class HybridGridStorage implements gridStorage {
    * Sync from remote storage and merge with local data
    */
   async syncFromRemote(): Promise<Cell[]> {
+    // Return local data if no remote storage - perfectly normal
+    if (!this.remoteStorage) {
+      console.log("No remote storage available, returning local data");
+      return this.localStorage.loadCells();
+    }
+
     if (!(await this.isOnline())) {
-      throw new Error("Cannot sync from remote: device is offline");
+      console.log("Device offline, returning local data");
+      return this.localStorage.loadCells();
     }
 
     try {
@@ -192,8 +215,11 @@ export class HybridGridStorage implements gridStorage {
       console.log("Successfully synced from remote storage");
       return mergedCells;
     } catch (error) {
-      console.error("Failed to sync from remote storage:", error);
-      throw error;
+      console.error(
+        "Failed to sync from remote storage, using local data:",
+        error
+      );
+      return this.localStorage.loadCells();
     }
   }
 
@@ -225,7 +251,12 @@ export class HybridGridStorage implements gridStorage {
    */
   private startPeriodicSync(): void {
     this.syncTimer = setInterval(async () => {
-      if (this.syncMetadata.pendingChanges && (await this.isOnline())) {
+      // Only sync if we have remote storage, pending changes, and are online
+      if (
+        this.remoteStorage &&
+        this.syncMetadata.pendingChanges &&
+        (await this.isOnline())
+      ) {
         try {
           const cells = await this.localStorage.loadCells();
           await this.syncToRemote(cells);
@@ -249,17 +280,26 @@ export class HybridGridStorage implements gridStorage {
   }
 
   /**
+   * Check if remote storage is available
+   */
+  hasRemoteStorage(): boolean {
+    return this.remoteStorage !== null;
+  }
+
+  /**
    * Get sync status information
    */
   getSyncStatus(): {
     lastSyncTime: Date | null;
     hasPendingChanges: boolean;
     lastModifiedTime: Date;
+    hasRemoteStorage: boolean;
   } {
     return {
       lastSyncTime: this.syncMetadata.lastSyncTime,
       hasPendingChanges: this.syncMetadata.pendingChanges,
       lastModifiedTime: this.syncMetadata.lastModifiedTime,
+      hasRemoteStorage: this.hasRemoteStorage(),
     };
   }
 }

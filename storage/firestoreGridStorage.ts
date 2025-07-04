@@ -14,35 +14,25 @@ import { gridStorage } from "./gridStorage";
 
 export class FirestoreGridStorage implements gridStorage {
   private readonly collectionName: string;
-  private user: User | null;
+  private user: User; // No null allowed
 
-  constructor(user: User | null, collectionName: string = "grid_cells") {
+  constructor(user: User, collectionName: string = "cells") {
+    // No null allowed
     this.collectionName = collectionName;
     this.user = user;
   }
 
-  /**
-   * Update the current user for this storage instance
-   */
-  setUser(user: User | null): void {
+  setUser(user: User): void {
+    // No null allowed
     this.user = user;
   }
 
-  /**
-   * Get the user-specific collection reference
-   */
   private getUserCollection() {
-    if (!this.user) {
-      throw new Error("User must be authenticated to access Firestore storage");
-    }
+    // No null check needed - user is guaranteed to exist
     return collection(FIREBASE_DB, "users", this.user.uid, this.collectionName);
   }
 
   async saveCells(cells: Cell[]): Promise<void> {
-    if (!this.user) {
-      throw new Error("User must be authenticated to save cells");
-    }
-
     try {
       const userCollection = this.getUserCollection();
 
@@ -100,10 +90,6 @@ export class FirestoreGridStorage implements gridStorage {
   }
 
   async loadCells(): Promise<Cell[]> {
-    if (!this.user) {
-      throw new Error("User must be authenticated to load cells");
-    }
-
     try {
       const userCollection = this.getUserCollection();
       const q = query(userCollection, orderBy("id"));
@@ -128,10 +114,6 @@ export class FirestoreGridStorage implements gridStorage {
    * Clear all cells for the current user
    */
   async clearCells(): Promise<void> {
-    if (!this.user) {
-      throw new Error("User must be authenticated to clear cells");
-    }
-
     try {
       const userCollection = this.getUserCollection();
       const querySnapshot = await getDocs(userCollection);
