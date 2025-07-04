@@ -1,8 +1,8 @@
 import { FIREBASE_AUTH } from "@/firebase";
+import { FirestoreGridStorage, gridStorage } from "../storage";
 import { Cell, CellType } from "../types/cells";
-import { storageService } from "./storageService";
 
-import { onAuthStateChanged } from "firebase/auth";
+import { User, onAuthStateChanged } from "firebase/auth";
 import { coordinateService } from "./coordinateService";
 
 const directions8 = [
@@ -21,27 +21,36 @@ class CellService {
   private listeners: (() => void)[] = [];
   private selectedId: number | null = null;
   private nextId = 1;
+  private storage: gridStorage;
 
-  constructor() {
-    // Load initial data if user is already available
-    if (FIREBASE_AUTH.currentUser) {
-      this.loadInitialData();
-    }
-
-    // Set up auth state listener to reload data when user changes
+  constructor(storage: gridStorage) {
+    this.storage = storage;
+    
+    // Set up auth state listener to update storage when user changes
     onAuthStateChanged(FIREBASE_AUTH, (user) => {
-      console.log("CellService: Auth state changed:", user?.uid || "null");
-
+      console.log("Auth state changed:", user?.uid || "null");
+      this.setUser(user);
+      
       // Reload data when user changes (but only if we had no user before or different user)
       if (user && this.cellMap.size === 0) {
         this.loadInitialData();
       }
     });
+    
+    // Try to load data immediately if user is already available
+    if (FIREBASE_AUTH.currentUser) {
+      this.loadInitialData();
+    }
+  }
+
+  setUser(user: User | null): void {
+    if (this.storage instanceof FirestoreGridStorage)
+      this.storage.setUser(user);
   }
 
   private async loadInitialData() {
     try {
-      const cells = await storageService.getStorage().loadCells();
+      const cells = await this.storage.loadCells();
       cells.forEach((cell: Cell) => {
         this.cellMap.set(cell.id, cell);
         if (cell.id >= this.nextId) {
@@ -57,7 +66,7 @@ class CellService {
 
   private async saveToStorage() {
     try {
-      await storageService.getStorage().saveCells(this.getCells());
+      await this.storage.saveCells(this.getCells());
     } catch (error) {
       console.error("Failed to save to storage:", error);
     }
@@ -113,8 +122,9 @@ class CellService {
   }
 
   getCellAt(x: number, y: number): Cell | undefined {
-    const cellId = coordinateService.getCellIdAt(x, y);
-    return cellId !== undefined ? this.cellMap.get(cellId) : undefined;
+    return Array.from(this.cellMap.values()).find(
+      (c) => c.x === x && c.y === y
+    );
   }
 
   getCellById(id: number): Cell | undefined {
@@ -235,14 +245,7 @@ class CellService {
   notify() {
     this.listeners.forEach((listener) => listener());
   }
-
-  /**
-   * Get the storage instance for sync operations
-   * @internal - only for sync service use
-   */
-  getStorage() {
-    return storageService.getStorage();
-  }
 }
-
-export const cellService = new CellService();
+export const cellService = new CellService(
+  new FirestoreGridStorage(FIREBASE_AUTH.currentUser)
+);

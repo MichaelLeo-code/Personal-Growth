@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { cellService } from "../service/cellService";
+import { storageService } from "../service/storageService";
 
 interface SyncStatus {
   lastSyncTime: Date | null;
@@ -18,7 +18,7 @@ export const useSyncStatus = () => {
   const [isSyncing, setIsSyncing] = useState(false);
 
   const updateSyncStatus = () => {
-    const status = cellService.getSyncStatus();
+    const status = storageService.getSyncStatus();
     setSyncStatus((prevStatus) => ({
       ...prevStatus,
       ...status,
@@ -28,7 +28,7 @@ export const useSyncStatus = () => {
   const forceSyncToRemote = async () => {
     setIsSyncing(true);
     try {
-      await cellService.forceSyncToRemote();
+      await storageService.forceSyncToRemote();
       updateSyncStatus();
     } catch (error) {
       console.error("Failed to sync to remote:", error);
@@ -39,7 +39,7 @@ export const useSyncStatus = () => {
 
   const forceSaveLocal = async () => {
     try {
-      await cellService.forceSave();
+      await storageService.forceSave();
       updateSyncStatus();
     } catch (error) {
       console.error("Failed to save locally:", error);
