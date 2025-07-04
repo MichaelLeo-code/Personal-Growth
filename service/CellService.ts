@@ -1,6 +1,8 @@
-import { gridStorage, localGridStorage } from "../storage";
+import { FIREBASE_AUTH } from "@/firebase";
+import { FirestoreGridStorage, gridStorage } from "../storage";
 import { Cell, CellType } from "../types/cells";
 
+import { User, onAuthStateChanged } from "firebase/auth";
 import { coordinateService } from "./coordinateService";
 
 const directions8 = [
@@ -23,7 +25,27 @@ class CellService {
 
   constructor(storage: gridStorage) {
     this.storage = storage;
-    this.loadInitialData();
+    
+    // Set up auth state listener to update storage when user changes
+    onAuthStateChanged(FIREBASE_AUTH, (user) => {
+      console.log("Auth state changed:", user?.uid || "null");
+      this.setUser(user);
+      
+      // Reload data when user changes (but only if we had no user before or different user)
+      if (user && this.cellMap.size === 0) {
+        this.loadInitialData();
+      }
+    });
+    
+    // Try to load data immediately if user is already available
+    if (FIREBASE_AUTH.currentUser) {
+      this.loadInitialData();
+    }
+  }
+
+  setUser(user: User | null): void {
+    if (this.storage instanceof FirestoreGridStorage)
+      this.storage.setUser(user);
   }
 
   private async loadInitialData() {
@@ -224,4 +246,6 @@ class CellService {
     this.listeners.forEach((listener) => listener());
   }
 }
-export const cellService = new CellService(new localGridStorage());
+export const cellService = new CellService(
+  new FirestoreGridStorage(FIREBASE_AUTH.currentUser)
+);
