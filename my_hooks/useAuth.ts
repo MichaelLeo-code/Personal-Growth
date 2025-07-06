@@ -23,9 +23,7 @@ export const useAuth = () => {
 
   const signIn = async (email: string, password: string) => {
     try {
-      console.log("Attempting to sign in user with email:", email);
       const result = await signInWithEmailAndPassword(auth, email, password);
-      console.log("User signed in successfully:", result);
       return { success: true, user: result.user };
     } catch (error: any) {
       console.error("Sign in error:", error);

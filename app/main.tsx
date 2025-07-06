@@ -31,7 +31,7 @@ export default function MainApp() {
     zoomState,
     cellSize,
   });
-  const [isEditMode] = useState(true); // Edit mode toggle - can add setIsEditMode later if needed
+  const [isEditMode] = useState(true);
 
   return (
     <SafeAreaView style={{ flex: 1 }}>
@@ -56,8 +56,6 @@ export default function MainApp() {
           onCellMoveEnd={handleMoveEnd}
         />
       </ReactNativeZoomableView>
-
-      <LogoutButton />
 
       {/* <FloatingButton
         onPress={() => setIsEditMode(!isEditMode)}
