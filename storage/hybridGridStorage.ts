@@ -84,21 +84,10 @@ export class HybridGridStorage implements gridStorage {
 
       const remoteCells = (await this.remoteStorage?.loadCells()) ?? [];
 
-      // If no cells exist anywhere, return empty array
       if (localCells.length === 0 && remoteCells.length === 0) {
         return [];
       }
 
-      // If only one source has data, use that
-      if (localCells.length === 0) {
-        await this.localStorage.saveCells(remoteCells); // Cache remote data locally
-        return remoteCells;
-      }
-      if (remoteCells.length === 0) {
-        return localCells;
-      }
-
-      // Both sources have data - compare timestamps to find the latest data
       const getLatestTimestamp = (cells: Cell[]) => {
         if (cells.length === 0) return 0;
         return Math.max(
@@ -110,11 +99,9 @@ export class HybridGridStorage implements gridStorage {
       const remoteLatestTimestamp = getLatestTimestamp(remoteCells);
 
       if (remoteLatestTimestamp > localLatestTimestamp) {
-        // Remote has newer data, update local cache
         await this.localStorage.saveCells(remoteCells);
         return remoteCells;
       } else {
-        // Local is newer or same, use local
         return localCells;
       }
     } catch (error) {

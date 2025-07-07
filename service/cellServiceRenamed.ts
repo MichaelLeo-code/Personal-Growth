@@ -63,7 +63,7 @@ class CellService {
   }
 
   addCell(
-    cell: Omit<Cell, "id" | "type" | "size"> & {
+    cell: Omit<Cell, "id" | "type" | "size" | "updatedAt"> & {
       type?: CellType;
       size?: { x: number; y: number };
     }
@@ -85,6 +85,7 @@ class CellService {
       id,
       type: cellType,
       size: cellSize,
+      updatedAt: new Date().toISOString(),
     };
 
     if (newCell.parent !== undefined) {
@@ -139,7 +140,7 @@ class CellService {
     return this.addCell({
       x,
       y,
-      text: "newCell",
+      text: "new cell",
       parent: nextToId,
       type: type ? type : CellType.Headline,
     });
@@ -180,7 +181,7 @@ class CellService {
     this.selectedId = null;
     coordinateService.clear();
     this.nextId = 1;
-    this.addCell({ text: "Starting point", x: 0, y: 0 });
+    this.addCell({ text: "Me", x: 0, y: 0 });
     this.notify();
     this.saveToStorage();
   }
@@ -189,6 +190,7 @@ class CellService {
     const cell = this.cellMap.get(id);
     if (!cell) return false;
     cell.text = newTitle;
+    cell.updatedAt = new Date().toISOString();
     this.cellMap.set(id, cell);
     this.notify();
     this.saveToStorage();
@@ -214,6 +216,7 @@ class CellService {
 
     coordinateService.occupyArea(cell.x, cell.y, cell.size, cell.id);
 
+    cell.updatedAt = new Date().toISOString();
     this.cellMap.set(id, cell);
     this.notify();
     this.saveToStorage();

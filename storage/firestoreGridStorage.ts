@@ -60,16 +60,8 @@ export class FirestoreGridStorage implements gridStorage {
 
       const savePromises = cellsToSave.map((cell) => {
         const docRef = doc(userCollection, cell.id.toString());
-        const now = new Date().toISOString();
 
-        // Ensure cell has proper timestamps
-        const cellWithTimestamps = {
-          ...cell,
-          createdAt: cell.createdAt || now,
-          updatedAt: cell.updatedAt || now,
-        };
-
-        return setDoc(docRef, cellWithTimestamps);
+        return setDoc(docRef, cell);
       });
 
       await Promise.all([...deletePromises, ...savePromises]);
