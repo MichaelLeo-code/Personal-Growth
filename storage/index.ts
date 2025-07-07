@@ -1,4 +1,4 @@
 export * from "./firestoreGridStorage";
-export * from "./gridStorageRenamed";
+export * from "./gridStorage";
 export * from "./hybridGridStorage";
-export * from "./localGridStorageRenamed";
+export * from "./localGridStorage";

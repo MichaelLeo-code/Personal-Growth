@@ -1,4 +1,4 @@
-export { cellService } from "./cellServiceRenamed";
+export { cellService } from "./cellService";
 export * from "./coordinateService";
 export * from "./storageService";
-export * from "./taskServiceRenamed";
+export * from "./taskService";

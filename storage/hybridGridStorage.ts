@@ -2,8 +2,8 @@ import { User } from "firebase/auth";
 import { AppState, AppStateStatus } from "react-native";
 import { Cell } from "../types/cells";
 import { FirestoreGridStorage } from "./firestoreGridStorage";
-import { gridStorage } from "./gridStorageRenamed";
-import { localGridStorage } from "./localGridStorageRenamed";
+import { gridStorage } from "./gridStorage";
+import { localGridStorage } from "./localGridStorage";
 
 export class HybridGridStorage implements gridStorage {
   private localStorage: localGridStorage;

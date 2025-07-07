@@ -1,5 +1,5 @@
 import { cellService } from "@/service";
-import { addTask, updateTask } from "@/service/taskServiceRenamed";
+import { addTask, updateTask } from "@/service/taskService";
 import { Task } from "@/types";
 import { TaskListCell } from "@/types/cells";
 import { useEffect, useState } from "react";
