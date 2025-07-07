@@ -17,18 +17,36 @@ export const useSyncStatus = () => {
 
   const updateSyncStatus = () => {
     const status = storageService.getSyncStatus();
+    const hasUnsavedLocalChanges =
+      !status.lastSyncTime || status.lastModifiedTime > status.lastSyncTime;
+
     setSyncStatus((prevStatus) => ({
       ...prevStatus,
       ...status,
+      hasUnsavedLocalChanges,
     }));
+
+    setIsSyncing(storageService.isSyncing());
   };
 
   useEffect(() => {
-    const interval = setInterval(updateSyncStatus, 2000);
+    const syncingInterval = setInterval(() => {
+      setIsSyncing(storageService.isSyncing());
+    }, 500);
+
+    const statusInterval = setInterval(updateSyncStatus, 2000);
 
     updateSyncStatus();
 
-    return () => clearInterval(interval);
+    const unsubscribe = storageService.onAuthChange(() => {
+      updateSyncStatus();
+    });
+
+    return () => {
+      clearInterval(syncingInterval);
+      clearInterval(statusInterval);
+      unsubscribe();
+    };
   }, []);
 
   return {

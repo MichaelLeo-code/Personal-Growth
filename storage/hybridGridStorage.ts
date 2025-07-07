@@ -13,7 +13,8 @@ export class HybridGridStorage implements gridStorage {
   private appStateSubscription: any = null;
   private readonly STORAGE_KEY: string = "cells";
 
-  private syncStatus: { lastSyncTime: Date; lastModifiedTime: Date };
+  private syncStatus: { lastSyncTime: Date | null; lastModifiedTime: Date };
+  private _isSyncing: boolean = false;
 
   constructor(user: User | null, storageKey?: string) {
     this.localStorage = new localGridStorage(storageKey ?? this.STORAGE_KEY);
@@ -25,7 +26,7 @@ export class HybridGridStorage implements gridStorage {
     this.startPeriodicSync();
 
     this.syncStatus = {
-      lastSyncTime: new Date(),
+      lastSyncTime: null,
       lastModifiedTime: new Date(),
     };
   }
@@ -42,7 +43,13 @@ export class HybridGridStorage implements gridStorage {
 
   private startPeriodicSync(): void {
     this.syncInterval = setInterval(() => {
-      this.syncToFirestore();
+      // Only sync if there are unsaved changes
+      if (
+        !this.syncStatus.lastSyncTime ||
+        this.syncStatus.lastModifiedTime > this.syncStatus.lastSyncTime
+      ) {
+        this.syncToFirestore();
+      }
     }, this.SYNC_INTERVAL_MS);
   }
 
@@ -54,16 +61,26 @@ export class HybridGridStorage implements gridStorage {
   }
 
   private async syncToFirestore(): Promise<void> {
+    if (!this.remoteStorage || this._isSyncing) return;
+
+    this._isSyncing = true;
     try {
       const localCells = await this.localStorage.loadCells();
-      await this.remoteStorage?.saveCells(localCells);
+      await this.remoteStorage.saveCells(localCells);
+      this.syncStatus.lastSyncTime = new Date();
+      console.log("Successfully synced to Firestore");
     } catch (error) {
       console.error("Failed to sync to Firestore:", error);
+    } finally {
+      this._isSyncing = false;
     }
   }
 
   setUser(user: User | null): void {
-    this.syncToFirestore();
+    // Sync current data before changing user
+    if (this.remoteStorage && !this._isSyncing) {
+      this.syncToFirestore();
+    }
 
     if (user) {
       if (this.remoteStorage) {
@@ -71,14 +88,19 @@ export class HybridGridStorage implements gridStorage {
       } else {
         this.remoteStorage = new FirestoreGridStorage(user, this.STORAGE_KEY);
       }
+      // Reset sync status when user changes - we'll need to sync again
+      this.syncStatus.lastSyncTime = null;
     } else {
       this.remoteStorage = null;
+      // No remote storage means no sync capability
+      this.syncStatus.lastSyncTime = null;
     }
   }
 
   async saveCells(cells: Cell[]): Promise<void> {
     try {
       await this.localStorage.saveCells(cells);
+      this.syncStatus.lastModifiedTime = new Date();
     } catch (error) {
       console.error("Failed to save cells to local storage:", error);
       throw error;
@@ -107,6 +129,8 @@ export class HybridGridStorage implements gridStorage {
 
       if (remoteLatestTimestamp > localLatestTimestamp) {
         await this.localStorage.saveCells(remoteCells);
+        this.syncStatus.lastModifiedTime = new Date();
+        this.syncStatus.lastSyncTime = new Date();
         return remoteCells;
       } else {
         return localCells;
@@ -114,6 +138,25 @@ export class HybridGridStorage implements gridStorage {
     } catch (error) {
       console.error("Failed to load cells:", error);
       throw error;
+    }
+  }
+
+  getSyncStatus(): { lastSyncTime: Date | null; lastModifiedTime: Date } {
+    return {
+      lastSyncTime: this.syncStatus.lastSyncTime,
+      lastModifiedTime: this.syncStatus.lastModifiedTime,
+    };
+  }
+
+  isSyncing(): boolean {
+    return this._isSyncing;
+  }
+
+  destroy(): void {
+    this.stopPeriodicSync();
+    if (this.appStateSubscription) {
+      this.appStateSubscription.remove();
+      this.appStateSubscription = null;
     }
   }
 }

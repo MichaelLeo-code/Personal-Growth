@@ -34,10 +34,11 @@ class StorageService {
     lastSyncTime: Date | null;
     lastModifiedTime: Date;
   } {
-    return {
-      lastSyncTime: new Date(),
-      lastModifiedTime: new Date(),
-    };
+    return this.storage.getSyncStatus();
+  }
+
+  isSyncing(): boolean {
+    return this.storage.isSyncing();
   }
 
   onAuthChange(callback: () => void): () => void {
