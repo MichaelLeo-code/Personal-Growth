@@ -1,5 +1,5 @@
 import React from "react";
-import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { StyleSheet, Text, View } from "react-native";
 import { useSyncStatus } from "../../my_hooks/useSyncStatus";
 
 export const SyncStatusIndicator: React.FC = () => {
@@ -32,20 +32,16 @@ export const SyncStatusIndicator: React.FC = () => {
 
   return (
     <View style={styles.container}>
-      <TouchableOpacity
-        style={[
-          styles.statusIndicator,
-          { backgroundColor: getSyncStatusColor() },
-        ]}
-        disabled={isSyncing}
-      >
-        <Text style={styles.statusText}>{getSyncStatusText()}</Text>
+      <View style={styles.statusIndicator}>
+        <Text style={[styles.statusText, { color: getSyncStatusColor() }]}>
+          {getSyncStatusText()}
+        </Text>
         {syncStatus.lastSyncTime && (
           <Text style={styles.lastSyncText}>
             Last sync: {formatLastSyncTime(syncStatus.lastSyncTime)}
           </Text>
         )}
-      </TouchableOpacity>
+      </View>
     </View>
   );
 };
@@ -54,21 +50,17 @@ const styles = StyleSheet.create({
   container: {
     flexDirection: "row",
     alignItems: "center",
-    padding: 8,
   },
   statusIndicator: {
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: 16,
-    marginRight: 8,
+    paddingHorizontal: 4,
+    paddingVertical: 2,
   },
   statusText: {
-    color: "#FFFFFF",
     fontSize: 12,
     fontWeight: "600",
   },
   lastSyncText: {
-    color: "#FFFFFF",
+    color: "#666",
     fontSize: 10,
     opacity: 0.8,
   },

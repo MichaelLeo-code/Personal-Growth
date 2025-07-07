@@ -1,6 +1,7 @@
 import { cellSize } from "@/constants";
 import { FloatingActionButtons } from "@/containers";
-import { Grid, LogoutButton, SyncStatusIndicator } from "@/my_components";
+import { useThemeColor } from "@/hooks/useThemeColor";
+import { Grid } from "@/my_components";
 import {
   useCellManagement,
   useCellMove,
@@ -9,7 +10,7 @@ import {
 } from "@/my_hooks";
 import { ReactNativeZoomableView } from "@openspacelabs/react-native-zoomable-view";
 import React, { useState } from "react";
-import { SafeAreaView, StyleSheet, View } from "react-native";
+import { SafeAreaView } from "react-native";
 
 export default function MainApp() {
   const { cells, selected, addCell, deleteSelectedCell, deleteAllCells } =
@@ -31,14 +32,20 @@ export default function MainApp() {
     zoomState,
     cellSize,
   });
-  const [isEditMode] = useState(true);
+  const [isEditMode] = useState(true); // Edit mode toggle - can add setIsEditMode later if needed
+
+  const backgroundColor = useThemeColor({}, "background");
+  const headerBackgroundColor = useThemeColor(
+    { light: "#f8f9fa", dark: "#1a1a1a" },
+    "background"
+  );
+  const borderColor = useThemeColor(
+    { light: "#e9ecef", dark: "#333" },
+    "background"
+  );
 
   return (
-    <SafeAreaView style={{ flex: 1 }}>
-      <View style={styles.header}>
-        <SyncStatusIndicator />
-        <LogoutButton />
-      </View>
+    <SafeAreaView style={[{ flex: 1, backgroundColor }]}>
       <ReactNativeZoomableView
         minZoom={0.1}
         doubleTapZoomToCenter={false}
@@ -76,16 +83,3 @@ export default function MainApp() {
     </SafeAreaView>
   );
 }
-
-const styles = StyleSheet.create({
-  header: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    paddingHorizontal: 16,
-    paddingVertical: 8,
-    backgroundColor: "#f8f9fa",
-    borderBottomWidth: 1,
-    borderBottomColor: "#e9ecef",
-  },
-});

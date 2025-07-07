@@ -12,7 +12,7 @@ But keep in mind that this is react native app, so it cant use fs library)
 [x] Create tasks in taskstore cell
 
 [x] Add drag and drop
-[ ] Add firestore + auth
+[x] Add firestore + auth
 [x] Name edit for Heading
 [x] Move cell on long press
 [ ] Emoji functionality
@@ -20,6 +20,8 @@ But keep in mind that this is react native app, so it cant use fs library)
 [ ] Is daily switch - or maybe daily tasks could be on headlines instead
 [ ] Lock icon os subsequent tasklists
 [ ] Fix how modals look. Fix the naming behavior.
+[ ] Add arrows to show parent/children relationship
+[ ] Fix delete, so that children are also deleted
 
 BUGS:
 [ ] Theme

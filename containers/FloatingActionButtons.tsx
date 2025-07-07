@@ -1,7 +1,12 @@
-import { DraggableFloatingButton, FloatingButton } from "@/my_components";
+import {
+  DraggableFloatingButton,
+  FloatingButton,
+  LogoutButton,
+  SyncStatusIndicator,
+} from "@/my_components";
 import { Cell, CellType } from "@/types";
 import React from "react";
-import { GestureResponderEvent } from "react-native";
+import { GestureResponderEvent, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 interface FloatingActionButtonsProps {
@@ -27,6 +32,26 @@ export const FloatingActionButtons: React.FC<FloatingActionButtonsProps> = ({
 
   return (
     <>
+      <View
+        style={{
+          position: "absolute",
+          left: 20,
+          top: insets.top + 5,
+          zIndex: 1000,
+        }}
+      >
+        <SyncStatusIndicator />
+      </View>
+      <View
+        style={{
+          position: "absolute",
+          right: 20,
+          top: insets.top + 70,
+          zIndex: 1000,
+        }}
+      >
+        <LogoutButton />
+      </View>
       <FloatingButton
         onPress={onDeleteAll}
         label="Delete all"

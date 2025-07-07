@@ -33,14 +33,10 @@ export const LogoutButton: React.FC = () => {
 
 const styles = StyleSheet.create({
   logoutButton: {
-    position: "absolute",
-    top: 50,
-    right: 20,
     backgroundColor: "#FF3B30",
     paddingHorizontal: 16,
     paddingVertical: 8,
     borderRadius: 8,
-    zIndex: 1000,
   },
   logoutText: {
     color: "#fff",

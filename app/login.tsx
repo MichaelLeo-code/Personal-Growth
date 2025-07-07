@@ -1,21 +1,20 @@
 import { LoginScreen } from "@/my_components";
-import { DarkTheme, ThemeProvider } from "@react-navigation/native";
+import { useThemeColor } from "@/hooks/useThemeColor";
 import React from "react";
 import { StyleSheet, View } from "react-native";
 
 export default function LoginPage() {
+  const backgroundColor = useThemeColor({}, 'background');
+  
   return (
-    <ThemeProvider value={DarkTheme}>
-      <View style={styles.container}>
-        <LoginScreen onLoginSuccess={() => {}} />
-      </View>
-    </ThemeProvider>
+    <View style={[styles.container, { backgroundColor }]}>
+      <LoginScreen onLoginSuccess={() => {}} />
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#000",
   },
 });

@@ -1,28 +1,46 @@
 import { useAuth } from "@/my_hooks";
-import { DarkTheme, ThemeProvider } from "@react-navigation/native";
+import { DarkTheme, DefaultTheme, ThemeProvider } from "@react-navigation/native";
 import { useFonts } from "expo-font";
 import React from "react";
 import { ActivityIndicator, SafeAreaView } from "react-native";
+import { useColorScheme } from "@/hooks/useColorScheme";
+import { Colors } from "@/constants/Colors";
 import LoginPage from "./login";
 import MainApp from "./main";
 
 export default function RootLayout() {
   const { user, loading: authLoading } = useAuth();
+  const colorScheme = useColorScheme();
 
   // Font loading
   const [loaded] = useFonts({
     SpaceMono: require("../assets/fonts/SpaceMono-Regular.ttf"),
   });
 
+  // Create custom theme based on color scheme
+  const theme = colorScheme === 'dark' ? {
+    ...DarkTheme,
+    colors: {
+      ...DarkTheme.colors,
+      background: Colors.dark.background,
+    }
+  } : {
+    ...DefaultTheme,
+    colors: {
+      ...DefaultTheme.colors,
+      background: Colors.light.background,
+    }
+  };
+
   if (!loaded || authLoading) {
     return (
-      <ThemeProvider value={DarkTheme}>
+      <ThemeProvider value={theme}>
         <SafeAreaView
           style={{
             flex: 1,
             justifyContent: "center",
             alignItems: "center",
-            backgroundColor: "#000",
+            backgroundColor: Colors[colorScheme ?? 'light'].background,
           }}
         >
           <ActivityIndicator size="large" color="#007AFF" />
@@ -31,14 +49,16 @@ export default function RootLayout() {
     );
   }
 
-  // Show login page if user is not authenticated
   if (!user) {
-    return <LoginPage />;
+    return (
+      <ThemeProvider value={theme}>
+        <LoginPage />
+      </ThemeProvider>
+    );
   }
 
-  // Show main app if user is authenticated
   return (
-    <ThemeProvider value={DarkTheme}>
+    <ThemeProvider value={theme}>
       <MainApp />
     </ThemeProvider>
   );
