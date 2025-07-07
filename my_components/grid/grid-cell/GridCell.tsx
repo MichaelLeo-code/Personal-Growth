@@ -1,6 +1,9 @@
 import React, { useRef } from "react";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
-import { totalCompletedCost, totalCost } from "../../../service/taskService";
+import {
+  totalCompletedCost,
+  totalCost,
+} from "../../../service/taskServiceRenamed";
 import { Cell, CellType } from "../../../types/cells";
 import { ProgressBar } from "./ProgressBar";
 

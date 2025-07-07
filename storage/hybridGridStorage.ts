@@ -76,10 +76,9 @@ export class HybridGridStorage implements gridStorage {
     }
   }
 
-  setUser(user: User | null): void {
-    // Sync current data before changing user
+  async setUser(user: User | null): Promise<void> {
     if (this.remoteStorage && !this._isSyncing) {
-      this.syncToFirestore();
+      await this.syncToFirestore();
     }
 
     if (user) {
@@ -88,11 +87,15 @@ export class HybridGridStorage implements gridStorage {
       } else {
         this.remoteStorage = new FirestoreGridStorage(user, this.STORAGE_KEY);
       }
-      // Reset sync status when user changes - we'll need to sync again
-      this.syncStatus.lastSyncTime = null;
+
+      try {
+        await this.loadLatestData();
+      } catch (error) {
+        console.error("Failed to compare timestamps on user change:", error);
+        this.syncStatus.lastSyncTime = null;
+      }
     } else {
       this.remoteStorage = null;
-      // No remote storage means no sync capability
       this.syncStatus.lastSyncTime = null;
     }
   }
@@ -109,32 +112,7 @@ export class HybridGridStorage implements gridStorage {
 
   async loadCells(): Promise<Cell[]> {
     try {
-      const localCells = await this.localStorage.loadCells();
-
-      const remoteCells = (await this.remoteStorage?.loadCells()) ?? [];
-
-      if (localCells.length === 0 && remoteCells.length === 0) {
-        return [];
-      }
-
-      const getLatestTimestamp = (cells: Cell[]) => {
-        if (cells.length === 0) return 0;
-        return Math.max(
-          ...cells.map((cell) => new Date(cell.updatedAt || 0).getTime())
-        );
-      };
-
-      const localLatestTimestamp = getLatestTimestamp(localCells);
-      const remoteLatestTimestamp = getLatestTimestamp(remoteCells);
-
-      if (remoteLatestTimestamp > localLatestTimestamp) {
-        await this.localStorage.saveCells(remoteCells);
-        this.syncStatus.lastModifiedTime = new Date();
-        this.syncStatus.lastSyncTime = new Date();
-        return remoteCells;
-      } else {
-        return localCells;
-      }
+      return await this.loadLatestData();
     } catch (error) {
       console.error("Failed to load cells:", error);
       throw error;
@@ -157,6 +135,38 @@ export class HybridGridStorage implements gridStorage {
     if (this.appStateSubscription) {
       this.appStateSubscription.remove();
       this.appStateSubscription = null;
+    }
+  }
+
+  private getLatestTimestamp(cells: Cell[]): number {
+    if (cells.length === 0) return 0;
+    return Math.max(
+      ...cells.map((cell) => new Date(cell.updatedAt || 0).getTime())
+    );
+  }
+
+  private async loadLatestData(): Promise<Cell[]> {
+    if (!this.remoteStorage) {
+      return await this.localStorage.loadCells();
+    }
+
+    const localCells = await this.localStorage.loadCells();
+    const remoteCells = await this.remoteStorage.loadCells();
+
+    if (localCells.length === 0 && remoteCells.length === 0) {
+      return [];
+    }
+
+    const localLatestTimestamp = this.getLatestTimestamp(localCells);
+    const remoteLatestTimestamp = this.getLatestTimestamp(remoteCells);
+
+    if (remoteLatestTimestamp > localLatestTimestamp) {
+      await this.localStorage.saveCells(remoteCells);
+      this.syncStatus.lastModifiedTime = new Date();
+      this.syncStatus.lastSyncTime = new Date();
+      return remoteCells;
+    } else {
+      return localCells;
     }
   }
 }

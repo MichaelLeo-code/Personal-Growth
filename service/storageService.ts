@@ -1,6 +1,6 @@
 import { FIREBASE_AUTH } from "@/firebase";
 import { HybridGridStorage } from "@/storage";
-import { User, onAuthStateChanged } from "firebase/auth";
+import { onAuthStateChanged } from "firebase/auth";
 
 /**
  * Service dedicated to managing storage and sync operations.
@@ -16,7 +16,7 @@ class StorageService {
 
     onAuthStateChanged(FIREBASE_AUTH, (user) => {
       console.log("StorageService: Auth state changed:", user?.uid || "null");
-      this.setUser(user);
+      this.storage.setUser(user);
 
       this.authChangeCallbacks.forEach((callback) => callback());
     });
@@ -24,10 +24,6 @@ class StorageService {
 
   getStorage(): HybridGridStorage {
     return this.storage;
-  }
-
-  setUser(user: User | null): void {
-    this.storage.setUser(user);
   }
 
   getSyncStatus(): {

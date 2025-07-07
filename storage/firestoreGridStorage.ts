@@ -51,7 +51,7 @@ export class FirestoreGridStorage implements gridStorage {
 
         const existingData = existingDoc.data();
 
-        return !deepEqual(JSON.stringify(existingData), JSON.stringify(cell));
+        return !deepEqual(existingData, cell);
       });
 
       const deletePromises = cellsToDelete.map((docToDelete) =>
