@@ -11,6 +11,8 @@ export interface BaseCell {
     x: number;
     y: number;
   };
+  createdAt: string;
+  updatedAt: string;
 }
 
 export interface HeadlineCell extends BaseCell {

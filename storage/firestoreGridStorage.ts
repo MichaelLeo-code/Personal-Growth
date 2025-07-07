@@ -37,12 +37,10 @@ export class FirestoreGridStorage implements gridStorage {
       const existingDocs = await getDocs(userCollection);
       const newCellIds = new Set(cells.map((cell) => cell.id.toString()));
 
-      // cells to delete in cloud
       const cellsToDelete = existingDocs.docs.filter(
         (doc) => !newCellIds.has(doc.id)
       );
 
-      // cells to update or create in cloud
       const cellsToSave = cells.filter((cell) => {
         const cellId = cell.id.toString();
         const existingDoc = existingDocs.docs.find((doc) => doc.id === cellId);
@@ -51,9 +49,10 @@ export class FirestoreGridStorage implements gridStorage {
           return true;
         }
 
-        const { updatedAt, ...existingData } = existingDoc.data();
-
-        return deepEqual(JSON.stringify(existingData), JSON.stringify(cell));
+        const existingData = existingDoc.data();
+        
+        // Compare the full cell data including timestamps
+        return !deepEqual(existingData, cell);
       });
 
       const deletePromises = cellsToDelete.map((docToDelete) =>
@@ -62,10 +61,16 @@ export class FirestoreGridStorage implements gridStorage {
 
       const savePromises = cellsToSave.map((cell) => {
         const docRef = doc(userCollection, cell.id.toString());
-        return setDoc(docRef, {
+        const now = new Date().toISOString();
+        
+        // Ensure cell has proper timestamps
+        const cellWithTimestamps = {
           ...cell,
-          updatedAt: new Date().toISOString(),
-        });
+          createdAt: cell.createdAt || now,
+          updatedAt: cell.updatedAt || now,
+        };
+        
+        return setDoc(docRef, cellWithTimestamps);
       });
 
       await Promise.all([...deletePromises, ...savePromises]);
@@ -87,7 +92,7 @@ export class FirestoreGridStorage implements gridStorage {
 
       const cells: Cell[] = [];
       querySnapshot.forEach((doc) => {
-        const { updatedAt, ...data } = doc.data();
+        const data = doc.data();
         cells.push(data as Cell);
       });
 
