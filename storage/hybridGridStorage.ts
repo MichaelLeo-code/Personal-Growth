@@ -80,46 +80,42 @@ export class HybridGridStorage implements gridStorage {
 
   async loadCells(): Promise<Cell[]> {
     try {
-      const [localCells, remoteCells] = await Promise.allSettled([
-        this.localStorage.loadCells(),
-        this.remoteStorage?.loadCells() ?? Promise.resolve([])
-      ]);
+      const localCells = await this.localStorage.loadCells();
 
-      const local = localCells.status === 'fulfilled' ? localCells.value : [];
-      const remote = remoteCells.status === 'fulfilled' ? remoteCells.value : [];
+      const remoteCells = (await this.remoteStorage?.loadCells()) ?? [];
 
       // If no cells exist anywhere, return empty array
-      if (local.length === 0 && remote.length === 0) {
+      if (localCells.length === 0 && remoteCells.length === 0) {
         return [];
       }
 
       // If only one source has data, use that
-      if (local.length === 0) {
-        await this.localStorage.saveCells(remote); // Cache remote data locally
-        return remote;
+      if (localCells.length === 0) {
+        await this.localStorage.saveCells(remoteCells); // Cache remote data locally
+        return remoteCells;
       }
-      if (remote.length === 0) {
-        return local;
+      if (remoteCells.length === 0) {
+        return localCells;
       }
 
       // Both sources have data - compare timestamps to find the latest data
       const getLatestTimestamp = (cells: Cell[]) => {
         if (cells.length === 0) return 0;
-        return Math.max(...cells.map(cell => 
-          new Date(cell.updatedAt || 0).getTime()
-        ));
+        return Math.max(
+          ...cells.map((cell) => new Date(cell.updatedAt || 0).getTime())
+        );
       };
 
-      const localLatestTimestamp = getLatestTimestamp(local);
-      const remoteLatestTimestamp = getLatestTimestamp(remote);
+      const localLatestTimestamp = getLatestTimestamp(localCells);
+      const remoteLatestTimestamp = getLatestTimestamp(remoteCells);
 
       if (remoteLatestTimestamp > localLatestTimestamp) {
         // Remote has newer data, update local cache
-        await this.localStorage.saveCells(remote);
-        return remote;
+        await this.localStorage.saveCells(remoteCells);
+        return remoteCells;
       } else {
         // Local is newer or same, use local
-        return local;
+        return localCells;
       }
     } catch (error) {
       console.error("Failed to load cells:", error);

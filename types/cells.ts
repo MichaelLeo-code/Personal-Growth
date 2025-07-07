@@ -11,7 +11,6 @@ export interface BaseCell {
     x: number;
     y: number;
   };
-  createdAt: string;
   updatedAt: string;
 }
 

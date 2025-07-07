@@ -50,9 +50,8 @@ export class FirestoreGridStorage implements gridStorage {
         }
 
         const existingData = existingDoc.data();
-        
-        // Compare the full cell data including timestamps
-        return !deepEqual(existingData, cell);
+
+        return !deepEqual(JSON.stringify(existingData), JSON.stringify(cell));
       });
 
       const deletePromises = cellsToDelete.map((docToDelete) =>
@@ -62,14 +61,14 @@ export class FirestoreGridStorage implements gridStorage {
       const savePromises = cellsToSave.map((cell) => {
         const docRef = doc(userCollection, cell.id.toString());
         const now = new Date().toISOString();
-        
+
         // Ensure cell has proper timestamps
         const cellWithTimestamps = {
           ...cell,
           createdAt: cell.createdAt || now,
           updatedAt: cell.updatedAt || now,
         };
-        
+
         return setDoc(docRef, cellWithTimestamps);
       });
 

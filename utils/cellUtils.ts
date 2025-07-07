@@ -22,7 +22,7 @@ export function createCell(
   }
 ): Cell {
   const now = new Date().toISOString();
-  
+
   const baseCell = {
     id,
     text,
@@ -54,7 +54,7 @@ export function createCell(
  */
 export function updateCell(cell: Cell, updates: Partial<Cell>): Cell {
   const now = new Date().toISOString();
-  
+
   return {
     ...cell,
     ...updates,
@@ -70,7 +70,7 @@ export function updateCell(cell: Cell, updates: Partial<Cell>): Cell {
 export function cellsContentEqual(cell1: Cell, cell2: Cell): boolean {
   const { createdAt: c1, updatedAt: u1, ...content1 } = cell1;
   const { createdAt: c2, updatedAt: u2, ...content2 } = cell2;
-  
+
   return JSON.stringify(content1) === JSON.stringify(content2);
 }
 
@@ -79,10 +79,10 @@ export function cellsContentEqual(cell1: Cell, cell2: Cell): boolean {
  */
 export function getLatestCellTimestamp(cells: Cell[]): Date {
   if (cells.length === 0) return new Date(0);
-  
+
   const latestTimestamp = Math.max(
-    ...cells.map(cell => new Date(cell.updatedAt).getTime())
+    ...cells.map((cell) => new Date(cell.updatedAt).getTime())
   );
-  
+
   return new Date(latestTimestamp);
 }
