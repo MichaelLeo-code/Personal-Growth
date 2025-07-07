@@ -42,16 +42,15 @@ export const FloatingActionButtons: React.FC<FloatingActionButtonsProps> = ({
       >
         <SyncStatusIndicator />
       </View>
-      <View
+
+      <LogoutButton
         style={{
           position: "absolute",
           right: 20,
-          top: insets.top + 70,
+          top: insets.top + 60,
           zIndex: 1000,
         }}
-      >
-        <LogoutButton />
-      </View>
+      />
       <FloatingButton
         onPress={onDeleteAll}
         label="Delete all"

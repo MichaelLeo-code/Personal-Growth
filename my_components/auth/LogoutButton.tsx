@@ -1,8 +1,9 @@
 import { useAuth } from "@/my_hooks";
 import React from "react";
-import { Alert, StyleSheet, Text, TouchableOpacity } from "react-native";
+import { Alert, ViewStyle } from "react-native";
+import { FloatingButton } from "../floating-button";
 
-export const LogoutButton: React.FC = () => {
+export const LogoutButton: React.FC<{ style: ViewStyle }> = ({ style }) => {
   const { logout } = useAuth();
 
   const handleLogout = async () => {
@@ -25,22 +26,11 @@ export const LogoutButton: React.FC = () => {
   };
 
   return (
-    <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
-      <Text style={styles.logoutText}>Logout</Text>
-    </TouchableOpacity>
+    <FloatingButton
+      onPress={handleLogout}
+      backgroundColor="#a81000"
+      label="Log out"
+      style={style}
+    ></FloatingButton>
   );
 };
-
-const styles = StyleSheet.create({
-  logoutButton: {
-    backgroundColor: "#FF3B30",
-    paddingHorizontal: 16,
-    paddingVertical: 8,
-    borderRadius: 8,
-  },
-  logoutText: {
-    color: "#fff",
-    fontSize: 14,
-    fontWeight: "600",
-  },
-});
