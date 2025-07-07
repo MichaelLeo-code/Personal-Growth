@@ -1,4 +1,3 @@
-import { initialCellData } from "@/constants";
 import { cellService } from "@/service";
 import { Cell, CellType } from "@/types";
 import { useEffect, useState } from "react";
@@ -29,7 +28,7 @@ export const useCellManagement = () => {
   };
 
   useEffect(() => {
-    initialCellData.forEach((cell) => cellService.addCell(cell));
+    // initialCellData.forEach((cell) => cellService.addCell(cell));
     setCells(cellService.getCells());
     setSelected(cellService.getSelected());
 

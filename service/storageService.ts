@@ -1,7 +1,6 @@
 import { FIREBASE_AUTH } from "@/firebase";
+import { HybridGridStorage } from "@/storage";
 import { User, onAuthStateChanged } from "firebase/auth";
-import { DebouncedStorage } from "../storage/debouncedStorage";
-import { HybridGridStorage } from "../storage/hybridGridStorage";
 
 /**
  * Service dedicated to managing storage and sync operations.
@@ -9,12 +8,11 @@ import { HybridGridStorage } from "../storage/hybridGridStorage";
  * that can be shared across the application.
  */
 class StorageService {
-  private storage: DebouncedStorage;
+  private storage: HybridGridStorage;
   private authChangeCallbacks: (() => void)[] = [];
 
   constructor() {
-    const hybridStorage = new HybridGridStorage(FIREBASE_AUTH.currentUser);
-    this.storage = new DebouncedStorage(hybridStorage);
+    this.storage = new HybridGridStorage(FIREBASE_AUTH.currentUser);
 
     onAuthStateChanged(FIREBASE_AUTH, (user) => {
       console.log("StorageService: Auth state changed:", user?.uid || "null");
@@ -24,7 +22,7 @@ class StorageService {
     });
   }
 
-  getStorage(): DebouncedStorage {
+  getStorage(): HybridGridStorage {
     return this.storage;
   }
 
@@ -32,20 +30,14 @@ class StorageService {
     this.storage.setUser(user);
   }
 
-  async forceSyncToRemote(): Promise<void> {
-    await this.storage.forceSyncToRemote();
-  }
-
-  getSyncStatus() {
-    return this.storage.getSyncStatus();
-  }
-
-  async forceSave(): Promise<void> {
-    await this.storage.forceSave();
-  }
-
-  async cleanup(): Promise<void> {
-    await this.storage.cleanup();
+  getSyncStatus(): {
+    lastSyncTime: Date | null;
+    lastModifiedTime: Date;
+  } {
+    return {
+      lastSyncTime: new Date(),
+      lastModifiedTime: new Date(),
+    };
   }
 
   onAuthChange(callback: () => void): () => void {

@@ -1,10 +1,9 @@
 import React from "react";
-import { Alert, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { useSyncStatus } from "../../my_hooks/useSyncStatus";
 
 export const SyncStatusIndicator: React.FC = () => {
-  const { syncStatus, isOnline, isSyncing, forceSyncToRemote, forceSaveLocal } =
-    useSyncStatus();
+  const { syncStatus, isOnline, isSyncing } = useSyncStatus();
 
   const formatLastSyncTime = (date: Date | null) => {
     if (!date) return "Never";
@@ -20,51 +19,15 @@ export const SyncStatusIndicator: React.FC = () => {
   };
 
   const getSyncStatusColor = () => {
-    if (isSyncing) return "#FFA500"; // Orange
     if (syncStatus.hasUnsavedLocalChanges) return "#FF6B6B"; // Red
-    if (syncStatus.hasPendingChanges) return "#FFD93D"; // Yellow
+    if (isSyncing) return "#FFD93D"; // Yellow
     return "#4ECDC4"; // Green
   };
 
   const getSyncStatusText = () => {
     if (isSyncing) return "Syncing...";
     if (syncStatus.hasUnsavedLocalChanges) return "Unsaved changes";
-    if (syncStatus.hasPendingChanges) return "Pending sync";
     return "Up to date";
-  };
-
-  const handleSyncPress = () => {
-    if (isSyncing) return;
-
-    if (!isOnline) {
-      Alert.alert(
-        "Offline",
-        "You're currently offline. Changes will sync when you're back online.",
-        [{ text: "OK" }]
-      );
-      return;
-    }
-
-    if (syncStatus.hasUnsavedLocalChanges || syncStatus.hasPendingChanges) {
-      Alert.alert(
-        "Force Sync",
-        "This will sync your local changes to the cloud. Continue?",
-        [
-          { text: "Cancel", style: "cancel" },
-          { text: "Sync", onPress: forceSyncToRemote },
-        ]
-      );
-    } else {
-      Alert.alert("Already Synced", "Your data is already up to date!", [
-        { text: "OK" },
-      ]);
-    }
-  };
-
-  const handleSavePress = () => {
-    if (syncStatus.hasUnsavedLocalChanges) {
-      forceSaveLocal();
-    }
   };
 
   return (
@@ -74,7 +37,6 @@ export const SyncStatusIndicator: React.FC = () => {
           styles.statusIndicator,
           { backgroundColor: getSyncStatusColor() },
         ]}
-        onPress={handleSyncPress}
         disabled={isSyncing}
       >
         <Text style={styles.statusText}>{getSyncStatusText()}</Text>
@@ -84,12 +46,6 @@ export const SyncStatusIndicator: React.FC = () => {
           </Text>
         )}
       </TouchableOpacity>
-
-      {syncStatus.hasUnsavedLocalChanges && (
-        <TouchableOpacity style={styles.saveButton} onPress={handleSavePress}>
-          <Text style={styles.saveButtonText}>Save</Text>
-        </TouchableOpacity>
-      )}
     </View>
   );
 };

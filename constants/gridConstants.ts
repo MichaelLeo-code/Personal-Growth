@@ -1,4 +1,4 @@
-export const initialCellData = [{ text: "Я", x: 0, y: 0, id: 1 }];
+export const initialCellData = [{ text: "Test", x: 0, y: 0, id: 1 }];
 
 // export const initialCellData = [
 //   { text: "A", x: 0, y: 0, id: 1 },

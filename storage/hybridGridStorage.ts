@@ -13,6 +13,8 @@ export class HybridGridStorage implements gridStorage {
   private appStateSubscription: any = null;
   private readonly STORAGE_KEY: string = "cells";
 
+  private syncStatus: { lastSyncTime: Date; lastModifiedTime: Date };
+
   constructor(user: User | null, storageKey?: string) {
     this.localStorage = new localGridStorage(storageKey ?? this.STORAGE_KEY);
     this.remoteStorage = user
@@ -21,6 +23,11 @@ export class HybridGridStorage implements gridStorage {
 
     this.setupAppStateListener();
     this.startPeriodicSync();
+
+    this.syncStatus = {
+      lastSyncTime: new Date(),
+      lastModifiedTime: new Date(),
+    };
   }
 
   private setupAppStateListener(): void {
