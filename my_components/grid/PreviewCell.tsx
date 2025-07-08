@@ -28,6 +28,7 @@ const getPreviewCellData = (
           previewCell.type === CellType.Headline
             ? { x: 1, y: 1 }
             : { x: 3, y: 3 },
+        updatedAt: new Date().toISOString(),
       }
     : undefined;
 };
@@ -50,19 +51,16 @@ export const PreviewCell: React.FC<Props> = ({
 }) => {
   const previewCellData = getPreviewCellData(previewCell);
 
-  // Determine which cell should be the source of the line
   const sourceCell =
     isMoving && selected?.parent
       ? cellService.getCellById(selected.parent)
       : selected;
 
-  // Calculate line to parent/selected cell if both source cell and preview cell exist
   const parentLine: LineData | null =
     sourceCell && previewCellData
       ? createLineBetweenCells(sourceCell, previewCellData, cellSize)
       : null;
 
-  // Calculate lines to children if we're moving a cell with children
   const childrenLines: LineData[] =
     isMoving && selected?.children && previewCellData
       ? selected.children
@@ -75,12 +73,11 @@ export const PreviewCell: React.FC<Props> = ({
           .filter((line): line is LineData => line !== null)
       : [];
 
-  // Combine all lines
   const allLines: LineData[] = [parentLine, ...childrenLines].filter(
     (line): line is LineData => line !== null
   );
 
-  // Calculate SVG dimensions using shared utility
+  // dimensions of the SVG container
   const { svgDimensions, adjustedLines } = calculateSvgDimensions(allLines);
 
   return (

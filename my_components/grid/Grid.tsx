@@ -1,9 +1,9 @@
 import { cellSize } from "@/constants";
+import { usePopup } from "@/my_hooks";
+import { cellService } from "@/service";
+import { Cell } from "@/types";
 import React, { useState } from "react";
 import { GestureResponderEvent, StyleSheet, View } from "react-native";
-import { usePopup } from "../../my_hooks";
-import { cellService } from "../../service";
-import { Cell } from "../../types/cells";
 import { PopupSelector } from "../popup";
 import { CellLines } from "./CellLines";
 import { GridCell } from "./grid-cell/GridCell";

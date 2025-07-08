@@ -1,9 +1,13 @@
+import { cellService } from "@/service";
 import { Cell } from "@/types/cells";
-import { createLineBetweenCells, calculateSvgDimensionsWithCells, LineData } from "@/utils";
+import {
+  calculateSvgDimensionsWithCells,
+  createLineBetweenCells,
+  LineData,
+} from "@/utils";
 import { useMemo } from "react";
 import { StyleSheet } from "react-native";
 import Svg, { Line } from "react-native-svg";
-import { cellService } from "../../service";
 
 type Props = {
   cells: Cell[];
