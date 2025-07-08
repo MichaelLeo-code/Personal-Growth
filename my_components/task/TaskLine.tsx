@@ -5,12 +5,14 @@ import { Task } from "../../types";
 type TaskLineProps = {
   parentId: number;
   onTaskChange?: (task: Task) => void;
+  onTaskDelete?: (taskId: number) => void;
   task?: Task;
 };
 
 export const TaskLine: React.FC<TaskLineProps> = ({
   parentId,
   onTaskChange,
+  onTaskDelete,
   task: initialTask,
 }) => {
   const [task, setTask] = useState<Task>(() => ({
@@ -88,7 +90,7 @@ export const TaskLine: React.FC<TaskLineProps> = ({
       />
       <Pressable
         style={styles.deleteButton}
-        onPress={() => console.log("Delete task:", task.id)}
+        onPress={() => onTaskDelete?.(task.id)}
       >
         <Text style={styles.deleteButtonText}>×</Text>
       </Pressable>

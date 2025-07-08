@@ -1,5 +1,5 @@
 import { cellService } from "@/service";
-import { addTask, updateTask } from "@/service/taskService";
+import { addTask, deleteTask, updateTask } from "@/service/taskService";
 import { Task } from "@/types";
 import { TaskListCell } from "@/types/cells";
 import { useEffect, useState } from "react";
@@ -17,9 +17,14 @@ export const TaskPopup: React.FC<TaskPopupProps> = ({
   hidePopup,
 }) => {
   const [tasks, setTasks] = useState<Task[]>(cell.tasks || []);
+  const [modifiedTaskIds, setModifiedTaskIds] = useState<Set<number>>(
+    new Set()
+  );
 
   useEffect(() => {
-    setTasks(cell.tasks || []);
+    const cellTasks = cell.tasks || [];
+    setTasks(cellTasks);
+    setModifiedTaskIds(new Set());
   }, [cell]);
 
   const handleTaskChange = (task: Task) => {
@@ -32,11 +37,28 @@ export const TaskPopup: React.FC<TaskPopupProps> = ({
       newTasks[index] = task;
       return newTasks;
     });
+
+    setModifiedTaskIds((prev) => new Set(prev).add(task.id));
+  };
+
+  const handleTaskDelete = (taskId: number) => {
+    const success = deleteTask(taskId, cell.id);
+    if (success) {
+      setTasks((prev) => prev.filter((task) => task.id !== taskId));
+
+      setModifiedTaskIds((prev) => {
+        const newSet = new Set(prev);
+        newSet.delete(taskId);
+        return newSet;
+      });
+    }
   };
 
   const handleClose = () => {
     tasks.forEach((task) => {
-      updateTask(task.id, cell.id, task);
+      if (modifiedTaskIds.has(task.id)) {
+        updateTask(task.id, cell.id, task);
+      }
     });
     hidePopup();
   };
@@ -64,6 +86,7 @@ export const TaskPopup: React.FC<TaskPopupProps> = ({
             parentId={cell.id}
             task={task}
             onTaskChange={handleTaskChange}
+            onTaskDelete={handleTaskDelete}
           />
         ))}
         <Pressable style={styles.button} onPress={addNew}>
