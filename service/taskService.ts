@@ -158,3 +158,38 @@ export function totalCompletedCost(cellId: number): number {
 
   return countYourself() + countChildren();
 }
+
+export function resetDailyTasks(cellId: number): boolean {
+  const cell = getTaskListCell(cellId);
+  if (!cell?.tasks || !cell.daily) {
+    return false;
+  }
+
+  const today = new Date().toDateString();
+
+  if (cell.lastResetDate === today) {
+    return false;
+  }
+
+  const taskUpdates = cell.tasks.map((task) => ({
+    ...task,
+    completed: false,
+  }));
+
+  cellService.updateCellProperties(cellId, {
+    lastResetDate: today,
+    tasks: taskUpdates,
+  });
+
+  return true;
+}
+
+export function checkAndResetDailyTasks(): void {
+  const allCells = cellService.getCells();
+
+  allCells.forEach((cell) => {
+    if (cell.type === CellType.Tasklist && cell.daily) {
+      resetDailyTasks(cell.id);
+    }
+  });
+}

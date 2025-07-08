@@ -224,6 +224,18 @@ class CellService {
     return true;
   }
 
+  updateCellProperties(id: number, updates: Partial<Cell>): boolean {
+    const cell = this.cellMap.get(id);
+    if (!cell) return false;
+
+    const updatedCell = { ...cell, ...updates };
+    updatedCell.updatedAt = new Date().toISOString();
+    this.cellMap.set(id, updatedCell);
+    this.notify();
+    this.saveToStorage();
+    return true;
+  }
+
   subscribe(listener: () => void): () => void {
     this.listeners.push(listener);
     return () => {

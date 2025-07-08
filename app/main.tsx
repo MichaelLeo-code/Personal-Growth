@@ -8,8 +8,9 @@ import {
   useDragAndDrop,
   useZoomState,
 } from "@/my_hooks";
+import { checkAndResetDailyTasks } from "@/service/taskService";
 import { ReactNativeZoomableView } from "@openspacelabs/react-native-zoomable-view";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { SafeAreaView } from "react-native";
 
 export default function MainApp() {
@@ -33,6 +34,10 @@ export default function MainApp() {
     cellSize,
   });
   const [isEditMode] = useState(true); // Edit mode toggle - can add setIsEditMode later if needed
+
+  useEffect(() => {
+    checkAndResetDailyTasks();
+  }, []);
 
   const backgroundColor = useThemeColor({}, "background");
   const headerBackgroundColor = useThemeColor(

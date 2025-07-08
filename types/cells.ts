@@ -20,6 +20,8 @@ export interface HeadlineCell extends BaseCell {
 export interface TaskListCell extends BaseCell {
   type: CellType.Tasklist;
   tasks?: Task[];
+  daily?: boolean;
+  lastResetDate?: string;
 }
 
 export enum CellType {
