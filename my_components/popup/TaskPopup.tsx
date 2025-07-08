@@ -34,7 +34,7 @@ export const TaskPopup: React.FC<TaskPopupProps> = ({
     });
   };
 
-  const handleSave = () => {
+  const handleClose = () => {
     tasks.forEach((task) => {
       updateTask(task.id, cell.id, task);
     });
@@ -53,9 +53,8 @@ export const TaskPopup: React.FC<TaskPopupProps> = ({
   return (
     <Popup
       isVisible={isVisible}
-      hidePopup={hidePopup}
+      hidePopup={handleClose}
       title={cell.text}
-      showCloseButton={false}
       onTitleChange={(newTitle) => cellService.renameCell(cell.id, newTitle)}
     >
       <View>
@@ -70,25 +69,12 @@ export const TaskPopup: React.FC<TaskPopupProps> = ({
         <Pressable style={styles.button} onPress={addNew}>
           <Text style={styles.buttonText}>+</Text>
         </Pressable>
-        <View style={styles.buttonContainer}>
-          <Pressable style={styles.button} onPress={hidePopup}>
-            <Text style={styles.buttonText}>Cancel</Text>
-          </Pressable>
-          <Pressable style={styles.button} onPress={handleSave}>
-            <Text style={styles.buttonText}>Save</Text>
-          </Pressable>
-        </View>
       </View>
     </Popup>
   );
 };
 
 const styles = StyleSheet.create({
-  buttonContainer: {
-    flexDirection: "row",
-    justifyContent: "flex-end",
-    marginTop: 10,
-  },
   button: {
     backgroundColor: "#444",
     paddingHorizontal: 16,

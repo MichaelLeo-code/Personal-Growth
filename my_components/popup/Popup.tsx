@@ -13,7 +13,6 @@ export type PopupProps = {
   hidePopup: () => void;
   title?: string;
   children?: React.ReactNode;
-  showCloseButton?: boolean;
   onTitleChange?: (newTitle: string) => void;
 };
 
@@ -22,7 +21,6 @@ export const Popup: React.FC<PopupProps> = ({
   hidePopup,
   title,
   children,
-  showCloseButton = true,
   onTitleChange,
 }) => {
   const [isEditingTitle, setIsEditingTitle] = useState(false);
@@ -52,8 +50,16 @@ export const Popup: React.FC<PopupProps> = ({
       animationType="fade"
       onRequestClose={hidePopup}
     >
-      <View style={styles.modalOverlay}>
-        <View style={styles.modalContent}>
+      <TouchableOpacity
+        style={styles.modalOverlay}
+        activeOpacity={1}
+        onPress={hidePopup}
+      >
+        <TouchableOpacity
+          style={styles.modalContent}
+          activeOpacity={1}
+          onPress={(e) => e.stopPropagation()}
+        >
           <View style={styles.modalHeader}>
             {isEditingTitle ? (
               <View style={styles.titleEditContainer}>
@@ -75,15 +81,10 @@ export const Popup: React.FC<PopupProps> = ({
                 <Text style={styles.modalTitle}>{title}</Text>
               </TouchableOpacity>
             )}
-            {showCloseButton && (
-              <TouchableOpacity onPress={hidePopup} style={styles.closeButton}>
-                <Text style={styles.closeButtonText}>×</Text>
-              </TouchableOpacity>
-            )}
           </View>
           {children}
-        </View>
-      </View>
+        </TouchableOpacity>
+      </TouchableOpacity>
     </Modal>
   );
 };
@@ -126,13 +127,6 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderBottomColor: "#ccc",
     paddingBottom: 2,
-  },
-  closeButton: {
-    padding: 5,
-  },
-  closeButtonText: {
-    fontSize: 24,
-    color: "#666",
   },
   modalBody: {
     alignItems: "center",

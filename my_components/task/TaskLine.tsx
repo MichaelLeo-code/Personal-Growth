@@ -20,9 +20,14 @@ export const TaskLine: React.FC<TaskLineProps> = ({
     cost: initialTask?.cost ?? 10,
   }));
 
+  const [costText, setCostText] = useState<string>(() =>
+    (initialTask?.cost ?? 10).toString()
+  );
+
   useEffect(() => {
     if (initialTask) {
       setTask(initialTask);
+      setCostText(initialTask.cost.toString());
     }
   }, [initialTask]);
 
@@ -30,6 +35,33 @@ export const TaskLine: React.FC<TaskLineProps> = ({
     const newTask = { ...task, ...updates };
     setTask(newTask);
     onTaskChange?.(newTask);
+  };
+
+  const handleCostChange = (value: string) => {
+    setCostText(value);
+
+    if (value === "") {
+      return;
+    }
+
+    const cost = parseInt(value);
+    if (!isNaN(cost) && cost >= 0) {
+      updateTask({ cost });
+    }
+  };
+
+  const onCostEditEnd = () => {
+    if (costText === "" || isNaN(parseInt(costText))) {
+      // Reset to current task cost if empty or invalid
+      setCostText(task.cost.toString());
+    } else {
+      const cost = parseInt(costText);
+      if (cost >= 0) {
+        updateTask({ cost });
+      } else {
+        setCostText(task.cost.toString());
+      }
+    }
   };
 
   return (
@@ -47,13 +79,9 @@ export const TaskLine: React.FC<TaskLineProps> = ({
       />
       <TextInput
         style={styles.numberInput}
-        value={task.cost.toString()}
-        onChangeText={(value) => {
-          const cost = parseInt(value);
-          if (!isNaN(cost) && cost >= 0) {
-            updateTask({ cost });
-          }
-        }}
+        value={costText}
+        onChangeText={handleCostChange}
+        onBlur={onCostEditEnd}
         placeholder="Cost"
         placeholderTextColor="#666"
         keyboardType="numeric"

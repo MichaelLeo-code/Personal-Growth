@@ -50,7 +50,8 @@ class CellService {
     }
   }
 
-  private async saveToStorage() {
+  async saveToStorage() {
+    console.log("Saving cells to storage...");
     try {
       await storageService.getStorage().saveCells(this.getCells());
     } catch (error) {

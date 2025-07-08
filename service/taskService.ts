@@ -1,7 +1,8 @@
 import { CellType, TaskListCell } from "@/types/cells";
 import { Task } from "../types/task";
-import { cellService } from "./";
-let nextId = 0;
+import { cellService } from "./cellService";
+
+let nextId = 1; // Start from 1 to avoid conflicts with default/initial values
 
 function getTaskListCell(parentId: number): TaskListCell | null {
   const parentCell = cellService.getCellById(parentId);
@@ -11,8 +12,30 @@ function getTaskListCell(parentId: number): TaskListCell | null {
   return parentCell as TaskListCell;
 }
 
+function initializeNextId(): void {
+  let maxId = 0;
+  const allCells = cellService.getCells();
+
+  allCells.forEach((cell) => {
+    if (cell.type === CellType.Tasklist && cell.tasks) {
+      cell.tasks.forEach((task) => {
+        if (task.id > maxId) {
+          maxId = task.id;
+        }
+      });
+    }
+  });
+
+  nextId = maxId + 1;
+}
+
+function getNextTaskId(): number {
+  initializeNextId();
+  return nextId++;
+}
+
 export function addTask(task: Omit<Task, "id">, parentId: number): Task | null {
-  const id = nextId++;
+  const id = getNextTaskId();
   const newTask: Task = { ...task, id };
 
   const parentCell = getTaskListCell(parentId);
@@ -21,6 +44,7 @@ export function addTask(task: Omit<Task, "id">, parentId: number): Task | null {
   }
 
   parentCell.tasks = [...(parentCell.tasks || []), newTask];
+  cellService.saveToStorage();
   cellService.notify();
   return newTask;
 }
@@ -37,6 +61,7 @@ export function deleteTask(taskId: number, parentId: number): boolean {
   }
 
   parentCell.tasks = parentCell.tasks.filter((task) => task.id !== taskId);
+  cellService.saveToStorage();
   cellService.notify();
   return true;
 }
@@ -58,6 +83,7 @@ export function updateTask(
 
   const updatedTask = { ...parentCell.tasks[taskIndex], ...updates };
   parentCell.tasks[taskIndex] = updatedTask;
+  cellService.saveToStorage();
   cellService.notify();
   return updatedTask;
 }
