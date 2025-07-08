@@ -1,7 +1,7 @@
 import { cellSize } from "@/constants";
 import { FloatingActionButtons } from "@/containers";
 import { useThemeColor } from "@/hooks/useThemeColor";
-import { Grid } from "@/my_components";
+import { BottomProgressBar, Grid } from "@/my_components";
 import {
   useCellManagement,
   useCellMove,
@@ -85,6 +85,8 @@ export default function MainApp() {
           onDragEnd={handleDragEnd}
         />
       )}
+
+      <BottomProgressBar cellId={1} />
     </SafeAreaView>
   );
 }

@@ -134,6 +134,28 @@ class CellService {
     return undefined;
   }
 
+  tempAddStart() {
+    const newCell: Cell = {
+      x: 0,
+      y: 0,
+      id: 1,
+      type: CellType.Headline,
+      size: { x: 1, y: 1 },
+      text: "Me",
+      children: [2],
+      updatedAt: new Date().toISOString(),
+    };
+    this.cellMap.set(1, newCell);
+    coordinateService.occupyArea(
+      newCell.x,
+      newCell.y,
+      newCell.size,
+      newCell.id
+    );
+    this.notify();
+    this.saveToStorage();
+  }
+
   addNextFreeCell(nextToId: number, type?: CellType): Cell | undefined {
     const coordinates = this.getNextFreeCellCoordinates(nextToId);
     if (!coordinates) return undefined;
