@@ -19,9 +19,9 @@ export const SyncStatusIndicator: React.FC = () => {
   };
 
   const getSyncStatusColor = () => {
-    if (syncStatus.hasUnsavedLocalChanges) return "#FF6B6B"; // Red
+    if (syncStatus.hasUnsavedLocalChanges) return "#a81000"; // Red
     if (isSyncing) return "#FFD93D"; // Yellow
-    return "#4ECDC4"; // Green
+    return "#4b50e3"; // Green
   };
 
   const getSyncStatusText = () => {

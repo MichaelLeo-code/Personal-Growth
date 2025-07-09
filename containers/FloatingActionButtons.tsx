@@ -90,7 +90,7 @@ export const FloatingActionButtons: React.FC<FloatingActionButtonsProps> = ({
             backgroundColor="#a81000"
             style={{
               right: 20,
-              bottom: insets.bottom + 5,
+              bottom: insets.bottom + 40,
             }}
             iconName="delete"
           />

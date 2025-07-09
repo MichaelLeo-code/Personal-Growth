@@ -5,11 +5,23 @@ import { StyleSheet, Text, View } from "react-native";
 
 export const BottomProgressBar: React.FC<{ cellId: number }> = ({ cellId }) => {
   const { cell, taskProgress } = useCellData(cellId);
-  const backgroundColor = useThemeColor({ light: "#f8f9fa", dark: "#1a1a1a" }, "background");
-  const borderColor = useThemeColor({ light: "#e9ecef", dark: "#333" }, "background");
+  const backgroundColor = useThemeColor(
+    { light: "#f8f9fa", dark: "#1a1a1a" },
+    "background"
+  );
+  const borderColor = useThemeColor(
+    { light: "#e9ecef", dark: "#333" },
+    "background"
+  );
   const textColor = useThemeColor({ light: "#333", dark: "#fff" }, "text");
-  const progressColor = useThemeColor({ light: "#4CAF50", dark: "#4CAF50" }, "tint");
-  const progressBgColor = useThemeColor({ light: "#e0e0e0", dark: "#333" }, "background");
+  const progressColor = useThemeColor(
+    { light: "#4CAF50", dark: "#4CAF50" },
+    "tint"
+  );
+  const progressBgColor = useThemeColor(
+    { light: "#e0e0e0", dark: "#333" },
+    "background"
+  );
 
   if (!cell) {
     return null;
@@ -25,12 +37,14 @@ export const BottomProgressBar: React.FC<{ cellId: number }> = ({ cellId }) => {
           {cell.text || `Cell ${cellId}`}
         </Text>
         <View style={styles.progressSection}>
-          <View style={[styles.progressBar, { backgroundColor: progressBgColor }]}>
-            <View 
+          <View
+            style={[styles.progressBar, { backgroundColor: progressBgColor }]}
+          >
+            <View
               style={[
-                styles.progressFill, 
-                { width: `${percentage}%`, backgroundColor: progressColor }
-              ]} 
+                styles.progressFill,
+                { width: `${percentage}%`, backgroundColor: progressColor },
+              ]}
             />
           </View>
           <Text style={[styles.progressText, { color: textColor }]}>
