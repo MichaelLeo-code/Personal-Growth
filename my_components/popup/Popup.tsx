@@ -7,6 +7,8 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
+import { useThemeColors } from "@/my_hooks";
+import { Spacing, Typography, BorderRadius, CommonStyles } from "@/constants";
 
 export type PopupProps = {
   isVisible: boolean;
@@ -25,6 +27,7 @@ export const Popup: React.FC<PopupProps> = ({
 }) => {
   const [isEditingTitle, setIsEditingTitle] = useState(false);
   const [editedTitle, setEditedTitle] = useState(title || "");
+  const colors = useThemeColors();
 
   const handleTitlePress = () => {
     setEditedTitle(title || "");
@@ -56,7 +59,7 @@ export const Popup: React.FC<PopupProps> = ({
         onPress={hidePopup}
       >
         <TouchableOpacity
-          style={styles.modalContent}
+          style={[styles.modalContent, { backgroundColor: colors.surface }]}
           activeOpacity={1}
           onPress={(e) => e.stopPropagation()}
         >
@@ -64,7 +67,10 @@ export const Popup: React.FC<PopupProps> = ({
             {isEditingTitle ? (
               <View style={styles.titleEditContainer}>
                 <TextInput
-                  style={styles.titleInput}
+                  style={[styles.titleInput, { 
+                    color: colors.text,
+                    borderBottomColor: colors.border 
+                  }]}
                   value={editedTitle}
                   onChangeText={setEditedTitle}
                   onSubmitEditing={handleTitleSubmit}
@@ -78,7 +84,9 @@ export const Popup: React.FC<PopupProps> = ({
                 onPress={handleTitlePress}
                 style={styles.titleContainer}
               >
-                <Text style={styles.modalTitle}>{title}</Text>
+                <Text style={[styles.modalTitle, { color: colors.text }]}>
+                  {title}
+                </Text>
               </TouchableOpacity>
             )}
           </View>
@@ -91,48 +99,38 @@ export const Popup: React.FC<PopupProps> = ({
 
 const styles = StyleSheet.create({
   modalOverlay: {
-    flex: 1,
-    backgroundColor: "rgba(0, 0, 0, 0.5)",
-    justifyContent: "center",
-    alignItems: "center",
+    ...CommonStyles.modalOverlay,
   },
   modalContent: {
-    backgroundColor: "#fff",
-    borderRadius: 8,
-    padding: 20,
-    width: "80%",
-    maxWidth: 400,
+    ...CommonStyles.modalContainer,
   },
   modalHeader: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    marginBottom: 20,
+    marginBottom: Spacing.xl,
   },
   titleContainer: {
     flex: 1,
-    marginRight: 10,
+    marginRight: Spacing.sm,
   },
   modalTitle: {
-    fontSize: 20,
-    fontWeight: "bold",
+    ...Typography.titleLarge,
   },
   titleEditContainer: {
     flex: 1,
-    marginRight: 10,
+    marginRight: Spacing.sm,
   },
   titleInput: {
-    fontSize: 20,
-    fontWeight: "bold",
+    ...Typography.titleLarge,
     borderBottomWidth: 1,
-    borderBottomColor: "#ccc",
-    paddingBottom: 2,
+    paddingBottom: Spacing.xs / 2,
   },
   modalBody: {
     alignItems: "center",
   },
   modalText: {
-    fontSize: 16,
-    marginBottom: 20,
+    ...Typography.bodyLarge,
+    marginBottom: Spacing.xl,
   },
 });

@@ -1,5 +1,6 @@
-import { useThemeColor } from "@/hooks/useThemeColor";
+import { useThemeColor, useThemeColors } from "@/my_hooks";
 import { cellService } from "@/service";
+import { Spacing, Typography, BorderRadius, CommonStyles } from "@/constants";
 import {
   addTask,
   checkAndResetDailyTasks,
@@ -36,6 +37,7 @@ export const TaskPopup: React.FC<TaskPopupProps> = ({
   );
   const [isDaily, setIsDaily] = useState<boolean>(cell.daily || false);
 
+  const colors = useThemeColors();
   const textColor = useThemeColor({}, "text");
   const tintColor = useThemeColor({}, "tint");
 
@@ -126,8 +128,8 @@ export const TaskPopup: React.FC<TaskPopupProps> = ({
             onTaskDelete={handleTaskDelete}
           />
         ))}
-        <Pressable style={styles.button} onPress={addNew}>
-          <Text style={styles.buttonText}>+</Text>
+        <Pressable style={[styles.button, { backgroundColor: colors.surfaceSecondary }]} onPress={addNew}>
+          <Text style={[styles.buttonText, { color: colors.text }]}>+</Text>
         </Pressable>
 
         <View style={styles.toggleContainer}>
@@ -136,9 +138,9 @@ export const TaskPopup: React.FC<TaskPopupProps> = ({
             <Switch
               value={isDaily}
               onValueChange={setIsDaily}
-              trackColor={{ false: "#767577", true: tintColor }}
-              thumbColor={isDaily ? "#fff" : "#f4f3f4"}
-              ios_backgroundColor="#767577"
+              trackColor={{ false: colors.border, true: tintColor }}
+              thumbColor={isDaily ? colors.background : colors.textMuted}
+              ios_backgroundColor={colors.border}
             />
             <TouchableOpacity
               style={[styles.tooltipButton, { borderColor: tintColor }]}
@@ -156,33 +158,28 @@ export const TaskPopup: React.FC<TaskPopupProps> = ({
 
 const styles = StyleSheet.create({
   button: {
-    backgroundColor: "#444",
-    paddingHorizontal: 16,
-    paddingVertical: 8,
-    borderRadius: 4,
+    paddingHorizontal: Spacing.lg,
+    paddingVertical: Spacing.sm,
+    borderRadius: BorderRadius.sm,
   },
   buttonText: {
-    color: "#fff",
-    fontSize: 14,
+    ...Typography.body,
     textAlign: "center",
   },
   toggleContainer: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    marginTop: 16,
-    paddingHorizontal: 4,
+    ...CommonStyles.rowBetween,
+    marginTop: Spacing.lg,
+    paddingHorizontal: Spacing.xs,
   },
   toggleLabel: {
-    fontSize: 16,
+    ...Typography.bodyLarge,
     fontWeight: "500",
   },
   switchContainer: {
-    flexDirection: "row",
-    alignItems: "center",
+    ...CommonStyles.row,
   },
   tooltipButton: {
-    marginLeft: 8,
+    marginLeft: Spacing.sm,
     width: 24,
     height: 24,
     borderRadius: 12,
@@ -191,7 +188,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   tooltipText: {
-    fontSize: 14,
+    ...Typography.body,
     fontWeight: "bold",
   },
 });

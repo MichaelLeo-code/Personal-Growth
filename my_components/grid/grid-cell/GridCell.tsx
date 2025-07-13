@@ -1,3 +1,5 @@
+import { BorderRadius, Spacing, Typography } from "@/constants";
+import { useThemeColors } from "@/my_hooks";
 import React, { useRef } from "react";
 import {
   Pressable,
@@ -26,19 +28,34 @@ const TaskPreview: React.FC<{
   taskId: number;
   cellId: number;
   onCheckboxPress: (taskId: number, cellId: number, completed: boolean) => void;
-}> = ({ text, completed, taskId, cellId, onCheckboxPress }) => (
-  <View style={styles.taskPreview}>
-    <Pressable
-      style={[styles.checkbox, completed && styles.checkboxCompleted]}
-      onPress={() => onCheckboxPress(taskId, cellId, !completed)}
-    >
-      {completed && <Text style={styles.checkmark}>✓</Text>}
-    </Pressable>
-    <Text style={styles.taskText} numberOfLines={1}>
-      {text}
-    </Text>
-  </View>
-);
+}> = ({ text, completed, taskId, cellId, onCheckboxPress }) => {
+  const colors = useThemeColors();
+
+  return (
+    <View style={styles.taskPreview}>
+      <Pressable
+        style={[
+          styles.checkbox,
+          { borderColor: colors.text },
+          completed && {
+            backgroundColor: colors.success,
+            borderColor: colors.success,
+          },
+        ]}
+        onPress={() => onCheckboxPress(taskId, cellId, !completed)}
+      >
+        {completed && (
+          <Text style={[styles.checkmark, { color: colors.background }]}>
+            ✓
+          </Text>
+        )}
+      </Pressable>
+      <Text style={[styles.taskText, { color: colors.text }]} numberOfLines={1}>
+        {text}
+      </Text>
+    </View>
+  );
+};
 
 export const GridCell: React.FC<GridCellProps> = ({
   cell,
@@ -51,6 +68,7 @@ export const GridCell: React.FC<GridCellProps> = ({
 }) => {
   const sizeMultiplier = cell.type === CellType.Headline ? 1 : 3;
   const lastTap = useRef<number>(0);
+  const colors = useThemeColors();
 
   const handlePress = () => {
     const now = Date.now();
@@ -87,7 +105,10 @@ export const GridCell: React.FC<GridCellProps> = ({
           {
             width: cellSize * cell.size.x,
             height: cellSize * cell.size.y,
-            backgroundColor: isSelected ? "#555" : "#000",
+            backgroundColor: isSelected
+              ? colors.surfaceSecondary
+              : colors.surface,
+            borderColor: colors.border,
             opacity: isDimmed ? 0.2 : 1,
           },
         ]}
@@ -98,6 +119,7 @@ export const GridCell: React.FC<GridCellProps> = ({
           <Text
             style={[
               styles.text,
+              { color: colors.text },
               cell.type === CellType.Headline && styles.headlineText,
             ]}
           >
@@ -138,59 +160,60 @@ const styles = StyleSheet.create({
   cell: {
     position: "relative",
     borderWidth: 1,
-    borderColor: "#ccc",
     justifyContent: "center",
     alignItems: "center",
+    borderRadius: BorderRadius.sm,
+    shadowColor: "#fff",
+    shadowOffset: {
+      width: 0,
+      height: 1,
+    },
+    shadowOpacity: 0.15,
+    shadowRadius: 6,
+    elevation: 3,
   },
   progressBarContainer: {
-    marginTop: 4,
-    paddingHorizontal: 4,
+    marginTop: Spacing.xs,
+    paddingHorizontal: Spacing.xs,
   },
   cellContent: {
     alignItems: "center",
     justifyContent: "center",
     width: "100%",
-    padding: 8,
+    padding: Spacing.sm,
   },
   text: {
-    fontSize: 16,
-    color: "#fff",
-    marginBottom: 4,
+    ...Typography.bodyLarge,
+    marginBottom: Spacing.xs,
     textAlign: "center",
   },
   headlineText: {
-    fontSize: 12,
-    marginBottom: 2,
+    ...Typography.caption,
+    marginBottom: Spacing.xs / 2,
   },
   tasksContainer: {
     width: "100%",
-    marginTop: 4,
+    marginTop: Spacing.xs,
   },
   taskPreview: {
     flexDirection: "row",
     alignItems: "center",
-    marginBottom: 2,
+    marginBottom: Spacing.xs / 2,
   },
   checkbox: {
     width: 16,
     height: 16,
     borderWidth: 1,
-    borderColor: "#fff",
-    marginRight: 4,
+    marginRight: Spacing.xs,
     justifyContent: "center",
     alignItems: "center",
-  },
-  checkboxCompleted: {
-    backgroundColor: "#4CAF50",
-    borderColor: "#4CAF50",
+    borderRadius: BorderRadius.sm,
   },
   checkmark: {
-    color: "#fff",
-    fontSize: 12,
+    ...Typography.caption,
   },
   taskText: {
-    color: "#fff",
-    fontSize: 12,
+    ...Typography.caption,
     flex: 1,
   },
 });

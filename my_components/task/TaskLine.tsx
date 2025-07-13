@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react";
 import { Pressable, StyleSheet, Text, TextInput, View } from "react-native";
 import { Task } from "../../types";
+import { useThemeColors } from "@/my_hooks";
+import { Spacing, Typography, BorderRadius, CommonStyles } from "@/constants";
 
 type TaskLineProps = {
   parentId: number;
@@ -25,6 +27,8 @@ export const TaskLine: React.FC<TaskLineProps> = ({
   const [costText, setCostText] = useState<string>(() =>
     (initialTask?.cost ?? 10).toString()
   );
+
+  const colors = useThemeColors();
 
   useEffect(() => {
     if (initialTask) {
@@ -69,30 +73,42 @@ export const TaskLine: React.FC<TaskLineProps> = ({
   return (
     <View style={styles.taskLine}>
       <Pressable
-        style={[styles.checkbox, task.completed && styles.checkboxChecked]}
+        style={[
+          styles.checkbox, 
+          { borderColor: colors.border },
+          task.completed && { backgroundColor: colors.surfaceSecondary }
+        ]}
         onPress={() => updateTask({ completed: !task.completed })}
       />
       <TextInput
-        style={styles.textInput}
+        style={[styles.textInput, { 
+          borderColor: colors.border,
+          backgroundColor: colors.surface,
+          color: colors.text 
+        }]}
         value={task.text}
         onChangeText={(text) => updateTask({ text })}
         placeholder="Enter task description"
-        placeholderTextColor="#666"
+        placeholderTextColor={colors.textMuted}
       />
       <TextInput
-        style={styles.numberInput}
+        style={[styles.numberInput, { 
+          borderColor: colors.border,
+          backgroundColor: colors.surface,
+          color: colors.text 
+        }]}
         value={costText}
         onChangeText={handleCostChange}
         onBlur={onCostEditEnd}
         placeholder="Cost"
-        placeholderTextColor="#666"
+        placeholderTextColor={colors.textMuted}
         keyboardType="numeric"
       />
       <Pressable
-        style={styles.deleteButton}
+        style={[styles.deleteButton, { backgroundColor: colors.surfaceSecondary }]}
         onPress={() => onTaskDelete?.(task.id)}
       >
-        <Text style={styles.deleteButtonText}>×</Text>
+        <Text style={[styles.deleteButtonText, { color: colors.text }]}>×</Text>
       </Pressable>
     </View>
   );
@@ -100,53 +116,36 @@ export const TaskLine: React.FC<TaskLineProps> = ({
 
 const styles = StyleSheet.create({
   taskLine: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 12,
-    marginBottom: 16,
+    ...CommonStyles.row,
+    gap: Spacing.md,
+    marginBottom: Spacing.lg,
   },
   checkbox: {
     width: 24,
     height: 24,
     borderWidth: 2,
-    borderColor: "#666",
-    borderRadius: 4,
+    borderRadius: BorderRadius.sm,
     backgroundColor: "transparent",
   },
-  checkboxChecked: {
-    backgroundColor: "#444",
-  },
   textInput: {
+    ...CommonStyles.inputBase,
     flex: 1,
     height: 40,
-    borderWidth: 1,
-    borderColor: "#444",
-    borderRadius: 4,
-    paddingHorizontal: 12,
-    color: "#fff",
-    backgroundColor: "#333",
   },
   numberInput: {
+    ...CommonStyles.inputBase,
     width: 80,
     height: 40,
-    borderWidth: 1,
-    borderColor: "#444",
-    borderRadius: 4,
-    paddingHorizontal: 12,
-    color: "#fff",
-    backgroundColor: "#333",
   },
   deleteButton: {
     width: 24,
     height: 24,
     justifyContent: "center",
     alignItems: "center",
-    backgroundColor: "#444",
     borderRadius: 12,
   },
   deleteButtonText: {
-    color: "#fff",
-    fontSize: 18,
+    ...Typography.bodyLarge,
     lineHeight: 18,
     textAlign: "center",
   },

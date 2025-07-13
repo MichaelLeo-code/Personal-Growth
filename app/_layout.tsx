@@ -1,10 +1,14 @@
+import { Colors } from "@/constants/Colors";
+import { useColorScheme } from "@/hooks/useColorScheme";
 import { useAuth } from "@/my_hooks";
-import { DarkTheme, DefaultTheme, ThemeProvider } from "@react-navigation/native";
+import {
+  DarkTheme,
+  DefaultTheme,
+  ThemeProvider,
+} from "@react-navigation/native";
 import { useFonts } from "expo-font";
 import React from "react";
 import { ActivityIndicator, SafeAreaView } from "react-native";
-import { useColorScheme } from "@/hooks/useColorScheme";
-import { Colors } from "@/constants/Colors";
 import LoginPage from "./login";
 import MainApp from "./main";
 
@@ -18,19 +22,22 @@ export default function RootLayout() {
   });
 
   // Create custom theme based on color scheme
-  const theme = colorScheme === 'dark' ? {
-    ...DarkTheme,
-    colors: {
-      ...DarkTheme.colors,
-      background: Colors.dark.background,
-    }
-  } : {
-    ...DefaultTheme,
-    colors: {
-      ...DefaultTheme.colors,
-      background: Colors.light.background,
-    }
-  };
+  const theme =
+    colorScheme === "dark"
+      ? {
+          ...DarkTheme,
+          colors: {
+            ...DarkTheme.colors,
+            background: Colors.dark.background,
+          },
+        }
+      : {
+          ...DefaultTheme,
+          colors: {
+            ...DefaultTheme.colors,
+            background: Colors.light.background,
+          },
+        };
 
   if (!loaded || authLoading) {
     return (
@@ -40,10 +47,16 @@ export default function RootLayout() {
             flex: 1,
             justifyContent: "center",
             alignItems: "center",
-            backgroundColor: Colors[colorScheme ?? 'light'].background,
+            backgroundColor: Colors[colorScheme ?? "light"].background,
           }}
         >
-          <ActivityIndicator size="large" color="#007AFF" />
+          <ActivityIndicator
+            size="large"
+            color={
+              Colors[colorScheme as keyof typeof Colors]?.accent ||
+              Colors.light.accent
+            }
+          />
         </SafeAreaView>
       </ThemeProvider>
     );

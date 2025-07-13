@@ -1,27 +1,15 @@
-import { useThemeColor } from "@/hooks/useThemeColor";
-import { useCellData } from "@/my_hooks";
+import { useThemeColor, useCellData } from "@/my_hooks";
+import { Spacing, Typography, CommonStyles } from "@/constants";
 import React from "react";
 import { StyleSheet, Text, View } from "react-native";
 
 export const BottomProgressBar: React.FC<{ cellId: number }> = ({ cellId }) => {
   const { cell, taskProgress } = useCellData(cellId);
-  const backgroundColor = useThemeColor(
-    { light: "#f8f9fa", dark: "#1a1a1a" },
-    "background"
-  );
-  const borderColor = useThemeColor(
-    { light: "#e9ecef", dark: "#333" },
-    "background"
-  );
-  const textColor = useThemeColor({ light: "#333", dark: "#fff" }, "text");
-  const progressColor = useThemeColor(
-    { light: "#4CAF50", dark: "#4CAF50" },
-    "tint"
-  );
-  const progressBgColor = useThemeColor(
-    { light: "#e0e0e0", dark: "#333" },
-    "background"
-  );
+  const backgroundColor = useThemeColor({}, "backgroundSecondary");
+  const borderColor = useThemeColor({}, "border");
+  const textColor = useThemeColor({}, "text");
+  const progressColor = useThemeColor({}, "success");
+  const progressBgColor = useThemeColor({}, "backgroundTertiary");
 
   if (!cell) {
     return null;
@@ -63,24 +51,21 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     borderTopWidth: 1,
-    paddingHorizontal: 16,
-    paddingVertical: 12,
+    paddingHorizontal: Spacing.lg,
+    paddingVertical: Spacing.md,
     minHeight: 60,
   },
   content: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
+    ...CommonStyles.rowBetween,
   },
   title: {
-    fontSize: 14,
+    ...Typography.body,
     fontWeight: "600",
     flex: 1,
-    marginRight: 12,
+    marginRight: Spacing.md,
   },
   progressSection: {
-    flexDirection: "row",
-    alignItems: "center",
+    ...CommonStyles.row,
     minWidth: 120,
   },
   progressBar: {
@@ -88,14 +73,14 @@ const styles = StyleSheet.create({
     height: 6,
     borderRadius: 3,
     overflow: "hidden",
-    marginRight: 8,
+    marginRight: Spacing.sm,
   },
   progressFill: {
     height: "100%",
     borderRadius: 3,
   },
   progressText: {
-    fontSize: 12,
+    ...Typography.caption,
     fontWeight: "500",
     minWidth: 35,
     textAlign: "right",

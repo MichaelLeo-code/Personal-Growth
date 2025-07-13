@@ -1,10 +1,11 @@
-import { useAuth } from "@/my_hooks";
+import { useAuth, useThemeColors } from "@/my_hooks";
 import React from "react";
 import { Alert, ViewStyle } from "react-native";
 import { FloatingButton } from "../floating-button";
 
 export const LogoutButton: React.FC<{ style: ViewStyle }> = ({ style }) => {
   const { logout } = useAuth();
+  const colors = useThemeColors();
 
   const handleLogout = async () => {
     Alert.alert("Logout", "Are you sure you want to logout?", [
@@ -28,7 +29,7 @@ export const LogoutButton: React.FC<{ style: ViewStyle }> = ({ style }) => {
   return (
     <FloatingButton
       onPress={handleLogout}
-      backgroundColor="#a81000"
+      backgroundColor={colors.error}
       label="Log out"
       style={style}
     ></FloatingButton>

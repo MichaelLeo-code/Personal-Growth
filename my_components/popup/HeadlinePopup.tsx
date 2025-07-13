@@ -1,5 +1,7 @@
 import { cellService } from "@/service";
 import { HeadlineCell } from "@/types/cells";
+import { useThemeColors } from "@/my_hooks";
+import { Spacing, Typography, BorderRadius, CommonStyles } from "@/constants";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 import { Popup, PopupProps } from "./Popup";
 
@@ -12,17 +14,21 @@ export const HeadlinePopup: React.FC<HeadlinePopupProps> = ({
   isVisible,
   hidePopup,
 }) => {
+  const colors = useThemeColors();
+  
   return (
     <Popup
       isVisible={isVisible}
       hidePopup={hidePopup}
       title={cell.text}
-      showCloseButton={true}
       onTitleChange={(newTitle) => cellService.renameCell(cell.id, newTitle)}
     >
       <View style={styles.buttonContainer}>
-        <Pressable style={styles.button} onPress={hidePopup}>
-          <Text style={styles.buttonText}>Cancel</Text>
+        <Pressable 
+          style={[styles.button, { backgroundColor: colors.surfaceSecondary }]} 
+          onPress={hidePopup}
+        >
+          <Text style={[styles.buttonText, { color: colors.text }]}>Cancel</Text>
         </Pressable>
       </View>
     </Popup>
@@ -33,17 +39,15 @@ const styles = StyleSheet.create({
   buttonContainer: {
     flexDirection: "row",
     justifyContent: "flex-end",
-    marginTop: 10,
+    marginTop: Spacing.sm,
   },
   button: {
-    backgroundColor: "#444",
-    paddingHorizontal: 16,
-    paddingVertical: 8,
-    borderRadius: 4,
+    paddingHorizontal: Spacing.lg,
+    paddingVertical: Spacing.sm,
+    borderRadius: BorderRadius.sm,
   },
   buttonText: {
-    color: "#fff",
-    fontSize: 14,
+    ...Typography.body,
     textAlign: "center",
   },
 });

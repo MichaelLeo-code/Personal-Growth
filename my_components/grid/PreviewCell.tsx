@@ -1,4 +1,5 @@
 import { cellSize as size } from "@/constants";
+import { useThemeColors } from "@/my_hooks";
 import { cellService, coordinateService } from "@/service";
 import { Cell, CellType } from "@/types";
 import {
@@ -58,6 +59,7 @@ export const PreviewCell: React.FC<Props> = ({
   selected,
   isMoving = false,
 }) => {
+  const colors = useThemeColors();
   const previewCellData = getPreviewCellData(previewCell, selected, isMoving);
 
   const sourceCell =
@@ -95,8 +97,11 @@ export const PreviewCell: React.FC<Props> = ({
         <View
           style={[
             styles.previewCell,
-            !isPreviewPositionValid(previewCellData) &&
+            { borderColor: colors.tint, backgroundColor: `${colors.tint}4D` },
+            !isPreviewPositionValid(previewCellData) && [
               styles.previewCellInvalid,
+              { borderColor: colors.error, backgroundColor: `${colors.error}4D` }
+            ],
             {
               left: previewCellData.x * size,
               top: previewCellData.y * size,
@@ -127,7 +132,7 @@ export const PreviewCell: React.FC<Props> = ({
               y1={line.y1}
               x2={line.x2}
               y2={line.y2}
-              stroke="#4b50e3"
+              stroke={colors.tint}
               strokeWidth="2"
               strokeDasharray="5,5"
             />
@@ -142,12 +147,9 @@ const styles = StyleSheet.create({
   previewCell: {
     position: "absolute",
     borderWidth: 2,
-    borderColor: "#4b50e3",
-    backgroundColor: "rgba(75, 80, 227, 0.3)",
     borderStyle: "dashed",
   },
   previewCellInvalid: {
-    borderColor: "#ff4444",
-    backgroundColor: "rgba(255, 68, 68, 0.3)",
+    // Colors are set dynamically via inline styles
   },
 });

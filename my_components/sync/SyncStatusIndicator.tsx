@@ -1,9 +1,12 @@
 import React from "react";
 import { StyleSheet, Text, View } from "react-native";
 import { useSyncStatus } from "../../my_hooks/useSyncStatus";
+import { useThemeColors } from "@/my_hooks";
+import { Spacing, Typography, CommonStyles } from "@/constants";
 
 export const SyncStatusIndicator: React.FC = () => {
-  const { syncStatus, isOnline, isSyncing } = useSyncStatus();
+  const { syncStatus, isSyncing } = useSyncStatus();
+  const colors = useThemeColors();
 
   const formatLastSyncTime = (date: Date | null) => {
     if (!date) return "Never";
@@ -19,9 +22,9 @@ export const SyncStatusIndicator: React.FC = () => {
   };
 
   const getSyncStatusColor = () => {
-    if (syncStatus.hasUnsavedLocalChanges) return "#a81000"; // Red
-    if (isSyncing) return "#FFD93D"; // Yellow
-    return "#4b50e3"; // Green
+    if (syncStatus.hasUnsavedLocalChanges) return colors.error;
+    if (isSyncing) return colors.warning;
+    return colors.success;
   };
 
   const getSyncStatusText = () => {
@@ -37,7 +40,7 @@ export const SyncStatusIndicator: React.FC = () => {
           {getSyncStatusText()}
         </Text>
         {syncStatus.lastSyncTime && (
-          <Text style={styles.lastSyncText}>
+          <Text style={[styles.lastSyncText, { color: colors.textMuted }]}>
             Last sync: {formatLastSyncTime(syncStatus.lastSyncTime)}
           </Text>
         )}
@@ -48,31 +51,30 @@ export const SyncStatusIndicator: React.FC = () => {
 
 const styles = StyleSheet.create({
   container: {
-    flexDirection: "row",
-    alignItems: "center",
+    ...CommonStyles.row,
   },
   statusIndicator: {
-    paddingHorizontal: 4,
-    paddingVertical: 2,
+    paddingHorizontal: Spacing.xs,
+    paddingVertical: Spacing.xs / 2,
   },
   statusText: {
-    fontSize: 12,
+    ...Typography.caption,
     fontWeight: "600",
   },
   lastSyncText: {
-    color: "#666",
+    ...Typography.caption,
     fontSize: 10,
     opacity: 0.8,
   },
   saveButton: {
-    backgroundColor: "#4ECDC4",
-    paddingHorizontal: 12,
-    paddingVertical: 6,
+    backgroundColor: "#4CAF50",
+    paddingHorizontal: Spacing.md,
+    paddingVertical: Spacing.sm / 2,
     borderRadius: 12,
   },
   saveButtonText: {
     color: "#FFFFFF",
-    fontSize: 12,
+    ...Typography.caption,
     fontWeight: "600",
   },
 });

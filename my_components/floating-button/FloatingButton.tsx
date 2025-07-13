@@ -7,6 +7,8 @@ import {
   ViewStyle,
 } from "react-native";
 import MaterialIcons from "react-native-vector-icons/MaterialCommunityIcons";
+import { useThemeColors } from "@/my_hooks";
+import { Spacing, Typography, BorderRadius, Shadows } from "@/constants";
 
 export type FloatingButtonProps = {
   onPress: (event: GestureResponderEvent) => void;
@@ -23,13 +25,19 @@ export const FloatingButton: React.FC<FloatingButtonProps> = ({
   onPress,
   style,
   size = 24,
-  contentColor = "#fff",
-  backgroundColor = "#6200ee",
-  pressedColor = "#3700b3",
+  contentColor,
+  backgroundColor,
+  pressedColor,
   iconName,
   label,
 }) => {
+  const colors = useThemeColors();
   const isIcon = !!iconName && !label;
+  
+  // Use theme colors as defaults
+  const defaultContentColor = contentColor || colors.background;
+  const defaultBackgroundColor = backgroundColor || colors.accent;
+  const defaultPressedColor = pressedColor || colors.tint;
 
   return (
     <Pressable
@@ -37,9 +45,9 @@ export const FloatingButton: React.FC<FloatingButtonProps> = ({
       style={({ pressed }) => [
         styles.baseButton,
         {
-          backgroundColor: pressed ? pressedColor : backgroundColor,
-          borderRadius: isIcon ? 28 : 8,
-          paddingHorizontal: isIcon ? 0 : 16,
+          backgroundColor: pressed ? defaultPressedColor : defaultBackgroundColor,
+          borderRadius: isIcon ? 28 : BorderRadius.md,
+          paddingHorizontal: isIcon ? 0 : Spacing.lg,
           width: isIcon ? 56 : undefined,
           height: isIcon ? 56 : 42,
         },
@@ -48,9 +56,9 @@ export const FloatingButton: React.FC<FloatingButtonProps> = ({
       ]}
     >
       {label ? (
-        <Text style={[styles.label, { color: contentColor }]}>{label}</Text>
+        <Text style={[styles.label, { color: defaultContentColor }]}>{label}</Text>
       ) : (
-        <MaterialIcons name={iconName!} size={size} color={contentColor} />
+        <MaterialIcons name={iconName!} size={size} color={defaultContentColor} />
       )}
     </Pressable>
   );
@@ -61,13 +69,13 @@ const styles = StyleSheet.create({
     position: "absolute",
     justifyContent: "center",
     alignItems: "center",
-    elevation: 6,
+    ...Shadows.medium,
   },
   label: {
-    fontSize: 12,
+    ...Typography.caption,
     fontWeight: "500",
   },
   pressedShadow: {
-    elevation: 2,
+    ...Shadows.small,
   },
 });

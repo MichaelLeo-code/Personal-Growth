@@ -1,6 +1,6 @@
 import { cellSize } from "@/constants";
 import { FloatingActionButtons } from "@/containers";
-import { useThemeColor } from "@/hooks/useThemeColor";
+import { useThemeColor } from "@/my_hooks";
 import { BottomProgressBar, Grid } from "@/my_components";
 import {
   useCellManagement,

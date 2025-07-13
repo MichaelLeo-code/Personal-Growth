@@ -1,11 +1,11 @@
 import { LoginScreen } from "@/my_components";
-import { useThemeColor } from "@/hooks/useThemeColor";
+import { useThemeColor } from "@/my_hooks";
 import React from "react";
 import { StyleSheet, View } from "react-native";
 
 export default function LoginPage() {
-  const backgroundColor = useThemeColor({}, 'background');
-  
+  const backgroundColor = useThemeColor({}, "background");
+
   return (
     <View style={[styles.container, { backgroundColor }]}>
       <LoginScreen onLoginSuccess={() => {}} />

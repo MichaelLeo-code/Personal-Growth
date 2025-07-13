@@ -1,4 +1,5 @@
-import { useAuth } from "@/my_hooks";
+import { useAuth, useThemeColor, useThemeColors } from "@/my_hooks";
+import { Spacing, Typography, BorderRadius, CommonStyles } from "@/constants";
 import React, { useState } from "react";
 import {
   ActivityIndicator,
@@ -23,6 +24,7 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({ onLoginSuccess }) => {
   const [isSignUp, setIsSignUp] = useState(false);
   const [loading, setLoading] = useState(false);
   const { signIn, signUp } = useAuth();
+  const colors = useThemeColors();
 
   const handleSubmit = async () => {
     if (!email.trim() || !password.trim()) {
@@ -62,28 +64,32 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({ onLoginSuccess }) => {
 
   return (
     <KeyboardAvoidingView
-      style={styles.container}
+      style={[styles.container, { backgroundColor: colors.background }]}
       behavior={Platform.OS === "ios" ? "padding" : "height"}
     >
       <ScrollView contentContainerStyle={styles.scrollContainer}>
         <View style={styles.formContainer}>
-          <Text style={styles.title}>
+          <Text style={[styles.title, { color: colors.text }]}>
             {isSignUp ? "Create Account" : "Welcome Back"}
           </Text>
-          <Text style={styles.subtitle}>
+          <Text style={[styles.subtitle, { color: colors.textSecondary }]}>
             {isSignUp
               ? "Sign up to get started with PGA"
               : "Sign in to continue to PGA"}
           </Text>
 
           <View style={styles.inputContainer}>
-            <Text style={styles.label}>Email</Text>
+            <Text style={[styles.label, { color: colors.text }]}>Email</Text>
             <TextInput
-              style={styles.input}
+              style={[styles.input, { 
+                backgroundColor: colors.surface, 
+                borderColor: colors.border,
+                color: colors.text 
+              }]}
               value={email}
               onChangeText={setEmail}
               placeholder="Enter your email"
-              placeholderTextColor="#666"
+              placeholderTextColor={colors.textMuted}
               keyboardType="email-address"
               autoCapitalize="none"
               autoCorrect={false}
@@ -91,27 +97,35 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({ onLoginSuccess }) => {
           </View>
 
           <View style={styles.inputContainer}>
-            <Text style={styles.label}>Password</Text>
+            <Text style={[styles.label, { color: colors.text }]}>Password</Text>
             <TextInput
-              style={styles.input}
+              style={[styles.input, { 
+                backgroundColor: colors.surface, 
+                borderColor: colors.border,
+                color: colors.text 
+              }]}
               value={password}
               onChangeText={setPassword}
               placeholder="Enter your password"
-              placeholderTextColor="#666"
+              placeholderTextColor={colors.textMuted}
               secureTextEntry
               autoCapitalize="none"
             />
           </View>
 
           <TouchableOpacity
-            style={[styles.button, loading && styles.buttonDisabled]}
+            style={[
+              styles.button, 
+              { backgroundColor: colors.accent },
+              loading && styles.buttonDisabled
+            ]}
             onPress={handleSubmit}
             disabled={loading}
           >
             {loading ? (
-              <ActivityIndicator color="#fff" />
+              <ActivityIndicator color={colors.background} />
             ) : (
-              <Text style={styles.buttonText}>
+              <Text style={[styles.buttonText, { color: colors.background }]}>
                 {isSignUp ? "Sign Up" : "Sign In"}
               </Text>
             )}
@@ -122,7 +136,7 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({ onLoginSuccess }) => {
             onPress={toggleMode}
             disabled={loading}
           >
-            <Text style={styles.toggleText}>
+            <Text style={[styles.toggleText, { color: colors.accent }]}>
               {isSignUp
                 ? "Already have an account? Sign In"
                 : "Don't have an account? Sign Up"}
@@ -136,13 +150,12 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({ onLoginSuccess }) => {
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
-    backgroundColor: "#000",
+    ...CommonStyles.container,
   },
   scrollContainer: {
     flexGrow: 1,
     justifyContent: "center",
-    padding: 20,
+    padding: Spacing.xl,
   },
   formContainer: {
     width: "100%",
@@ -150,57 +163,43 @@ const styles = StyleSheet.create({
     alignSelf: "center",
   },
   title: {
-    fontSize: 32,
-    fontWeight: "bold",
-    color: "#fff",
+    ...Typography.display,
     textAlign: "center",
-    marginBottom: 8,
+    marginBottom: Spacing.sm,
   },
   subtitle: {
-    fontSize: 16,
-    color: "#999",
+    ...Typography.bodyLarge,
     textAlign: "center",
-    marginBottom: 40,
+    marginBottom: Spacing.xxxxl,
   },
   inputContainer: {
-    marginBottom: 20,
+    marginBottom: Spacing.xl,
   },
   label: {
-    fontSize: 16,
-    color: "#fff",
-    marginBottom: 8,
+    ...Typography.bodyLarge,
     fontWeight: "500",
+    marginBottom: Spacing.sm,
   },
   input: {
-    backgroundColor: "#1a1a1a",
-    borderColor: "#333",
+    ...CommonStyles.inputBase,
     borderWidth: 1,
-    borderRadius: 8,
-    padding: 16,
-    fontSize: 16,
-    color: "#fff",
   },
   button: {
-    backgroundColor: "#007AFF",
-    borderRadius: 8,
-    padding: 16,
-    alignItems: "center",
-    marginTop: 20,
+    ...CommonStyles.buttonBase,
+    marginTop: Spacing.xl,
   },
   buttonDisabled: {
     opacity: 0.6,
   },
   buttonText: {
-    color: "#fff",
-    fontSize: 18,
+    ...Typography.bodyLarge,
     fontWeight: "600",
   },
   toggleButton: {
-    marginTop: 20,
+    marginTop: Spacing.xl,
     alignItems: "center",
   },
   toggleText: {
-    color: "#007AFF",
-    fontSize: 16,
+    ...Typography.bodyLarge,
   },
 });
