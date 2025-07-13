@@ -90,7 +90,7 @@ export const useCellMove = ({ zoomState, cellSize }: UseCellMoveProps) => {
     const { x: gridX, y: gridY } = screenToGridCoordinates(pageX, pageY);
     const { x, y } = adjustForCellCenter(gridX, gridY, movingCell.size);
 
-    if (!coordinateService.isOccupied(x, y)) {
+    if (!coordinateService.isOccupiedArea(x, y, movingCell.size)) {
       const success = cellService.moveCell(movingCell.id, x, y);
       if (success) {
         cellService.selectCell({ ...movingCell, x, y });

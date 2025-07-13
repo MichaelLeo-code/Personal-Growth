@@ -70,16 +70,18 @@ class CellService {
       size?: { x: number; y: number };
     }
   ): Cell | undefined {
-    if (coordinateService.isOccupied(cell.x, cell.y)) {
+    const cellType = cell.type || CellType.Headline;
+    const cellSize =
+      cell.size || calculateDynamicCellSize({ ...cell, type: cellType });
+
+    if (coordinateService.isOccupiedArea(cell.x, cell.y, cellSize)) {
       console.warn(
         `Cell at (${cell.x}, ${cell.y}) is already occupied. Cannot add new cell.`
       );
       return undefined;
     }
     const id = this.nextId++;
-    const cellType = cell.type || CellType.Headline;
-    const cellSize =
-      cell.size || calculateDynamicCellSize({ ...cell, type: cellType });
+
     const newCell: Cell = {
       ...cell,
       id,

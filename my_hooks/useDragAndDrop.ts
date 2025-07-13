@@ -70,7 +70,7 @@ export const useDragAndDrop = ({
     const { pageX, pageY } = event.nativeEvent;
     const { x, y } = screenToGridCoordinates(pageX, pageY);
 
-    if (!coordinateService.isOccupied(x, y)) {
+    {
       const newCell = cellService.addCell({
         x,
         y,

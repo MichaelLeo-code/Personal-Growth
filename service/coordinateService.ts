@@ -65,8 +65,8 @@ class CoordinateService {
     y: number,
     size: { x: number; y: number }
   ): boolean {
-    for (let i = -1; i <= size.x; i++) {
-      for (let j = -1; j <= size.y; j++) {
+    for (let i = 0; i < size.x; i++) {
+      for (let j = 0; j < size.y; j++) {
         if (!this.isOccupied(x + i, y + j)) {
           return false;
         }
