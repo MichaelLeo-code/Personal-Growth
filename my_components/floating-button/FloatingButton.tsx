@@ -59,8 +59,6 @@ export const FloatingButton: React.FC<FloatingButtonProps> = ({
 const styles = StyleSheet.create({
   baseButton: {
     position: "absolute",
-    bottom: 24,
-    right: 24,
     justifyContent: "center",
     alignItems: "center",
     elevation: 6,
