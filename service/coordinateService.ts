@@ -60,10 +60,14 @@ class CoordinateService {
     return output || "No occupied coordinates";
   }
 
-  isOccupiedArea(x1: number, x2: number, y1: number, y2: number): boolean {
-    for (let x = x1; x <= x2; x++) {
-      for (let y = y1; y <= y2; y++) {
-        if (!this.isOccupied(x, y)) {
+  isOccupiedArea(
+    x: number,
+    y: number,
+    size: { x: number; y: number }
+  ): boolean {
+    for (let i = -1; i <= size.x; i++) {
+      for (let j = -1; j <= size.y; j++) {
+        if (!this.isOccupied(x + i, y + j)) {
           return false;
         }
       }

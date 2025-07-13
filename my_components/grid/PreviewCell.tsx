@@ -34,7 +34,11 @@ const getPreviewCellData = (
 };
 
 const isPreviewPositionValid = (previewCellData: Cell) => {
-  return !coordinateService.isOccupied(previewCellData.x, previewCellData.y);
+  return !coordinateService.isOccupiedArea(
+    previewCellData.x,
+    previewCellData.y,
+    previewCellData.size
+  );
 };
 type Props = {
   previewCell: { x: number; y: number; type: CellType } | null;

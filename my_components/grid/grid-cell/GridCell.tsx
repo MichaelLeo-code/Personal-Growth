@@ -1,6 +1,16 @@
 import React, { useRef } from "react";
-import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
-import { totalCompletedCost, totalCost } from "../../../service/taskService";
+import {
+  Pressable,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
+import {
+  completeTask,
+  totalCompletedCost,
+  totalCost,
+} from "../../../service/taskService";
 import { Cell, CellType } from "../../../types/cells";
 import { ProgressBar } from "./ProgressBar";
 
@@ -14,14 +24,20 @@ type GridCellProps = {
   onLongPress: (cell: Cell) => void;
 };
 
-const TaskPreview: React.FC<{ text: string; completed: boolean }> = ({
-  text,
-  completed,
-}) => (
+const TaskPreview: React.FC<{
+  text: string;
+  completed: boolean;
+  taskId: number;
+  cellId: number;
+  onCheckboxPress: (taskId: number, cellId: number, completed: boolean) => void;
+}> = ({ text, completed, taskId, cellId, onCheckboxPress }) => (
   <View style={styles.taskPreview}>
-    <View style={[styles.checkbox, completed && styles.checkboxCompleted]}>
+    <Pressable
+      style={[styles.checkbox, completed && styles.checkboxCompleted]}
+      onPress={() => onCheckboxPress(taskId, cellId, !completed)}
+    >
       {completed && <Text style={styles.checkmark}>✓</Text>}
-    </View>
+    </Pressable>
     <Text style={styles.taskText} numberOfLines={1}>
       {text}
     </Text>
@@ -55,53 +71,93 @@ export const GridCell: React.FC<GridCellProps> = ({
     lastTap.current = now;
   };
 
+  const handleCheckboxPress = (
+    taskId: number,
+    cellId: number,
+    completed: boolean
+  ) => {
+    completeTask(taskId, cellId, completed);
+  };
+
   return (
-    <TouchableOpacity
-      style={[
-        styles.cell,
-        {
-          left: cell.x * cellSize,
-          top: cell.y * cellSize,
-          width: cellSize * sizeMultiplier,
-          height: cellSize * sizeMultiplier,
-          backgroundColor: isSelected ? "#555" : "#000",
-          opacity: isDimmed ? 0.2 : 1,
-        },
-      ]}
-      onPress={handlePress}
-      onLongPress={() => onLongPress(cell)}
+    <View
+      style={{
+        position: "absolute",
+        left: cell.x * cellSize,
+        top: cell.y * cellSize,
+      }}
     >
-      <View style={styles.cellContent}>
-        <Text style={styles.text}>{cell.text}</Text>
-        {cell.type === CellType.Tasklist && cell.tasks && (
-          <View style={styles.tasksContainer}>
-            {cell.tasks.slice(0, 3).map((task) => (
-              <TaskPreview
-                key={task.id}
-                text={task.text}
-                completed={task.completed}
-              />
-            ))}
-            {cell.tasks.length > 3 && (
-              <Text style={styles.moreTasks}>
-                +{cell.tasks.length - 3} more
-              </Text>
-            )}
-          </View>
-        )}
-        <ProgressBar completed={completed} total={total} />
+      <TouchableOpacity
+        style={[
+          styles.cell,
+          {
+            width: cellSize * sizeMultiplier,
+            height: cellSize * sizeMultiplier,
+            backgroundColor: isSelected ? "#555" : "#000",
+            opacity: isDimmed ? 0.2 : 1,
+          },
+        ]}
+        onPress={handlePress}
+        onLongPress={() => onLongPress(cell)}
+      >
+        <View style={styles.cellContent}>
+          <Text
+            style={[
+              styles.text,
+              cell.type === CellType.Headline && styles.headlineText,
+            ]}
+          >
+            {cell.text}
+          </Text>
+          {cell.type === CellType.Tasklist && cell.tasks && (
+            <View style={styles.tasksContainer}>
+              {cell.tasks.slice(0, 3).map((task) => (
+                <TaskPreview
+                  key={task.id}
+                  text={task.text}
+                  completed={task.completed}
+                  taskId={task.id}
+                  cellId={cell.id}
+                  onCheckboxPress={handleCheckboxPress}
+                />
+              ))}
+              {cell.tasks.length > 3 && (
+                <Text style={styles.moreTasks}>
+                  +{cell.tasks.length - 3} more
+                </Text>
+              )}
+            </View>
+          )}
+        </View>
+      </TouchableOpacity>
+      <View
+        style={[
+          styles.progressBarContainer,
+          { width: cellSize * sizeMultiplier },
+        ]}
+      >
+        <ProgressBar
+          completed={completed}
+          total={total}
+          cellType={cell.type}
+          textPosition={cell.type === CellType.Headline ? "bottom" : "right"}
+        />
       </View>
-    </TouchableOpacity>
+    </View>
   );
 };
 
 const styles = StyleSheet.create({
   cell: {
-    position: "absolute",
+    position: "relative",
     borderWidth: 1,
     borderColor: "#ccc",
     justifyContent: "center",
     alignItems: "center",
+  },
+  progressBarContainer: {
+    marginTop: 4,
+    paddingHorizontal: 4,
   },
   cellContent: {
     alignItems: "center",
@@ -113,6 +169,11 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: "#fff",
     marginBottom: 4,
+    textAlign: "center",
+  },
+  headlineText: {
+    fontSize: 12,
+    marginBottom: 2,
   },
   tasksContainer: {
     width: "100%",

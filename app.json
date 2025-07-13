@@ -1,56 +1,22 @@
 {
   "expo": {
     "name": "Personal Growth App",
-    "slug": "PGA",
+    "slug": "pga",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/images/icon.png",
-    "scheme": "pga",
-    "userInterfaceStyle": "automatic",
-    "newArchEnabled": true,
-    "ios": {
-      "bundleIdentifier": "com..yourapp",
-      "buildNumber": "1"
-    },
-    "android": {
-      "adaptiveIcon": {
-        "foregroundImage": "./assets/images/adaptive-icon.png",
-        "backgroundColor": "#ffffff"
-      },
-      "edgeToEdgeEnabled": true
-    },
-    "web": {
-      "bundler": "metro",
-      "output": "static",
-      "favicon": "./assets/images/favicon.png"
-    },
-    "plugins": [
-      "expo-router",
-      [
-        "expo-splash-screen",
-        {
-          "image": "./assets/images/splash-icon.png",
-          "imageWidth": 200,
-          "resizeMode": "contain",
-          "backgroundColor": "#ffffff"
-        }
-      ]
-    ],
-    "experiments": {
-      "typedRoutes": true
-    },
     "extra": {
-      "router": {},
       "eas": {
-        "projectId": "720e4999-eda4-497f-b163-78e94def83ee"
+        "projectId": "92e9dfe4-6dd2-4d58-aa8d-e5c4fae8dfe3"
       }
     },
-    "owner": "michael.leo.dk",
+    "owner": "cubeco",
     "runtimeVersion": {
       "policy": "appVersion"
     },
     "updates": {
-      "url": "https://u.expo.dev/720e4999-eda4-497f-b163-78e94def83ee"
-    }
+      "url": "https://u.expo.dev/92e9dfe4-6dd2-4d58-aa8d-e5c4fae8dfe3"
+    },
+    "android": {},
+    "ios": {}
   }
 }

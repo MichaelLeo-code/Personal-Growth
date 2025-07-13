@@ -10,6 +10,7 @@ export class HybridGridStorage implements gridStorage {
   private remoteStorage: FirestoreGridStorage | null;
   private syncInterval: ReturnType<typeof setInterval> | null = null;
   private readonly SYNC_INTERVAL_MS = 30 * 1000; // 30 seconds
+  private hasUnsavedLocalChanges: boolean = false;
   private appStateSubscription: any = null;
   private readonly STORAGE_KEY: string = "cells";
 
@@ -64,15 +65,18 @@ export class HybridGridStorage implements gridStorage {
     if (!this.remoteStorage || this._isSyncing) return;
 
     this._isSyncing = true;
-    try {
-      const localCells = await this.localStorage.loadCells();
-      await this.remoteStorage.saveCells(localCells);
-      this.syncStatus.lastSyncTime = new Date();
-      console.log("Successfully synced to Firestore");
-    } catch (error) {
-      console.error("Failed to sync to Firestore:", error);
-    } finally {
-      this._isSyncing = false;
+    if (this.hasUnsavedLocalChanges) {
+      this.hasUnsavedLocalChanges = false;
+      try {
+        const localCells = await this.localStorage.loadCells();
+        await this.remoteStorage.saveCells(localCells);
+        this.syncStatus.lastSyncTime = new Date();
+        console.log("Successfully synced to Firestore");
+      } catch (error) {
+        console.error("Failed to sync to Firestore:", error);
+      } finally {
+        this._isSyncing = false;
+      }
     }
   }
 
@@ -104,6 +108,7 @@ export class HybridGridStorage implements gridStorage {
     try {
       await this.localStorage.saveCells(cells);
       this.syncStatus.lastModifiedTime = new Date();
+      this.hasUnsavedLocalChanges = true;
     } catch (error) {
       console.error("Failed to save cells to local storage:", error);
       throw error;
