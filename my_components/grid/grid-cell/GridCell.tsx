@@ -6,11 +6,7 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import {
-  completeTask,
-  totalCompletedCost,
-  totalCost,
-} from "../../../service/taskService";
+import { completeTask } from "../../../service/taskService";
 import { Cell, CellType } from "../../../types/cells";
 import { ProgressBar } from "./ProgressBar";
 
@@ -54,8 +50,6 @@ export const GridCell: React.FC<GridCellProps> = ({
   onLongPress,
 }) => {
   const sizeMultiplier = cell.type === CellType.Headline ? 1 : 3;
-  const total = totalCost(cell.id);
-  const completed = totalCompletedCost(cell.id);
   const lastTap = useRef<number>(0);
 
   const handlePress = () => {
@@ -137,9 +131,7 @@ export const GridCell: React.FC<GridCellProps> = ({
         ]}
       >
         <ProgressBar
-          completed={completed}
-          total={total}
-          cellType={cell.type}
+          cellId={cell.id}
           textPosition={cell.type === CellType.Headline ? "bottom" : "right"}
         />
       </View>
