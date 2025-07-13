@@ -2,6 +2,7 @@ import { FIREBASE_AUTH } from "@/firebase";
 import { Cell, CellType } from "../types/cells";
 import { storageService } from "./storageService";
 
+import { calculateDynamicCellSize } from "@/utils";
 import { coordinateService } from "./coordinateService";
 
 const directions8 = [
@@ -78,9 +79,7 @@ class CellService {
     const id = this.nextId++;
     const cellType = cell.type || CellType.Headline;
     const cellSize =
-      cell.size || cellType === CellType.Headline
-        ? { x: 1, y: 1 }
-        : { x: 3, y: 3 };
+      cell.size || calculateDynamicCellSize({ ...cell, type: cellType });
     const newCell: Cell = {
       ...cell,
       id,
@@ -253,6 +252,36 @@ class CellService {
     const updatedCell = { ...cell, ...updates };
     updatedCell.updatedAt = new Date().toISOString();
     this.cellMap.set(id, updatedCell);
+    this.notify();
+    this.saveToStorage();
+    return true;
+  }
+
+  updateCellSize(id: number): boolean {
+    const cell = this.cellMap.get(id);
+    if (!cell) return false;
+
+    const newSize = calculateDynamicCellSize(cell);
+
+    if (cell.size.x === newSize.x && cell.size.y === newSize.y) {
+      return true;
+    }
+
+    // TODO
+    coordinateService.deleteArea(cell.x, cell.y, cell.size);
+    if (coordinateService.isOccupiedArea(cell.x, cell.y, newSize)) {
+      coordinateService.occupyArea(cell.x, cell.y, cell.size, cell.id);
+      console.warn(
+        `Cannot resize cell ${id} - new size would conflict with existing cells`
+      );
+      return false;
+    }
+
+    cell.size = newSize;
+    cell.updatedAt = new Date().toISOString();
+    coordinateService.occupyArea(cell.x, cell.y, cell.size, cell.id);
+
+    this.cellMap.set(id, cell);
     this.notify();
     this.saveToStorage();
     return true;

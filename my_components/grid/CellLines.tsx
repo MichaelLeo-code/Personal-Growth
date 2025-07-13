@@ -31,14 +31,14 @@ export const CellLines: React.FC<Props> = ({ cells, cellSize = 50 }) => {
       if (cell.parent) {
         const parentCell = cellService.getCellById(cell.parent);
         if (parentCell) {
-          lineData.push(createLineBetweenCells(parentCell, cell, cellSize));
+          lineData.push(createLineBetweenCells(parentCell, cell));
         }
       }
     });
 
     // Use shared utility to calculate SVG dimensions with cell bounds and padding
     const padding = cellSize * 2;
-    return calculateSvgDimensionsWithCells(lineData, cells, cellSize, padding);
+    return calculateSvgDimensionsWithCells(lineData, cells, padding);
   }, [cells, cellSize]);
 
   return (

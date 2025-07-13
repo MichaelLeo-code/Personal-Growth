@@ -85,8 +85,8 @@ export const GridCell: React.FC<GridCellProps> = ({
         style={[
           styles.cell,
           {
-            width: cellSize * sizeMultiplier,
-            height: cellSize * sizeMultiplier,
+            width: cellSize * cell.size.x,
+            height: cellSize * cell.size.y,
             backgroundColor: isSelected ? "#555" : "#000",
             opacity: isDimmed ? 0.2 : 1,
           },
@@ -105,7 +105,7 @@ export const GridCell: React.FC<GridCellProps> = ({
           </Text>
           {cell.type === CellType.Tasklist && cell.tasks && (
             <View style={styles.tasksContainer}>
-              {cell.tasks.slice(0, 3).map((task) => (
+              {cell.tasks.map((task) => (
                 <TaskPreview
                   key={task.id}
                   text={task.text}
@@ -115,11 +115,6 @@ export const GridCell: React.FC<GridCellProps> = ({
                   onCheckboxPress={handleCheckboxPress}
                 />
               ))}
-              {cell.tasks.length > 3 && (
-                <Text style={styles.moreTasks}>
-                  +{cell.tasks.length - 3} more
-                </Text>
-              )}
             </View>
           )}
         </View>
@@ -197,11 +192,5 @@ const styles = StyleSheet.create({
     color: "#fff",
     fontSize: 12,
     flex: 1,
-  },
-  moreTasks: {
-    color: "#888",
-    fontSize: 10,
-    marginTop: 2,
-    textAlign: "center",
   },
 });

@@ -87,7 +87,6 @@ export const Grid: React.FC<GridProps> = ({
       ))}
       <PreviewCell
         previewCell={previewCell}
-        cellSize={cellSize}
         selected={selected}
         isMoving={isMoving}
       />

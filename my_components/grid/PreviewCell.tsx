@@ -1,3 +1,4 @@
+import { cellSize as size } from "@/constants";
 import { cellService, coordinateService } from "@/service";
 import { Cell, CellType } from "@/types";
 import {
@@ -15,22 +16,28 @@ export type PreviewCellType = {
 };
 
 const getPreviewCellData = (
-  previewCell: PreviewCellType | null
+  previewCell: PreviewCellType | null,
+  selected?: Cell | null,
+  isMoving?: boolean
 ): Cell | undefined => {
-  return previewCell
-    ? {
-        id: -1,
-        x: previewCell.x,
-        y: previewCell.y,
-        text: "Preview",
-        type: previewCell.type,
-        size:
-          previewCell.type === CellType.Headline
-            ? { x: 1, y: 1 }
-            : { x: 3, y: 3 },
-        updatedAt: new Date().toISOString(),
-      }
-    : undefined;
+  if (!previewCell) return undefined;
+
+  const calculatePreviewSize = (type: CellType) => {
+    if (selected && isMoving) {
+      return selected.size;
+    }
+    return type === CellType.Headline ? { x: 1, y: 1 } : { x: 3, y: 3 };
+  };
+
+  return {
+    id: -1,
+    x: previewCell.x,
+    y: previewCell.y,
+    text: "Preview",
+    type: previewCell.type,
+    size: calculatePreviewSize(previewCell.type),
+    updatedAt: new Date().toISOString(),
+  };
 };
 
 const isPreviewPositionValid = (previewCellData: Cell) => {
@@ -41,19 +48,17 @@ const isPreviewPositionValid = (previewCellData: Cell) => {
   );
 };
 type Props = {
-  previewCell: { x: number; y: number; type: CellType } | null;
-  cellSize: number;
+  previewCell: PreviewCellType | null;
   selected?: Cell | null;
   isMoving?: boolean;
 };
 
 export const PreviewCell: React.FC<Props> = ({
   previewCell,
-  cellSize,
   selected,
   isMoving = false,
 }) => {
-  const previewCellData = getPreviewCellData(previewCell);
+  const previewCellData = getPreviewCellData(previewCell, selected, isMoving);
 
   const sourceCell =
     isMoving && selected?.parent
@@ -62,7 +67,7 @@ export const PreviewCell: React.FC<Props> = ({
 
   const parentLine: LineData | null =
     sourceCell && previewCellData
-      ? createLineBetweenCells(sourceCell, previewCellData, cellSize)
+      ? createLineBetweenCells(sourceCell, previewCellData)
       : null;
 
   const childrenLines: LineData[] =
@@ -71,7 +76,7 @@ export const PreviewCell: React.FC<Props> = ({
           .map((childId) => {
             const childCell = cellService.getCellById(childId);
             return childCell
-              ? createLineBetweenCells(previewCellData, childCell, cellSize)
+              ? createLineBetweenCells(previewCellData, childCell)
               : null;
           })
           .filter((line): line is LineData => line !== null)
@@ -93,10 +98,10 @@ export const PreviewCell: React.FC<Props> = ({
             !isPreviewPositionValid(previewCellData) &&
               styles.previewCellInvalid,
             {
-              left: previewCellData.x * cellSize,
-              top: previewCellData.y * cellSize,
-              width: cellSize * previewCellData.size.x,
-              height: cellSize * previewCellData.size.y,
+              left: previewCellData.x * size,
+              top: previewCellData.y * size,
+              width: size * previewCellData.size.x,
+              height: size * previewCellData.size.y,
             },
           ]}
         />

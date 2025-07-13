@@ -1,3 +1,5 @@
+import { cellSize } from "@/constants";
+
 export interface LineData {
   x1: number;
   y1: number;
@@ -81,13 +83,13 @@ export const calculateSvgDimensions = (
 /**
  * Calculate the center point of a cell
  * @param cell Cell with x, y, and size properties
- * @param cellSize Size of each grid cell in pixels
  * @returns Center coordinates in pixels
  */
-export const getCellCenter = (
-  cell: { x: number; y: number; size: { x: number; y: number } },
-  cellSize: number
-): { x: number; y: number } => ({
+export const getCellCenter = (cell: {
+  x: number;
+  y: number;
+  size: { x: number; y: number };
+}): { x: number; y: number } => ({
   x: (cell.x + cell.size.x / 2) * cellSize,
   y: (cell.y + cell.size.y / 2) * cellSize,
 });
@@ -96,16 +98,14 @@ export const getCellCenter = (
  * Create a line between two cells
  * @param fromCell Source cell
  * @param toCell Target cell
- * @param cellSize Size of each grid cell in pixels
  * @returns Line data
  */
 export const createLineBetweenCells = (
   fromCell: { x: number; y: number; size: { x: number; y: number } },
-  toCell: { x: number; y: number; size: { x: number; y: number } },
-  cellSize: number
+  toCell: { x: number; y: number; size: { x: number; y: number } }
 ): LineData => {
-  const from = getCellCenter(fromCell, cellSize);
-  const to = getCellCenter(toCell, cellSize);
+  const from = getCellCenter(fromCell);
+  const to = getCellCenter(toCell);
 
   return {
     x1: from.x,
@@ -119,14 +119,12 @@ export const createLineBetweenCells = (
  * Calculate SVG bounds that include both lines and cell bounds with padding
  * @param lines Array of line coordinates
  * @param cells Array of cells to include in bounds calculation
- * @param cellSize Size of each grid cell in pixels
  * @param padding Padding to add around the content
  * @returns SVG dimensions and adjusted line coordinates
  */
 export const calculateSvgDimensionsWithCells = (
   lines: LineData[],
   cells: { x: number; y: number; size: { x: number; y: number } }[],
-  cellSize: number,
   padding: number = 0
 ): {
   svgDimensions: SvgDimensions;

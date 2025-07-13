@@ -44,6 +44,8 @@ export function addTask(task: Omit<Task, "id">, parentId: number): Task | null {
   }
 
   parentCell.tasks = [...(parentCell.tasks || []), newTask];
+
+  cellService.updateCellSize(parentId);
   cellService.saveToStorage();
   cellService.notify();
   return newTask;
@@ -61,6 +63,8 @@ export function deleteTask(taskId: number, parentId: number): boolean {
   }
 
   parentCell.tasks = parentCell.tasks.filter((task) => task.id !== taskId);
+
+  cellService.updateCellSize(parentId);
   cellService.saveToStorage();
   cellService.notify();
   return true;
