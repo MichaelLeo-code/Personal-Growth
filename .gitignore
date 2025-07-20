@@ -41,4 +41,6 @@ app-example
 yarn.lock
 .yarn/install-state.gz
 
-firebase.ts
+@keystore.txt
+eas.json
+.env

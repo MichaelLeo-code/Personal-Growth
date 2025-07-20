@@ -8,8 +8,8 @@ export const calculateDynamicCellSize = (
 
     if (taskCount > 3) {
       console.log("Task count more than 3, increasing size");
-      const additionalTasks = taskCount - 3;
-      const additionalHeight = Math.ceil(additionalTasks / 2);
+      const additionalTasks = taskCount - 5;
+      const additionalHeight = Math.ceil(additionalTasks / 2.5);
       return { x: 3, y: 3 + additionalHeight };
     }
 

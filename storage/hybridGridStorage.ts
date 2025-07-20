@@ -143,6 +143,10 @@ export class HybridGridStorage implements gridStorage {
     }
   }
 
+  async cleanLocalStorage(): Promise<void> {
+    console.log("Cleaning local storage...");
+    await this.localStorage.deleteAll();
+  }
   private getLatestTimestamp(cells: Cell[]): number {
     if (cells.length === 0) return 0;
     return Math.max(
@@ -165,10 +169,16 @@ export class HybridGridStorage implements gridStorage {
     const localLatestTimestamp = this.getLatestTimestamp(localCells);
     const remoteLatestTimestamp = this.getLatestTimestamp(remoteCells);
 
+    console.log(
+      `Local latest timestamp: ${localLatestTimestamp}, Remote latest timestamp: ${remoteLatestTimestamp}`
+    );
     if (remoteLatestTimestamp > localLatestTimestamp) {
+      console.log("Remote data is newer, updating local storage.");
+      console.log(localCells.length, "local cells");
       await this.localStorage.saveCells(remoteCells);
       this.syncStatus.lastModifiedTime = new Date();
       this.syncStatus.lastSyncTime = new Date();
+      console.log("help im stuck");
       return remoteCells;
     } else {
       return localCells;

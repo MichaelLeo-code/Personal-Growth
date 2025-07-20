@@ -1,4 +1,10 @@
-import { BorderRadius, Spacing, Typography } from "@/constants";
+import {
+  BorderRadius,
+  Shadows,
+  Spacing,
+  Stroke,
+  Typography,
+} from "@/constants";
 import { useThemeColors } from "@/my_hooks";
 import React, { useRef } from "react";
 import {
@@ -105,11 +111,14 @@ export const GridCell: React.FC<GridCellProps> = ({
           {
             width: cellSize * cell.size.x,
             height: cellSize * cell.size.y,
-            backgroundColor: isSelected
-              ? colors.surfaceSecondary
-              : colors.surface,
+            backgroundColor: colors.surface,
             borderColor: colors.border,
-            opacity: isDimmed ? 0.2 : 1,
+            shadowColor: colors.shadow,
+            opacity: isDimmed ? 0.5 : 1,
+          },
+          isSelected && {
+            backgroundColor: colors.surfaceSecondary,
+            ...Shadows.medium,
           },
         ]}
         onPress={handlePress}
@@ -159,18 +168,11 @@ export const GridCell: React.FC<GridCellProps> = ({
 const styles = StyleSheet.create({
   cell: {
     position: "relative",
-    borderWidth: 1,
+    borderWidth: Stroke.md,
     justifyContent: "center",
     alignItems: "center",
     borderRadius: BorderRadius.sm,
-    shadowColor: "#fff",
-    shadowOffset: {
-      width: 0,
-      height: 1,
-    },
-    shadowOpacity: 0.15,
-    shadowRadius: 6,
-    elevation: 3,
+    ...Shadows.small,
   },
   progressBarContainer: {
     marginTop: Spacing.xs,

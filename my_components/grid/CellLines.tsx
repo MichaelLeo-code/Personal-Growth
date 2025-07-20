@@ -1,11 +1,13 @@
+import { Stroke } from "@/constants";
+import { useThemeColors } from "@/my_hooks";
 import { cellService } from "@/service";
 import { Cell } from "@/types/cells";
-import { useThemeColors } from "@/my_hooks";
 import {
   calculateSvgDimensionsWithCells,
   createLineBetweenCells,
   LineData,
 } from "@/utils";
+import React from "react";
 import { useMemo } from "react";
 import { StyleSheet } from "react-native";
 import Svg, { Line } from "react-native-svg";
@@ -17,7 +19,7 @@ type Props = {
 
 export const CellLines: React.FC<Props> = ({ cells, cellSize = 50 }) => {
   const colors = useThemeColors();
-  
+
   // Calculate the lines and SVG dimensions using shared utility
   const { svgDimensions, adjustedLines } = useMemo(() => {
     if (cells.length === 0) {
@@ -65,8 +67,8 @@ export const CellLines: React.FC<Props> = ({ cells, cellSize = 50 }) => {
           y1={line.y1}
           x2={line.x2}
           y2={line.y2}
-          stroke={colors.text}
-          strokeWidth="1"
+          stroke={colors.border}
+          strokeWidth={Stroke.md}
         />
       ))}
     </Svg>

@@ -7,8 +7,8 @@ import {
   ThemeProvider,
 } from "@react-navigation/native";
 import { useFonts } from "expo-font";
-import React from "react";
-import { ActivityIndicator, SafeAreaView } from "react-native";
+import { ActivityIndicator } from "react-native";
+import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
 import LoginPage from "./login";
 import MainApp from "./main";
 
@@ -41,38 +41,44 @@ export default function RootLayout() {
 
   if (!loaded || authLoading) {
     return (
-      <ThemeProvider value={theme}>
-        <SafeAreaView
-          style={{
-            flex: 1,
-            justifyContent: "center",
-            alignItems: "center",
-            backgroundColor: Colors[colorScheme ?? "light"].background,
-          }}
-        >
-          <ActivityIndicator
-            size="large"
-            color={
-              Colors[colorScheme as keyof typeof Colors]?.accent ||
-              Colors.light.accent
-            }
-          />
-        </SafeAreaView>
-      </ThemeProvider>
+      <SafeAreaProvider>
+        <ThemeProvider value={theme}>
+          <SafeAreaView
+            style={{
+              flex: 1,
+              justifyContent: "center",
+              alignItems: "center",
+              backgroundColor: Colors[colorScheme ?? "light"].background,
+            }}
+          >
+            <ActivityIndicator
+              size="large"
+              color={
+                Colors[colorScheme as keyof typeof Colors]?.accent ||
+                Colors.light.accent
+              }
+            />
+          </SafeAreaView>
+        </ThemeProvider>
+      </SafeAreaProvider>
     );
   }
 
   if (!user) {
     return (
-      <ThemeProvider value={theme}>
-        <LoginPage />
-      </ThemeProvider>
+      <SafeAreaProvider>
+        <ThemeProvider value={theme}>
+          <LoginPage />
+        </ThemeProvider>
+      </SafeAreaProvider>
     );
   }
 
   return (
-    <ThemeProvider value={theme}>
-      <MainApp />
-    </ThemeProvider>
+    <SafeAreaProvider>
+      <ThemeProvider value={theme}>
+        <MainApp />
+      </ThemeProvider>
+    </SafeAreaProvider>
   );
 }

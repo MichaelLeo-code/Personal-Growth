@@ -51,11 +51,11 @@ class CoordinateService {
   toString(): string {
     let output = "";
 
-    for (const [x, innerMap] of this.coordinatesMap) {
-      for (const [y, value] of innerMap) {
+    this.coordinatesMap.forEach((innerMap, x) => {
+      innerMap.forEach((value, y) => {
         output += `(${x}, ${y}) => ${value}\n`;
-      }
-    }
+      });
+    });
 
     return output || "No occupied coordinates";
   }
@@ -67,12 +67,12 @@ class CoordinateService {
   ): boolean {
     for (let i = 0; i < size.x; i++) {
       for (let j = 0; j < size.y; j++) {
-        if (!this.isOccupied(x + i, y + j)) {
-          return false;
+        if (this.isOccupied(x + i, y + j)) {
+          return true;
         }
       }
     }
-    return true;
+    return false;
   }
 
   clear(): void {

@@ -3,14 +3,8 @@
   "compilerOptions": {
     "strict": true,
     "paths": {
-      "@/*": [
-        "./*"
-      ]
+      "@/*": ["./*"]
     }
   },
-  "include": [
-    "**/*.ts",
-    "**/*.tsx",
-    "my_components/FloatingButton.xts"
-  ]
+  "include": ["**/*.ts", "**/*.tsx", "my_components/FloatingButton.xts"]
 }

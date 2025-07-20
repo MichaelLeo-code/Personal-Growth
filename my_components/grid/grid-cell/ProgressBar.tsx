@@ -1,7 +1,7 @@
+import { Spacing } from "@/constants";
+import { useThemeColors } from "@/my_hooks";
 import { totalCompletedCost, totalCost } from "@/service";
 import { StyleSheet, Text, View } from "react-native";
-import { useThemeColors } from "@/my_hooks";
-import { Spacing } from "@/constants";
 
 export const ProgressBar: React.FC<{
   cellId: number;
@@ -20,21 +20,25 @@ export const ProgressBar: React.FC<{
         isColumn && styles.progressContainerColumn,
       ]}
     >
-      <View style={[
-        styles.progressBar, 
-        { backgroundColor: colors.backgroundTertiary },
-        isColumn && styles.progressBarColumn
-      ]}>
-        <View style={[
-          styles.progressFill, 
-          { width: `${percentage}%`, backgroundColor: colors.success }
-        ]} />
+      <View
+        style={[
+          styles.progressBar,
+          { backgroundColor: colors.surfaceSecondary },
+          isColumn && styles.progressBarColumn,
+        ]}
+      >
+        <View
+          style={[
+            styles.progressFill,
+            { width: `${percentage}%`, backgroundColor: colors.success },
+          ]}
+        />
       </View>
       <Text
         style={[
-          styles.progressText, 
+          styles.progressText,
           { color: colors.textMuted },
-          isColumn && styles.progressTextBottom
+          isColumn && styles.progressTextBottom,
         ]}
       >
         {completed}/{total}

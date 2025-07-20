@@ -7,4 +7,4 @@ export const initialCellData = [{ text: "Test", x: 0, y: 0, id: 1 }];
 //   { text: "D", x: 5, y: 1, id: 4, parent: 3 },
 // ];
 
-export const cellSize = 50; // Default cell size, can be overridden by props
+export const cellSize = 50;

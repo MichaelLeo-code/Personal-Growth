@@ -1,15 +1,15 @@
-import { useThemeColor, useCellData } from "@/my_hooks";
-import { Spacing, Typography, CommonStyles } from "@/constants";
+import { CommonStyles, Spacing, Typography } from "@/constants";
+import { useCellData, useThemeColor } from "@/my_hooks";
 import React from "react";
 import { StyleSheet, Text, View } from "react-native";
 
 export const BottomProgressBar: React.FC<{ cellId: number }> = ({ cellId }) => {
   const { cell, taskProgress } = useCellData(cellId);
-  const backgroundColor = useThemeColor({}, "backgroundSecondary");
+  const backgroundColor = useThemeColor({}, "surface");
   const borderColor = useThemeColor({}, "border");
   const textColor = useThemeColor({}, "text");
   const progressColor = useThemeColor({}, "success");
-  const progressBgColor = useThemeColor({}, "backgroundTertiary");
+  const progressBgColor = useThemeColor({}, "surfaceSecondary");
 
   if (!cell) {
     return null;

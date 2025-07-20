@@ -29,4 +29,13 @@ export class localGridStorage implements gridStorage {
       throw new Error("Failed to load cells from local storage");
     }
   }
+
+  async deleteAll(): Promise<void> {
+    try {
+      await AsyncStorage.removeItem(this.storageKey);
+    } catch (error) {
+      console.error("Failed to delete all cells:", error);
+      throw new Error("Failed to delete all cells from local storage");
+    }
+  }
 }

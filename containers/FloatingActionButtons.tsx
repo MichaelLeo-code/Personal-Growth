@@ -37,7 +37,7 @@ export const FloatingActionButtons: React.FC<FloatingActionButtonsProps> = ({
           position: "absolute",
           left: 20,
           top: insets.top + 5,
-          zIndex: 1000,
+          zIndex: 10,
         }}
       >
         <SyncStatusIndicator />
@@ -48,7 +48,7 @@ export const FloatingActionButtons: React.FC<FloatingActionButtonsProps> = ({
           position: "absolute",
           right: 20,
           top: insets.top + 60,
-          zIndex: 1000,
+          zIndex: 10,
         }}
       />
       <FloatingButton
@@ -71,7 +71,7 @@ export const FloatingActionButtons: React.FC<FloatingActionButtonsProps> = ({
             backgroundColor="#4b50e3"
             style={{
               right: 20,
-              bottom: insets.bottom + 141,
+              bottom: 206,
             }}
           />
           <DraggableFloatingButton
@@ -82,7 +82,7 @@ export const FloatingActionButtons: React.FC<FloatingActionButtonsProps> = ({
             iconName="plus"
             style={{
               right: 20,
-              bottom: insets.bottom + 73,
+              bottom: 138,
             }}
           />
           <FloatingButton
@@ -90,7 +90,7 @@ export const FloatingActionButtons: React.FC<FloatingActionButtonsProps> = ({
             backgroundColor="#a81000"
             style={{
               right: 20,
-              bottom: insets.bottom + 40,
+              bottom: 70,
             }}
             iconName="delete"
           />

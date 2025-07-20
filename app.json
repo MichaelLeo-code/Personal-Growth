@@ -16,7 +16,15 @@
     "updates": {
       "url": "https://u.expo.dev/92e9dfe4-6dd2-4d58-aa8d-e5c4fae8dfe3"
     },
-    "android": {},
-    "ios": {}
+    "android": {
+      "package": "com.cubeco.pga",
+      "minSdkVersion": 21
+    },
+    "ios": {},
+    "plugins": [
+      "expo-font",
+      "expo-router",
+      "expo-web-browser"
+    ]
   }
 }

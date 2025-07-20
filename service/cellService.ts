@@ -28,14 +28,23 @@ class CellService {
       this.loadInitialData();
     }
 
-    storageService.onAuthChange(() => {
+    storageService.onAuthChange(async () => {
       if (FIREBASE_AUTH.currentUser && this.cellMap.size === 0) {
+        console.log(
+          "New user. Unhadnled yet",
+        );
         this.loadInitialData();
+      }
+      if (!FIREBASE_AUTH.currentUser) {
+        console.log("User logged out, clearing cell data.");
+        this.deleteAll();
+        await storageService.getStorage().cleanLocalStorage();
       }
     });
   }
 
   private async loadInitialData() {
+    console.log("Loading initial data...");
     try {
       const cells = await storageService.getStorage().loadCells();
       cells.forEach((cell: Cell) => {
@@ -207,7 +216,6 @@ class CellService {
     this.nextId = 1;
     this.addCell({ text: "Me", x: 0, y: 0 });
     this.notify();
-    this.saveToStorage();
   }
 
   renameCell(id: number, newTitle: string): boolean {

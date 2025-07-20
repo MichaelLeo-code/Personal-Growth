@@ -2,7 +2,7 @@
  * Shared styling constants and reusable styles for the app
  */
 
-import { StyleSheet } from 'react-native';
+import { StyleSheet } from "react-native";
 
 // Spacing system
 export const Spacing = {
@@ -33,22 +33,22 @@ export const Typography = {
   title: {
     fontSize: 18,
     lineHeight: 24,
-    fontWeight: '600' as const,
+    fontWeight: "600" as const,
   },
   titleLarge: {
     fontSize: 20,
     lineHeight: 28,
-    fontWeight: 'bold' as const,
+    fontWeight: "bold" as const,
   },
   headline: {
     fontSize: 24,
     lineHeight: 32,
-    fontWeight: 'bold' as const,
+    fontWeight: "bold" as const,
   },
   display: {
     fontSize: 32,
     lineHeight: 40,
-    fontWeight: 'bold' as const,
+    fontWeight: "bold" as const,
   },
 };
 
@@ -61,74 +61,75 @@ export const BorderRadius = {
   round: 999,
 };
 
-// Shadow system
+export const Stroke = {
+  sm: 1,
+  md: 1.5,
+  lg: 3,
+};
+
 export const Shadows = {
   small: {
-    shadowColor: '#000',
     shadowOffset: {
       width: 0,
       height: 1,
     },
-    shadowOpacity: 0.1,
-    shadowRadius: 2,
-    elevation: 2,
+    shadowOpacity: 0.3,
+    shadowRadius: 5,
+    elevation: 3,
   },
   medium: {
-    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 1,
+    },
+    shadowOpacity: 0.3,
+    shadowRadius: 7,
+    elevation: 5,
+  },
+  large: {
     shadowOffset: {
       width: 0,
       height: 2,
     },
-    shadowOpacity: 0.15,
-    shadowRadius: 4,
-    elevation: 4,
-  },
-  large: {
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 4,
-    },
-    shadowOpacity: 0.2,
+    shadowOpacity: 0.3,
     shadowRadius: 8,
-    elevation: 8,
+    elevation: 7,
   },
 };
 
-// Common reusable styles
 export const CommonStyles = StyleSheet.create({
   container: {
     flex: 1,
   },
   centerContent: {
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
   },
   row: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
   },
   rowBetween: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
   },
   column: {
-    flexDirection: 'column',
+    flexDirection: "column",
   },
   flex1: {
     flex: 1,
   },
   textCenter: {
-    textAlign: 'center',
+    textAlign: "center",
   },
   // Button base styles
   buttonBase: {
     paddingHorizontal: Spacing.lg,
     paddingVertical: Spacing.md,
     borderRadius: BorderRadius.md,
-    alignItems: 'center',
-    justifyContent: 'center',
+    alignItems: "center",
+    justifyContent: "center",
     minHeight: 44,
   },
   buttonSmall: {
@@ -161,16 +162,16 @@ export const CommonStyles = StyleSheet.create({
   // Modal styles
   modalOverlay: {
     flex: 1,
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
-    justifyContent: 'center',
-    alignItems: 'center',
+    backgroundColor: "rgba(0, 0, 0, 0.5)",
+    justifyContent: "center",
+    alignItems: "center",
   },
   modalContainer: {
     borderRadius: BorderRadius.lg,
     padding: Spacing.xl,
     margin: Spacing.lg,
     maxWidth: 400,
-    width: '90%',
+    width: "90%",
     ...Shadows.large,
   },
 });

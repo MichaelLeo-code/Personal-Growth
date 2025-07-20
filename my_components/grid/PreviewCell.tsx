@@ -7,6 +7,7 @@ import {
   createLineBetweenCells,
   LineData,
 } from "@/utils";
+import React from "react";
 import { StyleSheet, View } from "react-native";
 import Svg, { Line } from "react-native-svg";
 
