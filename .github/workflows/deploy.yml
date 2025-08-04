@@ -3,7 +3,7 @@ name: Deploy Expo App to gh-pages
 on:
   push:
     branches:
-      - main
+      - gh-pages
 
 permissions:
   contents: write
