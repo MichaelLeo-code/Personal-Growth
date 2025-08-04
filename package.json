@@ -2,6 +2,7 @@
   "name": "pga",
   "main": "expo-router/entry",
   "version": "1.0.0",
+  "homepage": "https://michaelleo-code.github.io/pga",
   "scripts": {
     "start": "expo start",
     "start:tunnel": "expo start --tunnel",
@@ -9,7 +10,8 @@
     "android": "expo start --android",
     "ios": "expo start --ios",
     "web": "expo start --web",
-    "lint": "expo lint"
+    "lint": "expo lint",
+    "build:android": "eas build --platform android --profile preview"
   },
   "dependencies": {
     "@expo/vector-icons": "^14.1.0",
