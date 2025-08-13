@@ -31,8 +31,11 @@ jobs:
       - name: List files in working directory
         run: ls -la
 
-      - name: List all directories from root
-        run: ls -la /
+      - name: List all directories from yarn
+        run: ls -la /.yarn
+
+      - name: Echo yarn
+        run: echo /.yarnrc.yml
 
       - name: Build project
         run: yarn build:web
