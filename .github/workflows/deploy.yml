@@ -1,41 +1,30 @@
-name: Deploy Expo App to gh-pages
+name: Deploy to GitHub Pages
 
 on:
   push:
     branches:
       - gh-pages
 
-permissions:
-  contents: write
-
 jobs:
-  deploy:
-    runs-on: ubuntu-22.04
+  build-and-deploy:
+    runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v3
 
-      - name: Set up Node.js
-        uses: actions/setup-node@v4
+      - name: Set up Node
+        uses: actions/setup-node@v3
         with:
-          node-version: 23
-          cache: "yarn"
-
-      - name: Enable and use Yarn via Corepack
-        run: |
-          corepack enable
-          corepack prepare yarn@4.5.3 --activate
+          node-version: "23"
 
       - name: Install dependencies
-        run: yarn install --immutable
+        run: yarn install --frozen-lockfile
 
-      - name: Build the project
-        run: yarn build
+      - name: Build project
+        run: yarn build:web
 
-      - name: Deploy to gh-pages branch
-        uses: peaceiris/actions-gh-pages@v4
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v6
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./build
-          publish_branch: gh-pages
+          publish_dir: ./dist
