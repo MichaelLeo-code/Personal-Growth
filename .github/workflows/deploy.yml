@@ -28,6 +28,12 @@ jobs:
         env:
           YARN_NODE_LINKER: node-modules
 
+      - name: List files in working directory
+        run: ls -la
+
+      - name: List all directories from root
+        run: ls -la /
+
       - name: Build project
         run: yarn build:web
 
