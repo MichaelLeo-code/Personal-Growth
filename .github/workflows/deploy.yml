@@ -24,7 +24,7 @@ jobs:
         run: corepack prepare yarn@4.5.3 --activate
 
       - name: Install dependencies
-        run: yarn install --immutable
+        run: yarn install
 
       - name: Build project
         run: yarn build:web
