@@ -25,6 +25,8 @@ jobs:
 
       - name: Install dependencies
         run: yarn install --mode=update-lockfile
+        env:
+          YARN_NODE_LINKER: node-modules
 
       - name: Build project
         run: yarn build:web
