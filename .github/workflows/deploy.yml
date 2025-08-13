@@ -35,7 +35,7 @@ jobs:
         run: ls -la .yarn
 
       - name: Echo yarn
-        run: echo .yarnrc.yml
+        run: cat .yarnrc.yml
 
       - name: Build project
         run: yarn build:web
