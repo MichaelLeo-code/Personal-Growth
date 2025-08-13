@@ -17,8 +17,14 @@ jobs:
         with:
           node-version: "23"
 
+      - name: Enable Corepack
+        run: corepack enable
+
+      - name: Prepare Yarn 4.5.3
+        run: corepack prepare yarn@4.5.3 --activate
+
       - name: Install dependencies
-        run: yarn install --frozen-lockfile
+        run: yarn install --immutable
 
       - name: Build project
         run: yarn build:web
