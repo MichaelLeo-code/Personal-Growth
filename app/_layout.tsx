@@ -9,11 +9,10 @@ import {
 import { useFonts } from "expo-font";
 import { ActivityIndicator } from "react-native";
 import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
-import LoginPage from "./login";
 import MainApp from "./main";
 
 export default function RootLayout() {
-  const { user, loading: authLoading } = useAuth();
+  const { loading: authLoading } = useAuth();
   const colorScheme = useColorScheme();
 
   // Font loading
@@ -59,16 +58,6 @@ export default function RootLayout() {
               }
             />
           </SafeAreaView>
-        </ThemeProvider>
-      </SafeAreaProvider>
-    );
-  }
-
-  if (!user) {
-    return (
-      <SafeAreaProvider>
-        <ThemeProvider value={theme}>
-          <LoginPage />
         </ThemeProvider>
       </SafeAreaProvider>
     );

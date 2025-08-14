@@ -1,9 +1,11 @@
 import {
   DraggableFloatingButton,
   FloatingButton,
+  LoginButton,
   LogoutButton,
   SyncStatusIndicator,
 } from "@/my_components";
+import { useAuth } from "@/my_hooks";
 import { Cell, CellType } from "@/types";
 import React from "react";
 import { GestureResponderEvent, View } from "react-native";
@@ -29,6 +31,7 @@ export const FloatingActionButtons: React.FC<FloatingActionButtonsProps> = ({
   onDragEnd,
 }) => {
   const insets = useSafeAreaInsets();
+  const { user } = useAuth();
 
   return (
     <>
@@ -43,14 +46,26 @@ export const FloatingActionButtons: React.FC<FloatingActionButtonsProps> = ({
         <SyncStatusIndicator />
       </View>
 
-      <LogoutButton
-        style={{
-          position: "absolute",
-          right: 20,
-          top: insets.top + 60,
-          zIndex: 10,
-        }}
-      />
+      {user ? (
+        <LogoutButton
+          style={{
+            position: "absolute",
+            right: 20,
+            top: insets.top + 60,
+            zIndex: 10,
+          }}
+        />
+      ) : (
+        <LoginButton
+          style={{
+            position: "absolute",
+            right: 20,
+            top: insets.top + 60,
+            zIndex: 10,
+          }}
+        />
+      )}
+      
       <FloatingButton
         onPress={onDeleteAll}
         label="Delete all"
