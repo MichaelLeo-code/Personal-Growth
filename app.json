@@ -4,6 +4,9 @@
     "slug": "pga",
     "version": "1.0.0",
     "orientation": "portrait",
+    "experiments": {
+      "baseUrl": "/Personal-Growth/"
+    },
     "extra": {
       "eas": {
         "projectId": "92e9dfe4-6dd2-4d58-aa8d-e5c4fae8dfe3"
