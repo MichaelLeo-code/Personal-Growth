@@ -6,12 +6,12 @@ import { getFirestore } from "firebase/firestore";
 import { getReactNativePersistence } from "./firebase/react-native-persistence";
 
 const firebaseConfig = {
-  apiKey: process.env.EXPO_PUBLIC_FIREBASE_API_KEY,
-  authDomain: process.env.EXPO_PUBLIC_FIREBASE_AUTH_DOMAIN,
-  projectId: process.env.EXPO_PUBLIC_FIREBASE_PROJECT_ID,
-  storageBucket: process.env.EXPO_PUBLIC_FIREBASE_STORAGE_BUCKET,
-  messagingSenderId: process.env.EXPO_PUBLIC_FIREBASE_MESSAGING_SENDER_ID,
-  appId: process.env.EXPO_PUBLIC_FIREBASE_APP_ID,
+  apiKey: "AIzaSyAX5VMvwgfuNvzkOLgKKXntZbt1z61P0Qg",
+  authDomain: "pga1-f49e3.firebaseapp.com",
+  projectId: "pga1-f49e3",
+  storageBucket: "pga1-f49e3.firebasestorage.app",
+  messagingSenderId: "868666344562",
+  appId: "1:868666344562:web:014e740decf4c53d53aeeb",
 };
 
 export const FIREBASE_APP = initializeApp(firebaseConfig);

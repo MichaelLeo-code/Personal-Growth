@@ -10,7 +10,13 @@
     "extra": {
       "eas": {
         "projectId": "92e9dfe4-6dd2-4d58-aa8d-e5c4fae8dfe3"
-      }
+      },
+      "firebaseApiKey": "YOUR_WEB_API_KEY",
+      "firebaseAuthDomain": "your-project.firebaseapp.com",
+      "firebaseProjectId": "your-project-id",
+      "firebaseStorageBucket": "your-project.appspot.com",
+      "firebaseMessagingSenderId": "your-sender-id",
+      "firebaseAppId": "your-app-id"
     },
     "owner": "cubeco",
     "runtimeVersion": {
@@ -28,9 +34,7 @@
       "meta": {
         "viewport": "width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
       },
-      "output": {
-        "publicPath": "/Personal-Growth/"
-      }
+      "publicUrl": "/Personal-Growth/"
     },
     "plugins": [
       "expo-font",
