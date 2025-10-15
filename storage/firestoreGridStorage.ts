@@ -108,4 +108,32 @@ export class FirestoreGridStorage implements gridStorage {
       throw new Error("Failed to clear cells from Firestore");
     }
   }
+
+  async getVersionTag(): Promise<string | null> {
+    try {
+      const metadataCollection = collection(FIREBASE_DB, "users", this.user.uid, "metadata");
+      const docSnapshot = await getDocs(query(metadataCollection));
+      
+      const versionDocSnapshot = docSnapshot.docs.find(d => d.id === "version");
+      if (versionDocSnapshot && versionDocSnapshot.exists()) {
+        const data = versionDocSnapshot.data();
+        return data.tag || null;
+      }
+      return null;
+    } catch (error) {
+      console.error("Failed to get version tag from Firestore:", error);
+      return null;
+    }
+  }
+
+  async setVersionTag(tag: string): Promise<void> {
+    try {
+      const metadataCollection = collection(FIREBASE_DB, "users", this.user.uid, "metadata");
+      const versionDoc = doc(metadataCollection, "version");
+      await setDoc(versionDoc, { tag, updatedAt: new Date().toISOString() });
+    } catch (error) {
+      console.error("Failed to set version tag in Firestore:", error);
+      throw new Error("Failed to set version tag in Firestore");
+    }
+  }
 }
