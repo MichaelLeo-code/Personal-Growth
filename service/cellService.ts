@@ -233,19 +233,24 @@ class CellService {
     const cell = this.cellMap.get(id);
     if (!cell) return false;
 
-    const existingCellId = coordinateService.getCellIdAt(newX, newY);
-    if (existingCellId !== undefined && existingCellId !== id) {
+    // First delete the current area to avoid self-collision detection
+    coordinateService.deleteArea(cell.x, cell.y, cell.size);
+
+    // Check if the new area is occupied by any other cell
+    if (coordinateService.isOccupiedArea(newX, newY, cell.size)) {
+      // Restore original position since move failed
+      coordinateService.occupyArea(cell.x, cell.y, cell.size, cell.id);
       console.warn(
-        `Cannot move cell to (${newX}, ${newY}) - position is occupied by cell ${existingCellId}`
+        `Cannot move cell to (${newX}, ${newY}) - position is occupied`
       );
       return false;
     }
 
-    coordinateService.deleteArea(cell.x, cell.y, cell.size);
-
+    // Update cell position
     cell.x = newX;
     cell.y = newY;
 
+    // Occupy new area
     coordinateService.occupyArea(cell.x, cell.y, cell.size, cell.id);
 
     cell.updatedAt = new Date().toISOString();
