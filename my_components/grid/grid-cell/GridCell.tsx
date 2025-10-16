@@ -81,6 +81,12 @@ export const GridCell: React.FC<GridCellProps> = ({
   const colors = useThemeColors();
 
   const handlePress = () => {
+    // Clear any pending long press timer
+    if (longPressTimer.current) {
+      clearTimeout(longPressTimer.current);
+      longPressTimer.current = null;
+    }
+
     if (isLongPressing.current) {
       isLongPressing.current = false;
       return;
@@ -111,6 +117,10 @@ export const GridCell: React.FC<GridCellProps> = ({
     console.log('📱 Mouse down', { clientX: event.clientX, clientY: event.clientY });
     currentMouseEvent.current = event;
     if (Platform.OS === 'web') {
+      // Clear any existing timer
+      if (longPressTimer.current) {
+        clearTimeout(longPressTimer.current);
+      }
       isLongPressing.current = false;
       longPressTimer.current = setTimeout(() => {
         console.log('📱 Long press triggered', { 
@@ -118,7 +128,7 @@ export const GridCell: React.FC<GridCellProps> = ({
           clientY: currentMouseEvent.current?.clientY 
         });
         isLongPressing.current = true;
-        onLongPress(cell)(currentMouseEvent.current);
+        // onLongPress(cell)(currentMouseEvent.current);
       }, 500); // 500ms for long press
     }
   };
@@ -130,15 +140,15 @@ export const GridCell: React.FC<GridCellProps> = ({
     }
   };
 
-  const handleMouseLeave = () => {
-    if (Platform.OS === 'web' && longPressTimer.current) {
-      clearTimeout(longPressTimer.current);
-      longPressTimer.current = null;
-      isLongPressing.current = false;
-    }
-  };
+  // const handleMouseLeave = () => {
+  //   if (Platform.OS === 'web' && longPressTimer.current) {
+  //     clearTimeout(longPressTimer.current);
+  //     longPressTimer.current = null;
+  //     isLongPressing.current = false;
+  //   }
+  // };
 
-  const handleLongPress = () => {
+  const handleLongPress = (event: any) => {
     // For mobile, use the TouchableOpacity's onLongPress
     // We need to create a synthetic event with approximate coordinates
     const syntheticEvent = {
@@ -147,7 +157,7 @@ export const GridCell: React.FC<GridCellProps> = ({
         pageY: 0,
       },
     };
-    onLongPress(cell)(syntheticEvent);
+    onLongPress(cell)(event ?? syntheticEvent);
   };
 
   return (
@@ -176,12 +186,10 @@ export const GridCell: React.FC<GridCellProps> = ({
         ]}
         onPress={handlePress}
         onLongPress={handleLongPress}
-        onPressIn={handleMouseDown}
-        onPressOut={handleMouseUp}
         // @ts-ignore - Web-specific event handlers
         onMouseDown={Platform.OS === 'web' ? handleMouseDown : undefined}
         onMouseUp={Platform.OS === 'web' ? handleMouseUp : undefined}
-        onMouseLeave={Platform.OS === 'web' ? handleMouseLeave : undefined}
+        // onMouseLeave={Platform.OS === 'web' ? handleMouseLeave : undefined}
       >
         <View style={styles.cellContent}>
           <Text
