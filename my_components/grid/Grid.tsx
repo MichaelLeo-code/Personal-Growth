@@ -42,52 +42,18 @@ export const Grid: React.FC<GridProps> = ({
   const isDragging = useRef(false);
 
   const handleCellLongPress = (cell: Cell) => (event: any) => {
-    console.log('🎯 handleCellLongPress called', { 
-      hasEvent: !!event,
-      eventType: event?.type,
-      hasClientX: event?.clientX !== undefined,
-      hasNativeEvent: !!event?.nativeEvent,
-      clientX: event?.clientX,
-      clientY: event?.clientY
-    });
-    
     if (onCellMoveStart) {
       cellService.selectCell(cell);
 
-      // Get the actual coordinates from the event
-      // For web, we need to handle both touch and mouse events
-      let pageX = 0;
-      let pageY = 0;
+      let pageX = startCoordinates?.x || 0;
+      let pageY = startCoordinates?.y || 0;
 
       if (Platform.OS === 'web' && event) {
-        // On web, the event could be a native mouse event
-        if (event.clientX !== undefined && event.clientY !== undefined) {
-          // This is a native web mouse event
-          pageX = event.clientX;
-          pageY = event.clientY;
-          console.log('🎯 Using event.clientX/Y', { pageX, pageY });
-        } else if (event.nativeEvent?.clientX !== undefined) {
-          // Sometimes it's wrapped in nativeEvent
-          pageX = event.nativeEvent.clientX;
-          pageY = event.nativeEvent.clientY;
-          console.log('🎯 Using event.nativeEvent.clientX/Y', { pageX, pageY });
-        } else if (event.nativeEvent?.pageX !== undefined) {
           pageX = event.nativeEvent.pageX;
           pageY = event.nativeEvent.pageY;
           console.log('🎯 Using event.nativeEvent.pageX/Y', { pageX, pageY });
-        } else if (startCoordinates) {
-          pageX = startCoordinates.x;
-          pageY = startCoordinates.y;
-          console.log('🎯 Using startCoordinates', { pageX, pageY });
         }
-      } else {
-        // On mobile, use stored coordinates
-        pageX = startCoordinates?.x || 0;
-        pageY = startCoordinates?.y || 0;
-      }
-
-      console.log('🎯 Final coordinates before calling moveHandler', { pageX, pageY });
-
+      
       const moveHandler = onCellMoveStart(cell);
       const eventWithCoordinates = {
         nativeEvent: {
@@ -98,7 +64,7 @@ export const Grid: React.FC<GridProps> = ({
       moveHandler(eventWithCoordinates);
       isDragging.current = true;
     } else {
-      console.log("test");
+      console.error("useCellMove hook has failed you!");
     }
   };
 
@@ -151,38 +117,23 @@ export const Grid: React.FC<GridProps> = ({
   // Add global mouse event listeners for web
   React.useEffect(() => {
     if (Platform.OS === 'web') {
-      const handleGlobalMouseUp = (event: MouseEvent) => {
-        console.log('🌐 Global mouseup fired', { isDragging: isDragging.current });
-        if (isDragging.current && onCellMoveEnd) {
-          const syntheticEvent = {
-            nativeEvent: {
-              pageX: event.clientX,
-              pageY: event.clientY,
-            },
-          } as GestureResponderEvent;
-          onCellMoveEnd(syntheticEvent);
-          isDragging.current = false;
-        }
-      };
-
       const handleContextMenu = (event: MouseEvent) => {
-        // Prevent right-click context menu during dragging
         if (isDragging.current) {
           event.preventDefault();
         }
       };
 
       document.addEventListener('mousemove', handleMouseMove);
-      document.addEventListener('mouseup', handleGlobalMouseUp);
+      document.addEventListener('mouseup', handleMouseUp);
       document.addEventListener('contextmenu', handleContextMenu);
       
       return () => {
         document.removeEventListener('mousemove', handleMouseMove);
-        document.removeEventListener('mouseup', handleGlobalMouseUp);
+        document.removeEventListener('mouseup', handleMouseUp);
         document.removeEventListener('contextmenu', handleContextMenu);
       };
     }
-  }, [handleMouseMove, onCellMoveEnd]);
+  }, [handleMouseMove, onCellMoveEnd, handleMouseUp]);
 
   return (
     <View

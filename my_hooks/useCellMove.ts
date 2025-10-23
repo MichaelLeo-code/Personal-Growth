@@ -2,7 +2,7 @@ import { PreviewCellType } from "@/my_components/grid/PreviewCell";
 import { cellService, coordinateService } from "@/service";
 import { Cell } from "@/types";
 import { useCallback, useState } from "react";
-import { Dimensions, GestureResponderEvent } from "react-native";
+import { Dimensions, GestureResponderEvent, Platform } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import {
   adjustForCellCenter,
@@ -32,7 +32,15 @@ export const useCellMove = ({ zoomState, cellSize }: UseCellMoveProps) => {
   const { width, height } = Dimensions.get("window");
   const safeHeight = height - insets.top - insets.bottom;
 
-  const screenToGridCoordinates = createScreenToGridCoordinates(
+  const screenToGridCoordinates = Platform.OS === 'web' 
+    ? createScreenToGridCoordinates(
+    width,
+    safeHeight,
+    0,
+    0,
+    zoomState,
+    cellSize
+  ) : createScreenToGridCoordinates(
     width,
     safeHeight,
     insets.top,
