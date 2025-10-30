@@ -12,6 +12,7 @@ class StorageService {
   private authChangeCallbacks: (() => void)[] = [];
 
   constructor() {
+    console.log("StorageService: constructor() called");
     this.storage = new HybridGridStorage(FIREBASE_AUTH.currentUser);
 
     onAuthStateChanged(FIREBASE_AUTH, (user) => {
@@ -20,9 +21,11 @@ class StorageService {
 
       this.authChangeCallbacks.forEach((callback) => callback());
     });
+    console.log("StorageService: constructor() completed");
   }
 
   getStorage(): HybridGridStorage {
+    console.log("StorageService: getStorage() called");
     return this.storage;
   }
 
@@ -30,16 +33,24 @@ class StorageService {
     lastSyncTime: Date | null;
     lastModifiedTime: Date;
   } {
-    return this.storage.getSyncStatus();
+    console.log("StorageService: getSyncStatus() called");
+    const status = this.storage.getSyncStatus();
+    console.log("StorageService: getSyncStatus() returning:", status);
+    return status;
   }
 
   isSyncing(): boolean {
-    return this.storage.isSyncing();
+    console.log("StorageService: isSyncing() called");
+    const syncing = this.storage.isSyncing();
+    console.log("StorageService: isSyncing() returning:", syncing);
+    return syncing;
   }
 
   onAuthChange(callback: () => void): () => void {
+    console.log("StorageService: onAuthChange() called - registering callback");
     this.authChangeCallbacks.push(callback);
     return () => {
+      console.log("StorageService: onAuthChange() - unregistering callback");
       this.authChangeCallbacks = this.authChangeCallbacks.filter(
         (cb) => cb !== callback
       );

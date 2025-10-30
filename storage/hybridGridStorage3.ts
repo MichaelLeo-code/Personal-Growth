@@ -35,7 +35,7 @@ export interface ConflictResolutionPrompt {
   conflictMessage: string;
 }
 
-export class HybridGridStorage3 implements gridStorage {
+export class HybridGridStorage implements gridStorage {
   private localStorage: localGridStorage;
   private remoteStorage: FirestoreGridStorage | null;
 
