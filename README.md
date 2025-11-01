@@ -8,4 +8,5 @@ Backed up with Google Firestore as cloud storage as well as Google Firebase Auth
 
 Thank you for showing up here.
 
-https://github.com/MichaelLeo-code/Personal-Growth/blob/main/.github/media/video_2025-11-01_17-26-30.mp4
+https://github.com/user-attachments/assets/6f4b1795-ecf3-4bc8-a523-c9fbe1e85e41
+
