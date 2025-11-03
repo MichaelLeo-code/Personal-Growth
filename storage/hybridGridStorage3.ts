@@ -52,6 +52,8 @@ export class HybridGridStorage implements gridStorage {
     | ((prompt: ConflictResolutionPrompt) => void)
     | null = null;
 
+  private syncCompletionCallbacks: (() => void)[] = [];
+
   constructor(user: User | null, storageKey?: string) {
     const key = storageKey ?? this.STORAGE_KEY;
     this.localStorage = new localGridStorage(key);
@@ -77,6 +79,26 @@ export class HybridGridStorage implements gridStorage {
     handler: (prompt: ConflictResolutionPrompt) => void
   ): void {
     this.conflictPromptHandler = handler;
+  }
+
+  /**
+   * Subscribe to sync completion events
+   * Returns an unsubscribe function
+   */
+  onSyncComplete(callback: () => void): () => void {
+    this.syncCompletionCallbacks.push(callback);
+    return () => {
+      this.syncCompletionCallbacks = this.syncCompletionCallbacks.filter(
+        (cb) => cb !== callback
+      );
+    };
+  }
+
+  /**
+   * Notify all sync completion listeners
+   */
+  private notifySyncComplete(): void {
+    this.syncCompletionCallbacks.forEach((callback) => callback());
   }
 
   private setupAppStateListener(): void {
@@ -300,6 +322,9 @@ export class HybridGridStorage implements gridStorage {
       this.syncStatus.state = SyncState.Synced;
 
       console.log("Successfully pulled from remote");
+      
+      // Notify listeners that sync completed
+      this.notifySyncComplete();
     } catch (error) {
       console.error("Failed to pull from remote:", error);
       throw error;

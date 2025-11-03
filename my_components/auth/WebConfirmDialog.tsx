@@ -1,7 +1,7 @@
-import React from "react";
-import { StyleSheet, Text, View, Pressable } from "react-native";
+import { BorderRadius, CommonStyles, Spacing, Typography } from "@/constants";
 import { useThemeColors } from "@/my_hooks";
-import { Spacing, Typography, BorderRadius, CommonStyles } from "@/constants";
+import React from "react";
+import { Pressable, StyleSheet, Text, View } from "react-native";
 
 interface WebConfirmDialogProps {
   title: string;

@@ -41,6 +41,11 @@ class CellService {
         await storageService.getStorage().cleanLocalStorage();
       }
     });
+
+    // Listen for sync completion to reload data from cloud
+    storageService.onSyncComplete(() => {
+      this.reloadFromStorage();
+    });
   }
 
   private async loadInitialData() {
@@ -57,6 +62,36 @@ class CellService {
       this.notify();
     } catch (error) {
       console.error("CellService: Failed to load initial data:", error);
+    }
+  }
+
+  /**
+   * Reload cells from storage after sync completion
+   * This clears the current state and reloads from storage
+   */
+  private async reloadFromStorage() {
+    console.log("CellService: v1.0.3 Reloading from storage after sync...");
+    try {
+      // Clear current state
+      this.cellMap.clear();
+      coordinateService.clear();
+      this.nextId = 1;
+
+      // Reload from storage
+      const cells = await storageService.getStorage().loadCells();
+      cells.forEach((cell: Cell) => {
+        this.cellMap.set(cell.id, cell);
+        if (cell.id >= this.nextId) {
+          this.nextId = cell.id + 1;
+        }
+        coordinateService.occupyArea(cell.x, cell.y, cell.size, cell.id);
+      });
+
+      // Notify all listeners to re-render
+      this.notify();
+      console.log("CellService: v1.0.3 Successfully reloaded cells from storage");
+    } catch (error) {
+      console.error("CellService: v1.0.3 Failed to reload from storage:", error);
     }
   }
 
