@@ -1,10 +1,10 @@
 export { useAuth } from "./useAuth";
 export { useCellManagement } from "./useCellManagement";
 export { useCellMove } from "./useCellMove";
-export { useConflictResolver } from "./useConflictResolver";
 export { useDragAndDrop } from "./useDragAndDrop";
 export { usePopup } from "./usePopup";
 export { useCellData } from "./useProgress";
+export { useSyncConflictHandler } from "./useSyncConflictHandler";
 export { useSyncStatus } from "./useSyncStatus";
 export { useZoomState } from "./useZoomState";
 export { useThemeColor, useThemeColors } from "./theme/useThemeColor";

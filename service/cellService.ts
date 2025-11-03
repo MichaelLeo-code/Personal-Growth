@@ -64,6 +64,12 @@ class CellService {
     }
   }
 
+  async reloadCells() {
+    console.log("CellService: Reloading cells from storage...");
+    this.clear();
+    await this.loadInitialData();
+  }
+
   async saveToStorage() {
     try {
       await storageService.getStorage().saveCells(this.getCells());

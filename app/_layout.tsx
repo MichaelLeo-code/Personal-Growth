@@ -1,5 +1,4 @@
 import { Colors } from "@/constants/Colors";
-import { ConflictResolverProvider } from "@/containers";
 import { useColorScheme } from "@/hooks/useColorScheme";
 import { useAuth } from "@/my_hooks";
 import {
@@ -67,9 +66,7 @@ export default function RootLayout() {
   return (
     <SafeAreaProvider>
       <ThemeProvider value={theme}>
-        <ConflictResolverProvider>
-          <MainApp />
-        </ConflictResolverProvider>
+        <MainApp />
       </ThemeProvider>
     </SafeAreaProvider>
   );
