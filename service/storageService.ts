@@ -1,5 +1,5 @@
 import { FIREBASE_AUTH } from "@/firebase";
-import { HybridGridStorage } from "@/storage";
+import { HybridGridStorage, ConflictResolutionPrompt } from "@/storage";
 import { onAuthStateChanged } from "firebase/auth";
 
 /**
@@ -10,17 +10,10 @@ import { onAuthStateChanged } from "firebase/auth";
 class StorageService {
   private storage: HybridGridStorage;
   private authChangeCallbacks: (() => void)[] = [];
-  private syncCompletionCallbacks: (() => void)[] = [];
 
   constructor() {
     console.log("StorageService: constructor() called");
     this.storage = new HybridGridStorage(FIREBASE_AUTH.currentUser);
-
-    // Subscribe to sync completion events from storage
-    this.storage.onSyncComplete(() => {
-      console.log("StorageService: Sync completed, notifying listeners");
-      this.syncCompletionCallbacks.forEach((callback) => callback());
-    });
 
     onAuthStateChanged(FIREBASE_AUTH, (user) => {
       console.log("StorageService: Auth state changed:", user?.uid || "null");
@@ -76,15 +69,13 @@ class StorageService {
     };
   }
 
-  onSyncComplete(callback: () => void): () => void {
-    console.log("StorageService: onSyncComplete() called - registering callback");
-    this.syncCompletionCallbacks.push(callback);
-    return () => {
-      console.log("StorageService: onSyncComplete() - unregistering callback");
-      this.syncCompletionCallbacks = this.syncCompletionCallbacks.filter(
-        (cb) => cb !== callback
-      );
-    };
+  /**
+   * Set the handler for conflict resolution prompts
+   */
+  setConflictPromptHandler(
+    handler: (prompt: ConflictResolutionPrompt) => void
+  ): void {
+    this.storage.setConflictPromptHandler(handler);
   }
 }
 
