@@ -50,6 +50,9 @@ export class localGridStorage implements gridStorage {
 
   async setItem(key: string, value: string): Promise<void> {
     try {
+      if (key === "local_synced_version_tag") {
+        console.log(`Local: Setting item ${key} to ${value}`);
+      }
       await AsyncStorage.setItem(key, value);
     } catch (error) {
       console.error(`Failed to set item ${key}:`, error);

@@ -33,9 +33,8 @@ class CellService {
     storageService.onAuthChange(async () => {
       this.clear();
 
-      console.log(`CellService: v1.0.3 Auth state changed in CellService: ${this.cellMap.size} cells loaded`);
+      console.log(`CellService: v1.0.3 Auth state changed in CellService. cellmap is size ${this.cellMap.size}, ${FIREBASE_AUTH.currentUser}`);
       if (FIREBASE_AUTH.currentUser) {
-        this.addCell({ text: "Me", x: 0, y: 0 });
 
         this.loadInitialData();
       }

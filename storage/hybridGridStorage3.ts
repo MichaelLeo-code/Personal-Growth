@@ -102,12 +102,18 @@ export class HybridGridStorage implements gridStorage {
   }
 
   private setupAppStateListener(): void {
+    // TODO sync FIRST!
+
     this.appStateSubscription = AppState.addEventListener(
       "change",
-      (nextAppState: AppStateStatus) => {
+      async (nextAppState: AppStateStatus) => {
         if (nextAppState === "background" || nextAppState === "inactive") {
-          // Aggressive approach: just push changes without checking
-          this.aggressivePushToRemote();
+          const hasChanges = await this.hasLocalChanges();
+          if (hasChanges) {
+            this.aggressivePushToRemote();
+          } else {
+            console.log("App going to background but no local changes to push");
+          }
         }
       }
     );
@@ -133,6 +139,7 @@ export class HybridGridStorage implements gridStorage {
   }
 
   private async setLocalVersionTag(tag: string): Promise<void> {
+    console.log(`🔴 Setting local synced version tag to: ${tag}`);
     await this.localStorage.setItem(this.VERSION_TAG_KEY, tag);
     this.syncStatus.localVersionTag = tag;
   }
@@ -166,7 +173,8 @@ export class HybridGridStorage implements gridStorage {
     }
   }
 
-  async setUser(user: User | null): Promise<void> {
+  setUser(user: User | null){
+    this.isFirstLoad = true;
     if (user) {
       if (this.remoteStorage) {
         this.remoteStorage.setUser(user);
@@ -174,8 +182,6 @@ export class HybridGridStorage implements gridStorage {
         this.remoteStorage = new FirestoreGridStorage(user, this.STORAGE_KEY);
       }
 
-      // Handle first load scenarios when user logs in
-      await this.handleFirstLoadWithUser();
     } else {
       this.remoteStorage = null;
       this.syncStatus.remoteVersionTag = null;
@@ -184,7 +190,9 @@ export class HybridGridStorage implements gridStorage {
 
   private async handleFirstLoadWithUser(): Promise<void> {
     if (!this.isFirstLoad || !this.remoteStorage) return;
-
+    const localVersionTag = await this.localStorage.getItem(this.VERSION_TAG_KEY);
+    console.log(`🔵 Local version tag: ${localVersionTag}`);
+    
     this.isFirstLoad = false;
 
     const localSyncedVersionTag = await this.localStorage.getItem(this.LOCAL_SYNCED_VERSION_KEY);
@@ -380,6 +388,10 @@ export class HybridGridStorage implements gridStorage {
   private async hasLocalChanges(): Promise<boolean> {
     const localVersionTag = await this.localStorage.getItem(this.VERSION_TAG_KEY);
     const localSyncedVersionTag = await this.localStorage.getItem(this.LOCAL_SYNCED_VERSION_KEY);
+    console.log(`🟡 .hasLocalChanges() ${localVersionTag} !== ${localSyncedVersionTag}`);
+    if (!localSyncedVersionTag) {
+      // TODO Sync then
+    }
     return localVersionTag !== localSyncedVersionTag;
   }
 
@@ -403,14 +415,31 @@ export class HybridGridStorage implements gridStorage {
   }
 
   async loadCells(): Promise<Cell[]> {
+    console.log("🔵 HybridStorage3.loadCells() CALLED - SYNC LOG");
+    console.log(`🔵 isFirstLoad: ${this.isFirstLoad}`);
+    console.log(`🔵 remoteStorage exists: ${!!this.remoteStorage}`);
+
+    const localVersionTag = await this.localStorage.getItem(this.VERSION_TAG_KEY);
+    console.log(`🔵 Local version tag: ${localVersionTag}`);
+    
     try {
+      console.log("🟢 Inside try block");
+      console.log(`🟢 isFirstLoad: ${this.isFirstLoad}, hasRemote: ${!!this.remoteStorage}`);
+      
       if (this.isFirstLoad && this.remoteStorage) {
+        console.log("🟡 Entering handleFirstLoadWithUser...");
         await this.handleFirstLoadWithUser();
+        console.log("🟡 Exited handleFirstLoadWithUser");
+      } else {
+        console.log("⚪ Skipping first load handling");
       }
 
-      return await this.localStorage.loadCells();
+      console.log("🟢 Loading cells from localStorage...");
+      const cells = await this.localStorage.loadCells();
+      console.log(`🟢 Loaded ${cells.length} cells`);
+      return cells;
     } catch (error) {
-      console.error("Failed to load cells:", error);
+      console.error("🔴 Failed to load cells:", error);
       throw error;
     }
   }
