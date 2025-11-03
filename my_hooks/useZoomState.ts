@@ -14,7 +14,6 @@ export const useZoomState = () => {
   });
 
   const handleTransform = (transform: ZoomState) => {
-    console.log("Transforming zoom state:", transform);
     setZoomState({
       zoomLevel: transform.zoomLevel,
       offsetX: transform.offsetX,

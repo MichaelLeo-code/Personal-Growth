@@ -31,12 +31,12 @@ class CellService {
     storageService.onAuthChange(async () => {
       if (FIREBASE_AUTH.currentUser && this.cellMap.size === 0) {
         console.log(
-          "New user. Unhadnled yet",
+          "CellService: New user. Unhandled yet",
         );
         this.loadInitialData();
       }
       if (!FIREBASE_AUTH.currentUser) {
-        console.log("User logged out, clearing cell data.");
+        console.log("CellService: User logged out, clearing cell data.");
         this.deleteAll();
         await storageService.getStorage().cleanLocalStorage();
       }
@@ -44,7 +44,7 @@ class CellService {
   }
 
   private async loadInitialData() {
-    console.log("Loading initial data...");
+    console.log("CellService: Loading initial data...");
     try {
       const cells = await storageService.getStorage().loadCells();
       cells.forEach((cell: Cell) => {
@@ -56,12 +56,12 @@ class CellService {
       });
       this.notify();
     } catch (error) {
-      console.error("Failed to load initial data:", error);
+      console.error("CellService: Failed to load initial data:", error);
     }
   }
 
   async saveToStorage() {
-    console.log("Saving cells to storage...");
+    console.log("CellService: Saving cells to storage...");
     try {
       await storageService.getStorage().saveCells(this.getCells());
     } catch (error) {
@@ -85,7 +85,7 @@ class CellService {
 
     if (coordinateService.isOccupiedArea(cell.x, cell.y, cellSize)) {
       console.warn(
-        `Cell at (${cell.x}, ${cell.y}) is already occupied. Cannot add new cell.`
+        `CellService: Cell at (${cell.x}, ${cell.y}) is already occupied. Cannot add new cell.`
       );
       return undefined;
     }
@@ -132,7 +132,7 @@ class CellService {
     const cell = this.getCellById(id);
     if (!cell)
       throw new Error(
-        "The cell that you are trying to search neighbours for does not exist"
+        "CellService: The cell that you are trying to search neighbours for does not exist"
       );
     for (const [dx, dy] of directions8) {
       const nx = cell.x + dx;
@@ -236,7 +236,7 @@ class CellService {
     const existingCellId = coordinateService.getCellIdAt(newX, newY);
     if (existingCellId !== undefined && existingCellId !== id) {
       console.warn(
-        `Cannot move cell to (${newX}, ${newY}) - position is occupied by cell ${existingCellId}`
+        `CellService: Cannot move cell to (${newX}, ${newY}) - position is occupied by cell ${existingCellId}`
       );
       return false;
     }
@@ -282,7 +282,7 @@ class CellService {
     if (coordinateService.isOccupiedArea(cell.x, cell.y, newSize)) {
       coordinateService.occupyArea(cell.x, cell.y, cell.size, cell.id);
       console.warn(
-        `Cannot resize cell ${id} - new size would conflict with existing cells`
+        `CellService: Cannot resize cell ${id} - new size would conflict with existing cells`
       );
       return false;
     }
