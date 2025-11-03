@@ -53,6 +53,18 @@ class StorageService {
     return syncing;
   }
 
+  async forcePushToRemote(): Promise<void> {
+    console.log("StorageService: forcePushToRemote() called");
+    await this.storage.forcePushToRemote();
+    console.log("StorageService: forcePushToRemote() completed");
+  }
+
+  async forceFetchFromRemote(): Promise<void> {
+    console.log("StorageService: forceFetchFromRemote() called");
+    await this.storage.forceFetchFromRemote();
+    console.log("StorageService: forceFetchFromRemote() completed");
+  }
+
   onAuthChange(callback: () => void): () => void {
     console.log("StorageService: onAuthChange() called - registering callback");
     this.authChangeCallbacks.push(callback);

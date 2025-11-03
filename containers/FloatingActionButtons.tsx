@@ -19,6 +19,8 @@ interface FloatingActionButtonsProps {
   onDragStart: (type: CellType) => (event: GestureResponderEvent) => void;
   onDrag: (event: GestureResponderEvent) => void;
   onDragEnd: (event: GestureResponderEvent) => void;
+  onForcePush: () => void;
+  onForceFetch: () => void;
 }
 
 export const FloatingActionButtons: React.FC<FloatingActionButtonsProps> = ({
@@ -29,6 +31,8 @@ export const FloatingActionButtons: React.FC<FloatingActionButtonsProps> = ({
   onDragStart,
   onDrag,
   onDragEnd,
+  onForcePush,
+  onForceFetch,
 }) => {
   const insets = useSafeAreaInsets();
   const { user } = useAuth();
@@ -47,14 +51,40 @@ export const FloatingActionButtons: React.FC<FloatingActionButtonsProps> = ({
       </View>
 
       {user ? (
-        <LogoutButton
-          style={{
-            position: "absolute",
-            right: 20,
-            top: insets.top + 60,
-            zIndex: 10,
-          }}
-        />
+        <>
+          <LogoutButton
+            style={{
+              position: "absolute",
+              right: 20,
+              top: insets.top + 60,
+              zIndex: 10,
+            }}
+          />
+          <FloatingButton
+            onPress={onForcePush}
+            label="Force Push"
+            iconName="cloud-upload"
+            backgroundColor="#ff9800"
+            style={{
+              position: "absolute",
+              right: 20,
+              top: insets.top + 115,
+              zIndex: 10,
+            }}
+          />
+          <FloatingButton
+            onPress={onForceFetch}
+            label="Force Fetch"
+            iconName="cloud-download"
+            backgroundColor="#2196f3"
+            style={{
+              position: "absolute",
+              right: 20,
+              top: insets.top + 170,
+              zIndex: 10,
+            }}
+          />
+        </>
       ) : (
         <LoginButton
           style={{

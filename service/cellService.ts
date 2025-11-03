@@ -23,16 +23,20 @@ class CellService {
   private nextId = 1;
 
   constructor() {
-    // Load initial data if user is already available
     if (FIREBASE_AUTH.currentUser) {
+         console.log(
+            "CellService: v1.0.3 Load initial data if user is already available"
+         );
       this.loadInitialData();
     }
 
     storageService.onAuthChange(async () => {
-      if (FIREBASE_AUTH.currentUser && this.cellMap.size === 0) {
-        console.log(
-          "CellService: New user. Unhandled yet",
-        );
+      this.clear();
+
+      console.log(`CellService: v1.0.3 Auth state changed in CellService: ${this.cellMap.size} cells loaded`);
+      if (FIREBASE_AUTH.currentUser) {
+        this.addCell({ text: "Me", x: 0, y: 0 });
+
         this.loadInitialData();
       }
       if (!FIREBASE_AUTH.currentUser) {
@@ -42,7 +46,6 @@ class CellService {
       }
     });
 
-    // Listen for sync completion to reload data from cloud
     storageService.onSyncComplete(() => {
       this.reloadFromStorage();
     });
@@ -52,6 +55,7 @@ class CellService {
     console.log("CellService: Loading initial data...");
     try {
       const cells = await storageService.getStorage().loadCells();
+         console.log(`CellService: initially loaded ${cells.length} cells`);
       cells.forEach((cell: Cell) => {
         this.cellMap.set(cell.id, cell);
         if (cell.id >= this.nextId) {
@@ -65,10 +69,7 @@ class CellService {
     }
   }
 
-  /**
-   * Reload cells from storage after sync completion
-   * This clears the current state and reloads from storage
-   */
+
   private async reloadFromStorage() {
     console.log("CellService: v1.0.3 Reloading from storage after sync...");
     try {
@@ -96,11 +97,10 @@ class CellService {
   }
 
   async saveToStorage() {
-    console.log("CellService: Saving cells to storage...");
     try {
       await storageService.getStorage().saveCells(this.getCells());
     } catch (error) {
-      console.error("Failed to save to storage:", error);
+         console.error("CellService: Failed to save to storage:", error);
     }
   }
 
@@ -163,7 +163,9 @@ class CellService {
     return this.cellMap.get(id);
   }
 
-  getNextFreeCellCoordinates(id: number): { x: number; y: number } | undefined {
+   getNextFreeCellCoordinates(
+      id: number
+   ): { x: number; y: number } | undefined {
     const cell = this.getCellById(id);
     if (!cell)
       throw new Error(
@@ -250,6 +252,14 @@ class CellService {
     coordinateService.clear();
     this.nextId = 1;
     this.addCell({ text: "Me", x: 0, y: 0 });
+    this.notify();
+  }
+  
+  clear(): void {
+    this.cellMap.clear();
+    this.selectedId = null;
+    coordinateService.clear();
+    this.nextId = 1;
     this.notify();
   }
 

@@ -334,6 +334,20 @@ export class HybridGridStorage implements gridStorage {
   }
 
   /**
+   * Public method to force push local data to remote
+   */
+  async forcePushToRemote(): Promise<void> {
+    await this.aggressivePushToRemote();
+  }
+
+  /**
+   * Public method to force fetch remote data and overwrite local
+   */
+  async forceFetchFromRemote(): Promise<void> {
+    await this.pullFromRemote();
+  }
+
+  /**
    * Aggressive approach: Push local changes to remote without checking for conflicts
    * This implements the "screw you" approach for simultaneous edits
    */

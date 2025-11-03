@@ -9,6 +9,7 @@ import {
   useZoomState,
 } from "@/my_hooks";
 import { checkAndResetDailyTasks } from "@/service/taskService";
+import { storageService } from "@/service";
 import { ReactNativeZoomableView } from "@openspacelabs/react-native-zoomable-view";
 import React, { useEffect, useState } from "react";
 import { Platform, View } from "react-native";
@@ -34,6 +35,26 @@ export default function MainApp() {
     cellSize,
   });
   const [isEditMode] = useState(true); // Edit mode toggle - can add setIsEditMode later if needed
+
+  const handleForcePush = async () => {
+    try {
+      await storageService.forcePushToRemote();
+      console.log("Force push completed successfully");
+    } catch (error) {
+      console.error("Force push failed:", error);
+    }
+  };
+
+  const handleForceFetch = async () => {
+    try {
+      await storageService.forceFetchFromRemote();
+      console.log("Force fetch completed successfully");
+      // Reload the page or refresh data to reflect the fetched changes
+      window.location.reload();
+    } catch (error) {
+      console.error("Force fetch failed:", error);
+    }
+  };
 
   useEffect(() => {
     checkAndResetDailyTasks();
@@ -125,6 +146,8 @@ export default function MainApp() {
           onDragStart={handleDragStart}
           onDrag={handleDrag}
           onDragEnd={handleDragEnd}
+          onForcePush={handleForcePush}
+          onForceFetch={handleForceFetch}
         />
       )}
 
