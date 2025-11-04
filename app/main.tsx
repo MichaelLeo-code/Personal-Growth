@@ -1,13 +1,15 @@
 import { cellSize } from "@/constants";
 import { FloatingActionButtons } from "@/containers";
-import { BottomProgressBar, Grid } from "@/my_components";
+import { BottomProgressBar, ConflictResolutionDialog, Grid } from "@/my_components";
 import {
-    useCellManagement,
-    useCellMove,
-    useDragAndDrop,
-    useThemeColor,
-    useZoomState,
+  useCellManagement,
+  useCellMove,
+  useDragAndDrop,
+  useSyncConflictHandler,
+  useThemeColor,
+  useZoomState,
 } from "@/my_hooks";
+import { cellService, storageService } from "@/service";
 import { checkAndResetDailyTasks } from "@/service/taskService";
 import { ReactNativeZoomableView } from "@openspacelabs/react-native-zoomable-view";
 import React, { useEffect, useState } from "react";
@@ -17,6 +19,7 @@ export default function MainApp() {
   const { cells, selected, addCell, deleteSelectedCell, deleteAllCells } =
     useCellManagement();
   const { zoomState, handleTransform } = useZoomState();
+  const { conflictPrompt, handleResolve, dismissDialog } = useSyncConflictHandler();
   const { previewCell, handleDragStart, handleDrag, handleDragEnd } =
     useDragAndDrop({
       zoomState,
@@ -34,6 +37,25 @@ export default function MainApp() {
     cellSize,
   });
   const [isEditMode] = useState(true); // Edit mode toggle - can add setIsEditMode later if needed
+
+  const handleForcePush = async () => {
+    try {
+      await storageService.forcePushToRemote();
+      console.log("Force push completed successfully");
+    } catch (error) {
+      console.error("Force push failed:", error);
+    }
+  };
+
+  const handleForceFetch = async () => {
+    try {
+      await storageService.forceFetchFromRemote();
+      console.log("Force fetch completed successfully");
+      await cellService.reloadCells();
+    } catch (error) {
+      console.error("Force fetch failed:", error);
+    }
+  };
 
   useEffect(() => {
     checkAndResetDailyTasks();
@@ -158,10 +180,22 @@ export default function MainApp() {
           onDragStart={handleDragStart}
           onDrag={handleDrag}
           onDragEnd={handleDragEnd}
+          onForcePush={handleForcePush}
+          onForceFetch={handleForceFetch}
         />
       )}
 
       <BottomProgressBar cellId={1} />
+
+      {conflictPrompt && (
+        <ConflictResolutionDialog
+          localCellsCount={conflictPrompt.localCellsCount}
+          remoteCellsCount={conflictPrompt.remoteCellsCount}
+          conflictMessage={conflictPrompt.conflictMessage}
+          onResolve={handleResolve}
+          onDismiss={dismissDialog}
+        />
+      )}
     </View>
   );
 }

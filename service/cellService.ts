@@ -23,20 +23,23 @@ class CellService {
   private nextId = 1;
 
   constructor() {
-    // Load initial data if user is already available
     if (FIREBASE_AUTH.currentUser) {
+      console.log(
+        "CellService: v1.0.3 Load initial data if user is already available"
+      );
       this.loadInitialData();
     }
 
     storageService.onAuthChange(async () => {
-      if (FIREBASE_AUTH.currentUser && this.cellMap.size === 0) {
-        console.log(
-          "New user. Unhadnled yet",
-        );
+      this.clear();
+
+      console.log(`CellService: v1.0.3 Auth state changed in CellService. cellmap is size ${this.cellMap.size}, ${FIREBASE_AUTH.currentUser}`);
+      if (FIREBASE_AUTH.currentUser) {
+
         this.loadInitialData();
       }
       if (!FIREBASE_AUTH.currentUser) {
-        console.log("User logged out, clearing cell data.");
+        console.log("CellService: User logged out, clearing cell data.");
         this.deleteAll();
         await storageService.getStorage().cleanLocalStorage();
       }
@@ -44,9 +47,10 @@ class CellService {
   }
 
   private async loadInitialData() {
-    console.log("Loading initial data...");
+    console.log("CellService: Loading initial data...");
     try {
       const cells = await storageService.getStorage().loadCells();
+      console.log(`CellService: initially loaded ${cells.length} cells`);
       cells.forEach((cell: Cell) => {
         this.cellMap.set(cell.id, cell);
         if (cell.id >= this.nextId) {
@@ -56,16 +60,21 @@ class CellService {
       });
       this.notify();
     } catch (error) {
-      console.error("Failed to load initial data:", error);
+      console.error("CellService: Failed to load initial data:", error);
     }
   }
 
+  async reloadCells() {
+    console.log("CellService: Reloading cells from storage...");
+    this.clear();
+    await this.loadInitialData();
+  }
+
   async saveToStorage() {
-    console.log("Saving cells to storage...");
     try {
       await storageService.getStorage().saveCells(this.getCells());
     } catch (error) {
-      console.error("Failed to save to storage:", error);
+      console.error("CellService: Failed to save to storage:", error);
     }
   }
 
@@ -85,7 +94,7 @@ class CellService {
 
     if (coordinateService.isOccupiedArea(cell.x, cell.y, cellSize)) {
       console.warn(
-        `Cell at (${cell.x}, ${cell.y}) is already occupied. Cannot add new cell.`
+        `CellService: Cell at (${cell.x}, ${cell.y}) is already occupied. Cannot add new cell.`
       );
       return undefined;
     }
@@ -128,11 +137,13 @@ class CellService {
     return this.cellMap.get(id);
   }
 
-  getNextFreeCellCoordinates(id: number): { x: number; y: number } | undefined {
+  getNextFreeCellCoordinates(
+    id: number
+  ): { x: number; y: number } | undefined {
     const cell = this.getCellById(id);
     if (!cell)
       throw new Error(
-        "The cell that you are trying to search neighbours for does not exist"
+        "CellService: The cell that you are trying to search neighbours for does not exist"
       );
     for (const [dx, dy] of directions8) {
       const nx = cell.x + dx;
@@ -218,6 +229,14 @@ class CellService {
     this.notify();
   }
 
+  clear(): void {
+    this.cellMap.clear();
+    this.selectedId = null;
+    coordinateService.clear();
+    this.nextId = 1;
+    this.notify();
+  }
+
   renameCell(id: number, newTitle: string): boolean {
     const cell = this.cellMap.get(id);
     if (!cell) return false;
@@ -241,7 +260,7 @@ class CellService {
       // Restore original position since move failed
       coordinateService.occupyArea(cell.x, cell.y, cell.size, cell.id);
       console.warn(
-        `Cannot move cell to (${newX}, ${newY}) - position is occupied`
+        `CellService: Cannot move cell to (${newX}, ${newY}) - position is occupied by cell ${existingCellId}`
       );
       return false;
     }
@@ -287,7 +306,7 @@ class CellService {
     if (coordinateService.isOccupiedArea(cell.x, cell.y, newSize)) {
       coordinateService.occupyArea(cell.x, cell.y, cell.size, cell.id);
       console.warn(
-        `Cannot resize cell ${id} - new size would conflict with existing cells`
+        `CellService: Cannot resize cell ${id} - new size would conflict with existing cells`
       );
       return false;
     }
