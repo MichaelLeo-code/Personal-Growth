@@ -12,7 +12,7 @@ import {
   StyleSheet,
   Text,
   TouchableOpacity,
-  View,
+  View
 } from "react-native";
 import { completeTask } from "../../../service/taskService";
 import { Cell, CellType } from "../../../types/cells";
@@ -25,7 +25,7 @@ type GridCellProps = {
   isDimmed?: boolean;
   onPress: (cell: Cell) => void;
   onDoublePress: (cell: Cell) => void;
-  onLongPress: (cell: Cell) => void;
+  onLongPress: (cell: Cell) => (event: any) => void;
 };
 
 const TaskPreview: React.FC<{
@@ -74,6 +74,8 @@ export const GridCell: React.FC<GridCellProps> = ({
 }) => {
   const sizeMultiplier = cell.type === CellType.Headline ? 1 : 3;
   const lastTap = useRef<number>(0);
+  const isLongPressing = useRef(false);
+  const currentMouseEvent = useRef<any>(null);
   const colors = useThemeColors();
 
   const handlePress = () => {
@@ -95,6 +97,26 @@ export const GridCell: React.FC<GridCellProps> = ({
     completed: boolean
   ) => {
     completeTask(taskId, cellId, completed);
+  };
+
+  // const handleMouseLeave = () => {
+  //   if (Platform.OS === 'web' && longPressTimer.current) {
+  //     clearTimeout(longPressTimer.current);
+  //     longPressTimer.current = null;
+  //     isLongPressing.current = false;
+  //   }
+  // };
+
+  const handleLongPress = (event: any) => {
+    // For mobile, use the TouchableOpacity's onLongPress
+    // We need to create a synthetic event with approximate coordinates
+    const syntheticEvent = {
+      nativeEvent: {
+        pageX: 0, // These will be overridden by the Grid's startCoordinates
+        pageY: 0,
+      },
+    };
+    onLongPress(cell)(event ?? syntheticEvent);
   };
 
   return (
@@ -122,7 +144,7 @@ export const GridCell: React.FC<GridCellProps> = ({
           },
         ]}
         onPress={handlePress}
-        onLongPress={() => onLongPress(cell)}
+        onLongPress={handleLongPress}
       >
         <View style={styles.cellContent}>
           <Text

@@ -24,9 +24,9 @@ class CellService {
 
   constructor() {
     if (FIREBASE_AUTH.currentUser) {
-         console.log(
-            "CellService: v1.0.3 Load initial data if user is already available"
-         );
+      console.log(
+        "CellService: v1.0.3 Load initial data if user is already available"
+      );
       this.loadInitialData();
     }
 
@@ -50,7 +50,7 @@ class CellService {
     console.log("CellService: Loading initial data...");
     try {
       const cells = await storageService.getStorage().loadCells();
-         console.log(`CellService: initially loaded ${cells.length} cells`);
+      console.log(`CellService: initially loaded ${cells.length} cells`);
       cells.forEach((cell: Cell) => {
         this.cellMap.set(cell.id, cell);
         if (cell.id >= this.nextId) {
@@ -74,7 +74,7 @@ class CellService {
     try {
       await storageService.getStorage().saveCells(this.getCells());
     } catch (error) {
-         console.error("CellService: Failed to save to storage:", error);
+      console.error("CellService: Failed to save to storage:", error);
     }
   }
 
@@ -137,9 +137,9 @@ class CellService {
     return this.cellMap.get(id);
   }
 
-   getNextFreeCellCoordinates(
-      id: number
-   ): { x: number; y: number } | undefined {
+  getNextFreeCellCoordinates(
+    id: number
+  ): { x: number; y: number } | undefined {
     const cell = this.getCellById(id);
     if (!cell)
       throw new Error(
@@ -228,7 +228,7 @@ class CellService {
     this.addCell({ text: "Me", x: 0, y: 0 });
     this.notify();
   }
-  
+
   clear(): void {
     this.cellMap.clear();
     this.selectedId = null;
@@ -252,19 +252,24 @@ class CellService {
     const cell = this.cellMap.get(id);
     if (!cell) return false;
 
-    const existingCellId = coordinateService.getCellIdAt(newX, newY);
-    if (existingCellId !== undefined && existingCellId !== id) {
+    // First delete the current area to avoid self-collision detection
+    coordinateService.deleteArea(cell.x, cell.y, cell.size);
+
+    // Check if the new area is occupied by any other cell
+    if (coordinateService.isOccupiedArea(newX, newY, cell.size)) {
+      // Restore original position since move failed
+      coordinateService.occupyArea(cell.x, cell.y, cell.size, cell.id);
       console.warn(
         `CellService: Cannot move cell to (${newX}, ${newY}) - position is occupied by cell ${existingCellId}`
       );
       return false;
     }
 
-    coordinateService.deleteArea(cell.x, cell.y, cell.size);
-
+    // Update cell position
     cell.x = newX;
     cell.y = newY;
 
+    // Occupy new area
     coordinateService.occupyArea(cell.x, cell.y, cell.size, cell.id);
 
     cell.updatedAt = new Date().toISOString();
