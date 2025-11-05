@@ -255,12 +255,10 @@ class CellService {
     // First delete the current area to avoid self-collision detection
     coordinateService.deleteArea(cell.x, cell.y, cell.size);
 
-    // Check if the new area is occupied by any other cell
     if (coordinateService.isOccupiedArea(newX, newY, cell.size)) {
-      // Restore original position since move failed
       coordinateService.occupyArea(cell.x, cell.y, cell.size, cell.id);
       console.warn(
-        `CellService: Cannot move cell to (${newX}, ${newY}) - position is occupied by cell ${existingCellId}`
+        `CellService: Cannot move cell to (${newX}, ${newY}) - position is occupied by cell ${coordinateService.getCellIdAt(newX, newY)}`
       );
       return false;
     }

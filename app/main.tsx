@@ -1,6 +1,6 @@
 import { cellSize } from "@/constants";
 import { FloatingActionButtons } from "@/containers";
-import { BottomProgressBar, ConflictResolutionDialog, Grid } from "@/my_components";
+import { BottomProgressBar, ConflictResolutionDialog, Grid, SelectedCellIndicator } from "@/my_components";
 import {
   useCellManagement,
   useCellMove,
@@ -185,6 +185,9 @@ export default function MainApp() {
         />
       )}
 
+      {selected && (
+        <SelectedCellIndicator cellId={selected.id} />
+      )}
       <BottomProgressBar cellId={1} />
 
       {conflictPrompt && (
