@@ -58,6 +58,11 @@ export default function MainApp() {
     }
   };
 
+  
+  const handleBackgroundPress = () => {
+    cellService.deselectCell();
+  };
+
   useEffect(() => {
     checkAndResetDailyTasks();
   }, []);
@@ -101,6 +106,7 @@ export default function MainApp() {
           onCellMoveStart={handleMoveStart}
           onCellMove={handleMove}
           onCellMoveEnd={handleMoveEnd}
+          onBackgroundPress={handleBackgroundPress}
         />
       </ReactNativeZoomableView>
 

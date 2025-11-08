@@ -17,6 +17,7 @@ type GridProps = {
   onCellMoveStart?: (cell: Cell) => (event: GestureResponderEvent) => void;
   onCellMove?: (event: GestureResponderEvent) => void;
   onCellMoveEnd?: (event: GestureResponderEvent) => void;
+  onBackgroundPress?: () => void;
 };
 
 export const Grid: React.FC<GridProps> = ({
@@ -27,6 +28,7 @@ export const Grid: React.FC<GridProps> = ({
   onCellMoveStart,
   onCellMove,
   onCellMoveEnd,
+  onBackgroundPress,
 }) => {
   const {
     isVisible: isPopupVisible,
@@ -40,8 +42,22 @@ export const Grid: React.FC<GridProps> = ({
   } | null>(null);
   
   const isDragging = useRef(false);
+  const cellWasPressed = useRef(false);
+  const hasMoved = useRef(false);
+  const mouseDownPos = useRef<{ x: number; y: number } | null>(null);
+
+  const handleCellPress = useCallback((cell: Cell) => {
+    cellWasPressed.current = true;
+    cellService.selectCell(cell);
+  }, []);
+
+  const handleCellDoublePress = useCallback((cell: Cell) => {
+    cellWasPressed.current = true;
+    showPopup(cell);
+  }, [showPopup]);
 
   const handleCellLongPress = (cell: Cell) => (event: any) => {
+    cellWasPressed.current = true;
     if (onCellMoveStart) {
       cellService.selectCell(cell);
 
@@ -69,6 +85,8 @@ export const Grid: React.FC<GridProps> = ({
   };
 
   const handleTouchStart = useCallback((event: GestureResponderEvent) => {
+    cellWasPressed.current = false;
+    hasMoved.current = false;
     setStartCoordinates({
       x: event.nativeEvent.pageX,
       y: event.nativeEvent.pageY,
@@ -76,6 +94,7 @@ export const Grid: React.FC<GridProps> = ({
   }, []);
 
   const handleTouchMove = useCallback((event: GestureResponderEvent) => {
+    hasMoved.current = true;
     if (isDragging.current && onCellMove) {
       onCellMove(event);
     }
@@ -85,8 +104,10 @@ export const Grid: React.FC<GridProps> = ({
     if (isDragging.current && onCellMoveEnd) {
       onCellMoveEnd(event);
       isDragging.current = false;
+    } else if (!cellWasPressed.current && !hasMoved.current && onBackgroundPress) {
+      onBackgroundPress();
     }
-  }, [onCellMoveEnd]);
+  }, [onCellMoveEnd, onBackgroundPress]);
 
   // Web-specific mouse event handlers
   const handleMouseMove = useCallback((event: any) => {
@@ -117,28 +138,61 @@ export const Grid: React.FC<GridProps> = ({
   // Add global mouse event listeners for web
   React.useEffect(() => {
     if (Platform.OS === 'web') {
+      const MOVE_THRESHOLD = 5; // pixels
+
       const handleContextMenu = (event: MouseEvent) => {
         if (isDragging.current) {
           event.preventDefault();
         }
       };
 
+      const handleMouseDown = (event: MouseEvent) => {
+        cellWasPressed.current = false;
+        hasMoved.current = false;
+        mouseDownPos.current = { x: event.clientX, y: event.clientY };
+      };
+
+      const handleMouseMoveGlobal = (event: MouseEvent) => {
+        if (mouseDownPos.current) {
+          const dx = Math.abs(event.clientX - mouseDownPos.current.x);
+          const dy = Math.abs(event.clientY - mouseDownPos.current.y);
+          if (dx > MOVE_THRESHOLD || dy > MOVE_THRESHOLD) {
+            hasMoved.current = true;
+          }
+        }
+      };
+
+      const handleClick = (event: MouseEvent) => {
+        if (!cellWasPressed.current && !hasMoved.current && onBackgroundPress) {
+          onBackgroundPress();
+        }
+        cellWasPressed.current = false;
+        hasMoved.current = false;
+        mouseDownPos.current = null;
+      };
+
+      document.addEventListener('mousedown', handleMouseDown);
       document.addEventListener('mousemove', handleMouseMove);
+      document.addEventListener('mousemove', handleMouseMoveGlobal);
       document.addEventListener('mouseup', handleMouseUp);
+      document.addEventListener('click', handleClick);
       document.addEventListener('contextmenu', handleContextMenu);
       
       return () => {
+        document.removeEventListener('mousedown', handleMouseDown);
         document.removeEventListener('mousemove', handleMouseMove);
+        document.removeEventListener('mousemove', handleMouseMoveGlobal);
         document.removeEventListener('mouseup', handleMouseUp);
+        document.removeEventListener('click', handleClick);
         document.removeEventListener('contextmenu', handleContextMenu);
       };
     }
-  }, [handleMouseMove, onCellMoveEnd, handleMouseUp]);
+  }, [handleMouseMove, handleMouseUp, onBackgroundPress]);
 
   return (
     <View
       style={styles.grid}
-      // @ts-ignore - Web-specific attribute
+      // @ts-ignore 
       className={Platform.OS === 'web' ? 'cell-grid-container' : undefined}
       onTouchStart={handleTouchStart}
       onTouchMove={handleTouchMove}
@@ -152,8 +206,8 @@ export const Grid: React.FC<GridProps> = ({
           cellSize={cellSize}
           isSelected={selected?.x === cell.x && selected?.y === cell.y}
           isDimmed={isMoving && selected?.id === cell.id}
-          onPress={(cell) => cellService.selectCell(cell)}
-          onDoublePress={(cell) => showPopup(cell)}
+          onPress={handleCellPress}
+          onDoublePress={handleCellDoublePress}
           onLongPress={(cell) => handleCellLongPress(cell)}
         />
       ))}

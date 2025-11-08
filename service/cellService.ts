@@ -195,6 +195,11 @@ class CellService {
     this.notify();
   }
 
+  deselectCell(): void {
+    this.selectedId = null;
+    this.notify();
+  }
+
   getSelected(): Cell | null {
     return this.selectedId !== null
       ? this.cellMap.get(this.selectedId) || null
