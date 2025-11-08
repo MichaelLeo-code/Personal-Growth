@@ -3,7 +3,7 @@ import { useCellData, useThemeColor } from "@/my_hooks";
 import React from "react";
 import { StyleSheet, Text, View } from "react-native";
 
-export const SelectedCellIndicator: React.FC<{ cellId: number }> = ({
+export const CellInfo: React.FC<{ cellId: number }> = ({
   cellId,
 }) => {
   const backgroundColor = useThemeColor({}, "surface");

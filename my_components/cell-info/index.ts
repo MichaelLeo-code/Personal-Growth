@@ -1,1 +1,1 @@
-export { SelectedCellIndicator } from "./SelectedCellIndicator";
+export { CellInfo } from "./CellInfo";

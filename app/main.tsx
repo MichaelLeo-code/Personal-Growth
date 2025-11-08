@@ -1,6 +1,6 @@
 import { cellSize } from "@/constants";
 import { FloatingActionButtons } from "@/containers";
-import { BottomProgressBar, ConflictResolutionDialog, Grid, SelectedCellIndicator } from "@/my_components";
+import { BottomProgressBar, CellInfo, ConflictResolutionDialog, Grid } from "@/my_components";
 import {
   useCellManagement,
   useCellMove,
@@ -14,6 +14,7 @@ import { checkAndResetDailyTasks } from "@/service/taskService";
 import { ReactNativeZoomableView } from "@openspacelabs/react-native-zoomable-view";
 import React, { useEffect, useState } from "react";
 import { Platform, View } from "react-native";
+import { webCssConfig } from "./web-css-config";
 
 export default function MainApp() {
   const { cells, selected, addCell, deleteSelectedCell, deleteAllCells } =
@@ -67,70 +68,7 @@ export default function MainApp() {
   React.useEffect(() => {
     if (Platform.OS === "web") {
       const style = document.createElement("style");
-      style.textContent = `
-        *, *::before, *::after {
-          touch-action: none !important;
-          user-select: none !important;
-          -webkit-user-select: none !important;
-          -moz-user-select: none !important;
-          -ms-user-select: none !important;
-          -webkit-touch-callout: none !important;
-          -webkit-tap-highlight-color: transparent !important;
-          -webkit-text-size-adjust: none !important;
-          -moz-text-size-adjust: none !important;
-          -ms-text-size-adjust: none !important;
-          text-size-adjust: none !important;
-          pointer-events: auto !important;
-        }
-        
-        body, html {
-          user-select: none !important;
-          -webkit-user-select: none !important;
-          -moz-user-select: none !important;
-          -ms-user-select: none !important;
-          overflow: hidden !important;
-        }
-
-        input, textarea {
-          user-select: text !important;
-          -webkit-user-select: text !important;
-          -moz-user-select: text !important;
-          -ms-user-select: text !important;
-        }
-
-        /* Prevent image dragging which can interfere with cell dragging */
-        img {
-          -webkit-user-drag: none !important;
-          -khtml-user-drag: none !important;
-          -moz-user-drag: none !important;
-          -o-user-drag: none !important;
-          user-drag: none !important;
-        }
-
-        /* Ensure dragging doesn't get stuck */
-        * {
-          -webkit-user-drag: none !important;
-          -moz-user-drag: none !important;
-          user-drag: none !important;
-        }
-
-        /* Prevent context menu during long press/drag */
-        .cell-container, .cell-grid-container {
-          -webkit-touch-callout: none !important;
-          -webkit-user-select: none !important;
-          -khtml-user-select: none !important;
-          -moz-user-select: none !important;
-          -ms-user-select: none !important;
-          user-select: none !important;
-        }
-
-        /* Ensure smooth dragging performance */
-        .cell-grid-container {
-          will-change: transform;
-          backface-visibility: hidden;
-          perspective: 1000;
-        }
-      `;
+      style.textContent = webCssConfig;
       document.head.appendChild(style);
 
       return () => {
@@ -186,7 +124,7 @@ export default function MainApp() {
       )}
 
       {selected && (
-        <SelectedCellIndicator cellId={selected.id} />
+        <CellInfo cellId={selected.id} />
       )}
       <BottomProgressBar cellId={1} />
 
