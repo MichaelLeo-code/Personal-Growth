@@ -2,9 +2,9 @@ import { Spacing, Typography } from "@/constants";
 import { useThemeColor } from "@/my_hooks";
 import { Ionicons } from "@expo/vector-icons";
 import React, { useRef, useState } from "react";
-import { PanResponder, StyleSheet, Text, View } from "react-native";
+import { FlatList, PanResponder, StyleSheet, Text, View } from "react-native";
 
-const TIME_OPTIONS = [5, 10, 15];
+const TIME_OPTIONS = [60, 45, 30, 20, 15, 10, 5];
 
 interface TimerButtonProps {
   cellId: number;
@@ -17,89 +17,45 @@ export const TimerButton: React.FC<TimerButtonProps> = ({ cellId, onTimeSelected
   const textColor = useThemeColor({}, "text");
 
   const [isExpanded, setIsExpanded] = useState(false);
-  const [selectedOption, setSelectedOption] = useState<number | null>(null);
+  const [selectedOption, setSelectedOption] = useState<number | null>(5);
   const currentSelection = useRef<number | null>(null);
 
   const panResponder = useRef(
     PanResponder.create({
-      onStartShouldSetPanResponder: () => {
-        console.log('onStartShouldSetPanResponder called');
-        return true;
-      },
-      onStartShouldSetPanResponderCapture: () => {
-        console.log('onStartShouldSetPanResponderCapture called');
-        return true;
-      },
       onMoveShouldSetPanResponder: () => {
-        console.log('onMoveShouldSetPanResponder called');
         return true;
-      },
-      onMoveShouldSetPanResponderCapture: () => {
-        console.log('onMoveShouldSetPanResponderCapture called');
-        return true;
-      },
-      onPanResponderGrant: () => {
-        console.log('Touch GRANTED on time button');
-      },
-      onPanResponderReject: () => {
-        console.log('Touch REJECTED - another responder took it');
       },
       onPanResponderMove: (_, gestureState) => {
-        console.log('onPanResponderMove called', { dy: gestureState.dy });
         if (gestureState.dy < 0) {
-          // Only respond to upward drag
           const dragDistance = Math.abs(gestureState.dy);
           
           if (dragDistance > 10) {
-            if (!isExpanded) {
-              console.log('Expanding menu');
-              setIsExpanded(true);
-            }
-            
-            // Calculate which option is highlighted based on drag distance
-            // Options are displayed top to bottom: 5, 10, 15
-            // Closest drag (just opened) = 15, middle = 10, furthest = 5
-            let newSelection: number | null = null;
-            if (dragDistance < 75) {
-              newSelection = TIME_OPTIONS[2]; // 15 (closest to button)
-            } else if (dragDistance < 130) {
-              newSelection = TIME_OPTIONS[1]; // 10 (middle)
-            } else {
-              newSelection = TIME_OPTIONS[0]; // 5 (top, furthest)
-            }
-            console.log('Selected option:', newSelection);
+            setIsExpanded(true);
+            const optionCount = TIME_OPTIONS.length;
+            const step = 55;
+            let index = Math.floor((dragDistance - 10) / step);
+            if (index >= optionCount) index = optionCount - 1;
+            const newSelection = TIME_OPTIONS[optionCount - 1 - index];
             currentSelection.current = newSelection;
             setSelectedOption(newSelection);
+            console.log('Touch moved upwards, selected option:', selectedOption);
           }
-        } else if (gestureState.dy > 10) {
-          // Dragging down significantly, reset
-          console.log('Dragging down, resetting');
-          if (isExpanded) {
-            setIsExpanded(false);
-          }
+        } else {
           currentSelection.current = null;
           setSelectedOption(null);
+          console.log('Touch moved downwards, resetting selection');
         }
       },
       onPanResponderRelease: (_, gestureState) => {
-        const dragDistance = Math.abs(gestureState.dy);
+        console.log('PanResponder released with gestureState:', selectedOption);
         const selected = currentSelection.current;
-        console.log('Release detected:', { selected, dragDistance, dy: gestureState.dy });
-        if (selected !== null && dragDistance > 10 && gestureState.dy < 0) {
-          console.log(`Selected ${selected} minutes for cell:`, cellId);
+        if (selected !== null && gestureState.dy < 0) {
           onTimeSelected?.(selected, cellId);
         }
         setIsExpanded(false);
         setSelectedOption(null);
         currentSelection.current = null;
-      },
-      onPanResponderTerminate: () => {
-        console.log('Touch terminated');
-        setIsExpanded(false);
-        setSelectedOption(null);
-        currentSelection.current = null;
-      },
-      onShouldBlockNativeResponder: () => true,
+      }
     })
   ).current;
 
@@ -111,34 +67,40 @@ export const TimerButton: React.FC<TimerButtonProps> = ({ cellId, onTimeSelected
     >
       {isExpanded && (
         <View style={[styles.optionsContainer, { backgroundColor, borderColor }]}>
-          {TIME_OPTIONS.map((minutes, index) => {
-            const isSelected = selectedOption === minutes;
-            const isLast = index === TIME_OPTIONS.length - 1;
-            return (
-              <View
-                key={minutes}
-                style={[
-                  styles.timeOption,
-                  isLast && styles.timeOptionLast,
-                ]}
-              >
-                {isSelected && (
-                  <View style={[
-                    styles.highlightRectangle,
-                    { borderColor: textColor }
-                  ]} />
-                )}
-                <Text style={[
-                  styles.optionText,
-                  { color: textColor },
-                  isSelected && styles.selectedOptionText
-                ]}>
-                  {minutes}
-                </Text>
-              </View>
-            );
-          })}
-          <View style={[styles.divider, { backgroundColor: borderColor }]} />
+          <FlatList
+            data={TIME_OPTIONS}
+            keyExtractor={(item) => item.toString()}
+            renderItem={({ item: minutes, index }) => {
+              const isSelected = selectedOption === minutes;
+              const isLast = index === TIME_OPTIONS.length - 1;
+              return (
+                <View
+                  style={[
+                    styles.timeOption,
+                    isLast && styles.timeOptionLast,
+                  ]}
+                >
+                  {isSelected && (
+                    <View style={[
+                      styles.highlightRectangle,
+                      { borderColor: textColor }
+                    ]} />
+                  )}
+                  <Text style={[
+                    styles.optionText,
+                    { color: textColor },
+                    isSelected && styles.selectedOptionText
+                  ]}>
+                    {minutes}
+                  </Text>
+                </View>
+              );
+            }}
+            ListFooterComponent={
+              <View style={[styles.divider, { backgroundColor: borderColor }]} />
+            }
+            scrollEnabled={false}
+          />
         </View>
       )}
       <View 
