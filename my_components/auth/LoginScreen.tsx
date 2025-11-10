@@ -1,5 +1,6 @@
 import { CommonStyles, Spacing, Typography } from "@/constants";
 import { useAuth, useThemeColors } from "@/my_hooks";
+import { useRouter } from "expo-router";
 import React, { useState } from "react";
 import {
   ActivityIndicator,
@@ -16,15 +17,20 @@ import {
 
 interface LoginScreenProps {
   onLoginSuccess: () => void;
+  initialMode?: "login" | "signup";
 }
 
-export const LoginScreen: React.FC<LoginScreenProps> = ({ onLoginSuccess }) => {
+export const LoginScreen: React.FC<LoginScreenProps> = ({ 
+  onLoginSuccess, 
+  initialMode = "signup" 
+}) => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [isSignUp, setIsSignUp] = useState(true);
+  const [isSignUp, setIsSignUp] = useState(initialMode === "signup");
   const [loading, setLoading] = useState(false);
   const { signIn, signUp } = useAuth();
   const colors = useThemeColors();
+  const router = useRouter();
 
   const handleSubmit = async () => {
     if (!email.trim() || !password.trim()) {
@@ -57,6 +63,12 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({ onLoginSuccess }) => {
   };
 
   const toggleMode = () => {
+    // Navigate to the appropriate route
+    if (isSignUp) {
+      router.push("/login");
+    } else {
+      router.push("/signup");
+    }
     setIsSignUp(!isSignUp);
     setEmail("");
     setPassword("");

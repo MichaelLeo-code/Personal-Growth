@@ -67,8 +67,9 @@ export default function RootLayout() {
     <SafeAreaProvider>
       <ThemeProvider value={theme}>
         <Stack screenOptions={{ headerShown: false }}>
-          <Stack.Screen name="main" />
+          <Stack.Screen name="index" />
           <Stack.Screen name="login" />
+          <Stack.Screen name="signup" />
         </Stack>
       </ThemeProvider>
     </SafeAreaProvider>

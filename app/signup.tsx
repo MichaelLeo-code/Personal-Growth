@@ -4,7 +4,7 @@ import { useRouter } from "expo-router";
 import React from "react";
 import { StyleSheet, View } from "react-native";
 
-export default function LoginPage() {
+export default function SignupPage() {
   const backgroundColor = useThemeColor({}, "background");
   const router = useRouter();
 
@@ -14,7 +14,7 @@ export default function LoginPage() {
 
   return (
     <View style={[styles.container, { backgroundColor }]}>
-      <LoginScreen initialMode="login" onLoginSuccess={handleLoginSuccess} />
+      <LoginScreen initialMode="signup" onLoginSuccess={handleLoginSuccess} />
     </View>
   );
 }
