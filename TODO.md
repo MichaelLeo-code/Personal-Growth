@@ -4,18 +4,18 @@ you could also consider react-native-pan-pinch-view
 - too much totalSum and totalCompletedSum calls
 
 Current to-do scope:
-[ ] log out in profile instead
-[ ] multiple panes
 
 backlogish:
 [ ] Emoji functionality
 [ ] Statistics
-[ ] Lock icon os subsequent tasklists
-[ ] Fix how modals look. Fix the naming behavior.
+[ ] Lock icon on subsequent tasklists
 [ ] Add arrows to show parent/children relationship
 [ ] Fix delete, so that children are also deleted
+[ ] log out in profile instead
+[ ] multiple panes
 
 BUGS:
+[ ] Fix how modals look. (the task line is sitcking out on mobile) Fix the naming behavior. (have to explicitly press enter to save the entry. Closing the keyboard discards the input - should not be like that)
 [ ] Progress bar not seen on the small cell on web
 
 ### Questions

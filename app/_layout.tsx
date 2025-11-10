@@ -7,9 +7,9 @@ import {
   ThemeProvider,
 } from "@react-navigation/native";
 import { useFonts } from "expo-font";
+import { Stack } from "expo-router";
 import { ActivityIndicator } from "react-native";
 import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
-import MainApp from "./main";
 
 export default function RootLayout() {
   const { loading: authLoading } = useAuth();
@@ -66,7 +66,10 @@ export default function RootLayout() {
   return (
     <SafeAreaProvider>
       <ThemeProvider value={theme}>
-        <MainApp />
+        <Stack screenOptions={{ headerShown: false }}>
+          <Stack.Screen name="main" />
+          <Stack.Screen name="login" />
+        </Stack>
       </ThemeProvider>
     </SafeAreaProvider>
   );

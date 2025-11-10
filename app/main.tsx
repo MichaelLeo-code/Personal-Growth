@@ -37,6 +37,7 @@ export default function MainApp() {
     cellSize,
   });
   const [isEditMode] = useState(true); // Edit mode toggle - can add setIsEditMode later if needed
+  const backgroundColor = useThemeColor({}, "background");
 
   const handleForcePush = async () => {
     try {
@@ -60,8 +61,6 @@ export default function MainApp() {
   useEffect(() => {
     checkAndResetDailyTasks();
   }, []);
-
-  const backgroundColor = useThemeColor({}, "background");
 
   // Web-specific CSS styles to prevent page zoom and text selection
   React.useEffect(() => {

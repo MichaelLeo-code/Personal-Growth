@@ -1,5 +1,5 @@
-import { useAuth, useThemeColor, useThemeColors } from "@/my_hooks";
-import { Spacing, Typography, BorderRadius, CommonStyles } from "@/constants";
+import { CommonStyles, Spacing, Typography } from "@/constants";
+import { useAuth, useThemeColors } from "@/my_hooks";
 import React, { useState } from "react";
 import {
   ActivityIndicator,
@@ -21,7 +21,7 @@ interface LoginScreenProps {
 export const LoginScreen: React.FC<LoginScreenProps> = ({ onLoginSuccess }) => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [isSignUp, setIsSignUp] = useState(false);
+  const [isSignUp, setIsSignUp] = useState(true);
   const [loading, setLoading] = useState(false);
   const { signIn, signUp } = useAuth();
   const colors = useThemeColors();
@@ -75,7 +75,7 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({ onLoginSuccess }) => {
           <Text style={[styles.subtitle, { color: colors.textSecondary }]}>
             {isSignUp
               ? "Sign up to get started with PGA"
-              : "Sign in to continue to PGA"}
+              : "Log in to continue to PGA"}
           </Text>
 
           <View style={styles.inputContainer}>
@@ -126,7 +126,7 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({ onLoginSuccess }) => {
               <ActivityIndicator color={colors.background} />
             ) : (
               <Text style={[styles.buttonText, { color: colors.background }]}>
-                {isSignUp ? "Sign Up" : "Sign In"}
+                {isSignUp ? "Sign Up" : "Log In"}
               </Text>
             )}
           </TouchableOpacity>
@@ -138,7 +138,7 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({ onLoginSuccess }) => {
           >
             <Text style={[styles.toggleText, { color: colors.accent }]}>
               {isSignUp
-                ? "Already have an account? Sign In"
+                ? "Already have an account? Log In"
                 : "Don't have an account? Sign Up"}
             </Text>
           </TouchableOpacity>
