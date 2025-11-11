@@ -136,6 +136,7 @@ export const FloatingActionButtons: React.FC<FloatingActionButtonsProps> = ({
             style={{
               right: 20,
               bottom: 70,
+              zIndex: 2
             }}
             iconName="delete"
           />

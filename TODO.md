@@ -1,7 +1,8 @@
 you could also consider react-native-pan-pinch-view
 
 #### Known issues
-- too much totalSum and totalCompletedSum calls
+
+-  too much totalSum and totalCompletedSum calls
 
 Current to-do scope:
 [ ] log out in profile instead
@@ -17,26 +18,27 @@ backlogish:
 
 BUGS:
 [ ] Progress bar not seen on the small cell on web
+[ ] when a cell moved, it frees up the other cell surroundings
 
 ### Questions
 
 ##### GridStore
 
-- next adjacent cell methods
-- assign parent if cell is selected
+-  next adjacent cell methods
+-  assign parent if cell is selected
 
 ### Resolved Questions
 
 ##### Model
 
-- reference parent as id or x, y? **ID**
-- Reference children's needed? **yes**
-  Pros:
+-  reference parent as id or x, y? **ID**
+-  Reference children's needed? **yes**
+   Pros:
 
-  - Enables quick lookup of a node's subtree.
-  - **Enable view of only certain levels**
+   -  Enables quick lookup of a node's subtree.
+   -  **Enable view of only certain levels**
 
-  Cons:
+   Cons:
 
-  - Needs strict synchronization
-  - JSON.stringify becomes problematic.
+   -  Needs strict synchronization
+   -  JSON.stringify becomes problematic.

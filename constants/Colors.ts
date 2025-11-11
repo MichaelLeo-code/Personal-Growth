@@ -32,6 +32,8 @@ export const Colors = {
     textMuted: "#687076",
     background: "#000",
     surface: "#151718",
+    // background: "#122461ff",
+    // surface: "#174c97ff",
     surfaceSecondary: "#303133",
     tint: tintColorDark,
     accent: "#007AFF",

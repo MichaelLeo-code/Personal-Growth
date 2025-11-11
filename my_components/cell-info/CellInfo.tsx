@@ -14,8 +14,7 @@ export const CellInfo: React.FC<{ cellId: number }> = ({
   const { cell } = useCellData(cellId);
 
   const handleTimeSelected = (minutes: number, cellId: number) => {
-    console.log(`Selected ${minutes} minutes for cell:`, cellId);
-    // TODO: Implement time tracking functionality
+    
   };
 
   if (!cell) {
@@ -43,7 +42,7 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     alignItems: "center",
-    zIndex: 1000,
+    zIndex: 1,
     elevation: 1000,
   },
   contentWrapper: {

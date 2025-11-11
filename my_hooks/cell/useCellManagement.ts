@@ -18,6 +18,7 @@ export const useCellManagement = () => {
 
   const deleteSelectedCell = () => {
     if (selected) {
+      console.log("useCellManagement: Deleting cell with id:", selected.id);
       cellService.deleteCell(selected.id);
       setSelected(null);
     }
