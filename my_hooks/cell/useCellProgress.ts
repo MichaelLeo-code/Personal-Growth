@@ -3,7 +3,7 @@ import { totalCompletedCost, totalCost } from "@/service/taskService";
 import { Cell } from "@/types";
 import { useEffect, useState } from "react";
 
-export const useCellData = (cellId: number) => {
+export const useCellProgress = (cellId: number) => {
   const [cell, setCell] = useState<Cell | null>(null);
 
   useEffect(() => {

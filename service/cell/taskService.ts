@@ -1,15 +1,15 @@
+import { cellService } from "@/service";
+import { Task } from "@/types";
 import { CellType, TaskListCell } from "@/types/cells";
-import { Task } from "../types/task";
-import { cellService } from "./cellService";
 
 let nextId = 1; // Start from 1 to avoid conflicts with default/initial values
 
-function getTaskListCell(parentId: number): TaskListCell | null {
-  const parentCell = cellService.getCellById(parentId);
-  if (!parentCell || parentCell.type !== CellType.Tasklist) {
+function getTaskListCell(cellId: number): TaskListCell | null {
+  const cell = cellService.getCellById(cellId);
+  if (!cell || cell.type !== CellType.Tasklist) {
     return null;
   }
-  return parentCell as TaskListCell;
+  return cell as TaskListCell;
 }
 
 function initializeNextId(): void {

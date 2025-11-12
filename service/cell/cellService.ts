@@ -1,9 +1,9 @@
 import { FIREBASE_AUTH } from "@/firebase";
-import { Cell, CellType } from "../types/cells";
-import { storageService } from "./storageService";
+import { Cell, CellType } from "../../types/cells";
+import { storageService } from "../storageService";
 
 import { calculateDynamicCellSize } from "@/utils";
-import { coordinateService } from "./coordinateService";
+import { coordinateService } from "../coordinateService";
 
 const directions8 = [
   [2, 0],

@@ -1,4 +1,4 @@
-export { useCellData, useCellManagement, useCellMove } from "./cell";
+export { useCellProgress, useCellManagement, useCellMove } from "./cell";
 export * from "./grid";
 export * from "./sync";
 export { useThemeColor, useThemeColors } from "./theme/useThemeColor";

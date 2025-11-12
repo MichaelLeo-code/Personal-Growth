@@ -1,5 +1,6 @@
 import { Spacing, Typography } from "@/constants";
-import { useCellData, useThemeColor } from "@/my_hooks";
+import { useThemeColor } from "@/my_hooks";
+import { cellService } from "@/service";
 import React from "react";
 import { StyleSheet, Text, View } from "react-native";
 import { TimerButton } from "./TimerButton";
@@ -11,10 +12,10 @@ export const CellInfo: React.FC<{ cellId: number }> = ({
   const borderColor = useThemeColor({}, "border");
   const textColor = useThemeColor({}, "text");
 
-  const { cell } = useCellData(cellId);
+  const cell = cellService.getCellById(cellId);
 
   const handleTimeSelected = (minutes: number) => {
-    
+    // cellService.
   };
 
   if (!cell) {
