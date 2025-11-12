@@ -2,16 +2,15 @@ import { Spacing, Typography } from "@/constants";
 import { useThemeColor } from "@/my_hooks";
 import { Ionicons } from "@expo/vector-icons";
 import React, { useRef, useState } from "react";
-import { FlatList, PanResponder, StyleSheet, Text, View } from "react-native";
+import { FlatList, PanResponder, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
 const TIME_OPTIONS = [60, 45, 30, 20, 15, 10, 5];
 
 interface TimerButtonProps {
-  cellId: number;
-  onTimeSelected?: (minutes: number, cellId: number) => void;
+  onTimeSelected?: (minutes: number) => void;
 }
 
-export const TimerButton: React.FC<TimerButtonProps> = ({ cellId, onTimeSelected }) => {
+export const TimerButton: React.FC<TimerButtonProps> = ({ onTimeSelected }) => {
   const backgroundColor = useThemeColor({}, "surface");
   const borderColor = useThemeColor({}, "border");
   const textColor = useThemeColor({}, "text");
@@ -38,19 +37,16 @@ export const TimerButton: React.FC<TimerButtonProps> = ({ cellId, onTimeSelected
             const newSelection = TIME_OPTIONS[optionCount - 1 - index];
             currentSelection.current = newSelection;
             setSelectedOption(newSelection);
-            console.log('Touch moved upwards, selected option:', selectedOption);
           }
         } else {
           currentSelection.current = null;
           setSelectedOption(null);
-          console.log('Touch moved downwards, resetting selection');
         }
       },
       onPanResponderRelease: (_, gestureState) => {
-        console.log('PanResponder released with gestureState:', selectedOption);
         const selected = currentSelection.current;
         if (selected !== null && gestureState.dy < 0) {
-          onTimeSelected?.(selected, cellId);
+          onTimeSelected?.(selected);
         }
         setIsExpanded(false);
         setSelectedOption(null);
@@ -60,10 +56,11 @@ export const TimerButton: React.FC<TimerButtonProps> = ({ cellId, onTimeSelected
   ).current;
 
   return (
-    <View 
+    <TouchableOpacity 
       style={styles.timeButtonContainer} 
       {...panResponder.panHandlers}
-      collapsable={false}
+      // collapsable={false}
+      onPress={() => setIsExpanded(true)}
     >
       {isExpanded && (
         <View style={[styles.optionsContainer, { backgroundColor, borderColor }]}>
@@ -74,11 +71,12 @@ export const TimerButton: React.FC<TimerButtonProps> = ({ cellId, onTimeSelected
               const isSelected = selectedOption === minutes;
               const isLast = index === TIME_OPTIONS.length - 1;
               return (
-                <View
+                <TouchableOpacity
                   style={[
                     styles.timeOption,
                     isLast && styles.timeOptionLast,
                   ]}
+                  onPress={() => onTimeSelected?.(minutes)}
                 >
                   {isSelected && (
                     <View style={[
@@ -93,7 +91,7 @@ export const TimerButton: React.FC<TimerButtonProps> = ({ cellId, onTimeSelected
                   ]}>
                     {minutes}
                   </Text>
-                </View>
+                </TouchableOpacity>
               );
             }}
             ListFooterComponent={
@@ -114,7 +112,7 @@ export const TimerButton: React.FC<TimerButtonProps> = ({ cellId, onTimeSelected
           <Ionicons name="time-outline" size={24} color={textColor} />
         </View>
       </View>
-    </View>
+    </TouchableOpacity>
   );
 };
 

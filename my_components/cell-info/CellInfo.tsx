@@ -13,7 +13,7 @@ export const CellInfo: React.FC<{ cellId: number }> = ({
 
   const { cell } = useCellData(cellId);
 
-  const handleTimeSelected = (minutes: number, cellId: number) => {
+  const handleTimeSelected = (minutes: number) => {
     
   };
 
@@ -29,7 +29,7 @@ export const CellInfo: React.FC<{ cellId: number }> = ({
             {cell.text || `Cell ${cellId}`}
           </Text>
         </View>
-        <TimerButton cellId={cellId} onTimeSelected={handleTimeSelected} />
+        <TimerButton onTimeSelected={handleTimeSelected} />
       </View>
     </View>
   );
