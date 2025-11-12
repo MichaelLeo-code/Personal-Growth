@@ -16,12 +16,12 @@ import {
 } from "react-native";
 
 interface LoginScreenProps {
-  onLoginSuccess: () => void;
+  closeLogin: () => void;
   initialMode?: "login" | "signup";
 }
 
 export const LoginScreen: React.FC<LoginScreenProps> = ({ 
-  onLoginSuccess, 
+  closeLogin, 
   initialMode = "signup" 
 }) => {
   const [email, setEmail] = useState("");
@@ -51,7 +51,7 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({
         : await signIn(email.trim(), password);
 
       if (result.success) {
-        onLoginSuccess();
+        closeLogin();
       } else {
         Alert.alert("Authentication Error", result.error);
       }
@@ -154,6 +154,16 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({
                 : "Don't have an account? Sign Up"}
             </Text>
           </TouchableOpacity>
+
+          <TouchableOpacity
+            style={styles.skipButton}
+            onPress={closeLogin}
+            disabled={loading}
+          >
+            <Text style={[styles.skipText, { color: colors.textSecondary }]}>
+              Proceed without an account
+            </Text>
+          </TouchableOpacity>
         </View>
       </ScrollView>
     </KeyboardAvoidingView>
@@ -213,5 +223,13 @@ const styles = StyleSheet.create({
   },
   toggleText: {
     ...Typography.bodyLarge,
+  },
+  skipButton: {
+    marginTop: Spacing.lg,
+    alignItems: "center",
+    paddingVertical: Spacing.md,
+  },
+  skipText: {
+    ...Typography.body,
   },
 });

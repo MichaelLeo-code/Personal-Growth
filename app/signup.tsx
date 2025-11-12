@@ -8,13 +8,13 @@ export default function SignupPage() {
   const backgroundColor = useThemeColor({}, "background");
   const router = useRouter();
 
-  const handleLoginSuccess = () => {
+  const closeLogin = () => {
     router.push("/");
   };
 
   return (
     <View style={[styles.container, { backgroundColor }]}>
-      <LoginScreen initialMode="signup" onLoginSuccess={handleLoginSuccess} />
+      <LoginScreen initialMode="signup" closeLogin={closeLogin} />
     </View>
   );
 }

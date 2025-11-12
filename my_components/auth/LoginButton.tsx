@@ -19,6 +19,14 @@ export const LoginButton: React.FC<{ style: ViewStyle }> = ({ style }) => {
     }
   };
 
+  const closeLogin = () => {
+    if (Platform.OS === "web") {
+      router.push("/");
+    } else {
+      setShowLoginModal(false);
+    }
+  }
+
   return (
     <>
       <FloatingButton
@@ -32,9 +40,9 @@ export const LoginButton: React.FC<{ style: ViewStyle }> = ({ style }) => {
         visible={showLoginModal}
         animationType="slide"
         presentationStyle="pageSheet"
-        onRequestClose={() => setShowLoginModal(false)}
+        onRequestClose={closeLogin}
       >
-        <LoginScreen onLoginSuccess={() => setShowLoginModal(false)} />
+        <LoginScreen closeLogin={closeLogin} />
       </Modal>
     </>
   );
