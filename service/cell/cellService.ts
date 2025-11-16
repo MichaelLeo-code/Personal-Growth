@@ -333,6 +333,7 @@ class CellService {
 
   notify() {
     this.listeners.forEach((listener) => listener());
+    console.log("CellService: Notified listeners of state change.");
   }
 }
 

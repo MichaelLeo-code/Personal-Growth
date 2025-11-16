@@ -34,37 +34,37 @@ function getNextTaskId(): number {
   return nextId++;
 }
 
-export function addTask(task: Omit<Task, "id">, parentId: number): Task | null {
+export function addTask(task: Omit<Task, "id">, cellId: number): Task | null {
   const id = getNextTaskId();
   const newTask: Task = { ...task, id };
 
-  const parentCell = getTaskListCell(parentId);
-  if (!parentCell) {
+  const cell = getTaskListCell(cellId);
+  if (!cell) {
     return null;
   }
 
-  parentCell.tasks = [...(parentCell.tasks || []), newTask];
+  cell.tasks = [...(cell.tasks || []), newTask];
 
-  cellService.updateCellSize(parentId);
+  cellService.updateCellSize(cellId);
   cellService.saveToStorage();
   cellService.notify();
   return newTask;
 }
 
-export function deleteTask(taskId: number, parentId: number): boolean {
-  const parentCell = getTaskListCell(parentId);
-  if (!parentCell?.tasks) {
+export function deleteTask(taskId: number, cellId: number): boolean {
+  const cell = getTaskListCell(cellId);
+  if (!cell?.tasks) {
     return false;
   }
 
-  const taskIndex = parentCell.tasks.findIndex((task) => task.id === taskId);
+  const taskIndex = cell.tasks.findIndex((task) => task.id === taskId);
   if (taskIndex === -1) {
     return false;
   }
 
-  parentCell.tasks = parentCell.tasks.filter((task) => task.id !== taskId);
+  cell.tasks = cell.tasks.filter((task) => task.id !== taskId);
 
-  cellService.updateCellSize(parentId);
+  cellService.updateCellSize(cellId);
   cellService.saveToStorage();
   cellService.notify();
   return true;
@@ -72,21 +72,21 @@ export function deleteTask(taskId: number, parentId: number): boolean {
 
 export function updateTask(
   taskId: number,
-  parentId: number,
+  cellId: number,
   updates: Partial<Omit<Task, "id">>
 ): Task | null {
-  const parentCell = getTaskListCell(parentId);
-  if (!parentCell?.tasks) {
+  const cell = getTaskListCell(cellId);
+  if (!cell?.tasks) {
     return null;
   }
 
-  const taskIndex = parentCell.tasks.findIndex((task) => task.id === taskId);
+  const taskIndex = cell.tasks.findIndex((task) => task.id === taskId);
   if (taskIndex === -1) {
     return null;
   }
 
-  const updatedTask = { ...parentCell.tasks[taskIndex], ...updates };
-  parentCell.tasks[taskIndex] = updatedTask;
+  const updatedTask = { ...cell.tasks[taskIndex], ...updates };
+  cell.tasks[taskIndex] = updatedTask;
   cellService.saveToStorage();
   cellService.notify();
   return updatedTask;
@@ -94,10 +94,10 @@ export function updateTask(
 
 export function completeTask(
   taskId: number,
-  parentId: number,
+  cellId: number,
   completed: boolean = true
 ): Task | null {
-  return updateTask(taskId, parentId, { completed });
+  return updateTask(taskId, cellId, { completed });
 }
 
 export function totalCost(cellId: number): number {

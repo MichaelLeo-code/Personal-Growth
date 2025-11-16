@@ -9,8 +9,7 @@ import {
   useThemeColor,
   useZoomState,
 } from "@/my_hooks";
-import { cellService, storageService } from "@/service";
-import { checkAndResetDailyTasks } from "@/service/taskService";
+import { cellService, checkAndResetDailyTasks, storageService } from "@/service";
 import { ReactNativeZoomableView } from "@openspacelabs/react-native-zoomable-view";
 import React, { useEffect, useState } from "react";
 import { Platform, View } from "react-native";

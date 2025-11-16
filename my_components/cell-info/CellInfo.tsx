@@ -1,8 +1,9 @@
 import { Spacing, Typography } from "@/constants";
 import { useThemeColor } from "@/my_hooks";
-import { cellService } from "@/service";
+import { cellService, minutesService } from "@/service";
 import React from "react";
 import { StyleSheet, Text, View } from "react-native";
+import { MinutesBarGraph } from "./MinutesBarGraph";
 import { TimerButton } from "./TimerButton";
 
 export const CellInfo: React.FC<{ cellId: number }> = ({
@@ -15,7 +16,8 @@ export const CellInfo: React.FC<{ cellId: number }> = ({
   const cell = cellService.getCellById(cellId);
 
   const handleTimeSelected = (minutes: number) => {
-    // cellService.
+    minutesService.addMinuteEntry(cellId, minutes);
+    console.log(`Added ${minutes} minutes to cell ${cellId}`);
   };
 
   if (!cell) {
@@ -32,6 +34,7 @@ export const CellInfo: React.FC<{ cellId: number }> = ({
         </View>
         <TimerButton onTimeSelected={handleTimeSelected} />
       </View>
+      <MinutesBarGraph cellId={cellId} maxBars={30} />
     </View>
   );
 };

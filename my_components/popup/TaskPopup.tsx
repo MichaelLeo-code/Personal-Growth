@@ -6,7 +6,7 @@ import {
   checkAndResetDailyTasks,
   deleteTask,
   updateTask,
-} from "@/service/taskService";
+} from "@/service";
 import { Task } from "@/types";
 import { TaskListCell } from "@/types/cells";
 import { useEffect, useState } from "react";

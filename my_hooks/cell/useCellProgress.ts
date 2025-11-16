@@ -1,5 +1,4 @@
-import { cellService } from "@/service";
-import { totalCompletedCost, totalCost } from "@/service/taskService";
+import { cellService, totalCompletedCost, totalCost } from "@/service";
 import { Cell } from "@/types";
 import { useEffect, useState } from "react";
 

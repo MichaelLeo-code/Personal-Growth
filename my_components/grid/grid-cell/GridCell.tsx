@@ -6,6 +6,7 @@ import {
   Typography,
 } from "@/constants";
 import { useThemeColors } from "@/my_hooks";
+import { completeTask } from "@/service";
 import React, { useRef } from "react";
 import {
   Pressable,
@@ -14,7 +15,6 @@ import {
   TouchableOpacity,
   View
 } from "react-native";
-import { completeTask } from "../../../service/taskService";
 import { Cell, CellType } from "../../../types/cells";
 import { ProgressBar } from "./ProgressBar";
 

@@ -1,8 +1,7 @@
+import { CommonStyles, Spacing, Typography } from "@/constants";
+import { useSyncStatus, useThemeColors } from "@/my_hooks";
 import React from "react";
 import { StyleSheet, Text, View } from "react-native";
-import { useSyncStatus } from "../../my_hooks/useSyncStatus";
-import { useThemeColors } from "@/my_hooks";
-import { Spacing, Typography, CommonStyles } from "@/constants";
 
 export const SyncStatusIndicator: React.FC = () => {
   const { syncStatus, isSyncing } = useSyncStatus();
