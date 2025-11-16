@@ -117,6 +117,7 @@ export const FloatingActionButtons: React.FC<FloatingActionButtonsProps> = ({
             style={{
               right: 20,
               bottom: 206,
+              zIndex: 10
             }}
           />
           <DraggableFloatingButton
@@ -128,6 +129,7 @@ export const FloatingActionButtons: React.FC<FloatingActionButtonsProps> = ({
             style={{
               right: 20,
               bottom: 138,
+              zIndex: 10
             }}
           />
           <FloatingButton
@@ -136,7 +138,7 @@ export const FloatingActionButtons: React.FC<FloatingActionButtonsProps> = ({
             style={{
               right: 20,
               bottom: 70,
-              zIndex: 2
+              zIndex: 10
             }}
             iconName="delete"
           />

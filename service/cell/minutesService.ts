@@ -4,7 +4,7 @@ import { CellType, HeadlineCell, MinuteEntry } from "@/types";
 class MinutesService {
   private entriesByDateMap: Map<number, Record<string, number>> = new Map();
 
-  private getHeadlineCell(cellId: number): HeadlineCell | null {
+  getHeadlineCell(cellId: number): HeadlineCell | null {
     const cell = cellService.getCellById(cellId);
     if (!cell || cell.type !== CellType.Headline) {
       return null;

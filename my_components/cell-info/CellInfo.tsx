@@ -25,8 +25,8 @@ export const CellInfo: React.FC<{ cellId: number }> = ({
   }
 
   return (
-    <View style={styles.container}>
-      <View style={styles.contentWrapper}>
+    <View style={styles.container} pointerEvents="box-none">
+      <View style={styles.contentWrapper} pointerEvents="box-none">
         <View style={[styles.indicator, { backgroundColor, borderColor }]} pointerEvents="none">
           <Text style={[styles.text, { color: textColor }]} numberOfLines={1}>
             {cell.text || `Cell ${cellId}`}
@@ -34,7 +34,7 @@ export const CellInfo: React.FC<{ cellId: number }> = ({
         </View>
         <TimerButton onTimeSelected={handleTimeSelected} />
       </View>
-      <MinutesBarGraph cellId={cellId} maxBars={30} />
+      {minutesService.getHeadlineCell(cellId) && <MinutesBarGraph cellId={cellId} maxBars={30} />}
     </View>
   );
 };
@@ -45,16 +45,17 @@ const styles = StyleSheet.create({
     bottom: 70,
     left: 0,
     right: 0,
-    alignItems: "center",
+    alignItems: "flex-start",
+    paddingLeft: Spacing.xxl,
     zIndex: 1,
-    elevation: 1000,
+    elevation: 5,
   },
   contentWrapper: {
     flexDirection: "row",
     alignItems: "center",
     gap: Spacing.md,
-    zIndex: 1001,
-    elevation: 1001,
+    zIndex: 1,
+    elevation: 5,
   },
   indicator: {
     paddingHorizontal: Spacing.lg,

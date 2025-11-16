@@ -1,4 +1,4 @@
-import { Spacing, Typography } from "@/constants";
+import { Colors, Spacing, Typography } from "@/constants";
 import { useThemeColor } from "@/my_hooks";
 import { Ionicons } from "@expo/vector-icons";
 import React, { useRef, useState } from "react";
@@ -103,8 +103,8 @@ export const TimerButton: React.FC<TimerButtonProps> = ({ onTimeSelected }) => {
       )}
       <View 
         style={[
-          styles.extendedButton,
           { backgroundColor, borderColor },
+          styles.extendedButton,
           isExpanded && styles.extendedButtonExpanded,
         ]}
       >
@@ -146,6 +146,7 @@ const styles = StyleSheet.create({
     borderTopLeftRadius: 0,
     borderTopRightRadius: 0,
     borderTopWidth: 0,
+    backgroundColor: Colors.dark.surface,
   },
   optionsContainer: {
     position: "absolute",
@@ -189,6 +190,7 @@ const styles = StyleSheet.create({
     width: 32,
     height: 1,
     marginVertical: Spacing.xs,
+    alignSelf: "center",
   },
   iconContainer: {
     width: 48,
