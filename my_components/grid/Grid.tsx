@@ -1,11 +1,12 @@
 import { cellSize } from "@/constants";
 import { useGridInteractionState, useGridMouse, useGridTouch, usePopup } from "@/my_hooks";
-import { cellService } from "@/service";
+import { cellService, minutesService } from "@/service";
 import { Cell } from "@/types";
 import React, { useCallback, useState } from "react";
 import { GestureResponderEvent, Platform, StyleSheet, View } from "react-native";
 import { PopupSelector } from "../popup";
 import { CellLines } from "./CellLines";
+import { FireAnimation } from "./FireAnimation";
 import { GridCell } from "./grid-cell/GridCell";
 import { PreviewCell, PreviewCellType } from "./PreviewCell";
 
@@ -131,6 +132,22 @@ export const Grid: React.FC<GridProps> = ({
           onLongPress={(cell) => handleCellLongPress(cell)}
         />
       ))}
+      {cells.map((cell) => {
+        if (minutesService.getDiligance(cell.id, 1)) {
+          return (
+            <FireAnimation
+              key={`fire-${cell.id}`}
+              cellX={cell.x}
+              cellY={cell.y}
+              cellSize={cellSize}
+              cellWidth={cellSize * cell.size.x}
+              cellHeight={cellSize * cell.size.y}
+            />
+          );
+        }
+        return null;
+      })}
+
       <PreviewCell
         previewCell={previewCell}
         selected={selected}

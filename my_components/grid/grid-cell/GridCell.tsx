@@ -125,6 +125,7 @@ export const GridCell: React.FC<GridCellProps> = ({
         position: "absolute",
         left: cell.x * cellSize,
         top: cell.y * cellSize,
+        zIndex: 2,
       }}
     >
       <TouchableOpacity

@@ -93,13 +93,14 @@ class MinutesService {
     return cell.minuteEntries || [];
   }
 
-  getDiligance(cellId: number, dateFrom: Date): number | null {
+  getDiligance(cellId: number, dateFrom: number): number | null {
     const cell = this.getHeadlineCell(cellId);
     if (!cell) return null; // Does it have to be null?
 
     const entriesByDate = this.getEntriesByDate(cellId);
     const today = new Date();
-    const fromDate = new Date(dateFrom);
+    const fromDate = new Date();
+    fromDate.setDate(today.getDate() - dateFrom);
 
     const totalDays = today.getDate() - fromDate.getDate();
 

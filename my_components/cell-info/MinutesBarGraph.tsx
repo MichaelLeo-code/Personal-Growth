@@ -31,7 +31,7 @@ export const MinutesBarGraph: React.FC<MinutesBarGraphProps> = ({
   useEffect(() => {
     const calculateBarData = () => {
       const entriesByDate = minutesService.getEntriesByDate(cellId);
-      
+
       const sortedEntries = Object.entries(entriesByDate)
         .map(([dateKey, minutes]) => {
           const [year, month, day] = dateKey.split("-").map(Number);
@@ -57,7 +57,7 @@ export const MinutesBarGraph: React.FC<MinutesBarGraphProps> = ({
     };
 
     calculateBarData();
-    
+
     const unsubscribe = cellService.subscribe(() => {
       calculateBarData();
     });
@@ -80,10 +80,10 @@ export const MinutesBarGraph: React.FC<MinutesBarGraphProps> = ({
   return (
     <View style={[styles.container, { backgroundColor, borderColor }]}>
       <Text style={[styles.title, { color: textColor }]}>
-        Minutes per Day
+        {barData[barData.length - 1].minutes}
       </Text>
-      <ScrollView 
-        horizontal 
+      <ScrollView
+        horizontal
         showsHorizontalScrollIndicator={true}
         contentContainerStyle={styles.scrollContent}
       >
