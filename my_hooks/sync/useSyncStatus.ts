@@ -1,5 +1,5 @@
+import { storageService } from "@/service";
 import { useEffect, useState } from "react";
-import { storageService } from "../service/storageService";
 
 interface SyncStatus {
   lastSyncTime: Date | null;

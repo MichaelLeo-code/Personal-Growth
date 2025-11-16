@@ -7,7 +7,7 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import {
   adjustForCellCenter,
   createScreenToGridCoordinates,
-} from "../utils/coordinateUtils";
+} from "../../utils/coordinateUtils";
 
 interface ZoomState {
   zoomLevel: number;

@@ -1,11 +1,12 @@
 import { cellSize } from "@/constants";
-import { usePopup } from "@/my_hooks";
-import { cellService } from "@/service";
+import { useGridInteractionState, useGridMouse, useGridTouch, usePopup } from "@/my_hooks";
+import { cellService, minutesService } from "@/service";
 import { Cell } from "@/types";
-import React, { useCallback, useRef, useState } from "react";
+import React, { useCallback, useState } from "react";
 import { GestureResponderEvent, Platform, StyleSheet, View } from "react-native";
 import { PopupSelector } from "../popup";
 import { CellLines } from "./CellLines";
+import { FireAnimation } from "./FireAnimation";
 import { GridCell } from "./grid-cell/GridCell";
 import { PreviewCell, PreviewCellType } from "./PreviewCell";
 
@@ -17,6 +18,7 @@ type GridProps = {
   onCellMoveStart?: (cell: Cell) => (event: GestureResponderEvent) => void;
   onCellMove?: (event: GestureResponderEvent) => void;
   onCellMoveEnd?: (event: GestureResponderEvent) => void;
+  onBackgroundPress?: () => void;
 };
 
 export const Grid: React.FC<GridProps> = ({
@@ -27,6 +29,7 @@ export const Grid: React.FC<GridProps> = ({
   onCellMoveStart,
   onCellMove,
   onCellMoveEnd,
+  onBackgroundPress,
 }) => {
   const {
     isVisible: isPopupVisible,
@@ -38,10 +41,49 @@ export const Grid: React.FC<GridProps> = ({
     x: number;
     y: number;
   } | null>(null);
-  
-  const isDragging = useRef(false);
+
+  // Shared state between touch and mouse interactions
+  const { isDragging, cellWasPressed } = useGridInteractionState();
+
+  const {
+    handleTouchStart: onTouchStart,
+    handleTouchMove,
+    handleTouchEnd,
+    markCellPressed,
+    setDragging,
+  } = useGridTouch({
+    onCellMove,
+    onCellMoveEnd,
+    onBackgroundPress,
+    isDragging,
+    cellWasPressed,
+  });
+
+  useGridMouse({
+    onCellMove,
+    onCellMoveEnd,
+    onBackgroundPress,
+    isDragging,
+    cellWasPressed,
+  });
+
+  const handleTouchStart = useCallback((event: GestureResponderEvent) => {
+    const coords = onTouchStart(event);
+    setStartCoordinates(coords);
+  }, [onTouchStart]);
+
+  const handleCellPress = useCallback((cell: Cell) => {
+    markCellPressed();
+    cellService.selectCell(cell);
+  }, [markCellPressed]);
+
+  const handleCellDoublePress = useCallback((cell: Cell) => {
+    markCellPressed();
+    showPopup(cell);
+  }, [showPopup, markCellPressed]);
 
   const handleCellLongPress = (cell: Cell) => (event: any) => {
+    markCellPressed();
     if (onCellMoveStart) {
       cellService.selectCell(cell);
 
@@ -62,83 +104,16 @@ export const Grid: React.FC<GridProps> = ({
         },
       } as GestureResponderEvent;
       moveHandler(eventWithCoordinates);
-      isDragging.current = true;
+      setDragging(true);
     } else {
       console.error("useCellMove hook has failed you!");
     }
   };
 
-  const handleTouchStart = useCallback((event: GestureResponderEvent) => {
-    setStartCoordinates({
-      x: event.nativeEvent.pageX,
-      y: event.nativeEvent.pageY,
-    });
-  }, []);
-
-  const handleTouchMove = useCallback((event: GestureResponderEvent) => {
-    if (isDragging.current && onCellMove) {
-      onCellMove(event);
-    }
-  }, [onCellMove]);
-
-  const handleTouchEnd = useCallback((event: GestureResponderEvent) => {
-    if (isDragging.current && onCellMoveEnd) {
-      onCellMoveEnd(event);
-      isDragging.current = false;
-    }
-  }, [onCellMoveEnd]);
-
-  // Web-specific mouse event handlers
-  const handleMouseMove = useCallback((event: any) => {
-    if (Platform.OS === 'web' && isDragging.current && onCellMove) {
-      const syntheticEvent = {
-        nativeEvent: {
-          pageX: event.clientX,
-          pageY: event.clientY,
-        },
-      } as GestureResponderEvent;
-      onCellMove(syntheticEvent);
-    }
-  }, [onCellMove]);
-
-  const handleMouseUp = useCallback((event: any) => {
-    if (Platform.OS === 'web' && isDragging.current && onCellMoveEnd) {
-      const syntheticEvent = {
-        nativeEvent: {
-          pageX: event.clientX,
-          pageY: event.clientY,
-        },
-      } as GestureResponderEvent;
-      onCellMoveEnd(syntheticEvent);
-      isDragging.current = false;
-    }
-  }, [onCellMoveEnd]);
-
-  // Add global mouse event listeners for web
-  React.useEffect(() => {
-    if (Platform.OS === 'web') {
-      const handleContextMenu = (event: MouseEvent) => {
-        if (isDragging.current) {
-          event.preventDefault();
-        }
-      };
-
-      document.addEventListener('mousemove', handleMouseMove);
-      document.addEventListener('mouseup', handleMouseUp);
-      document.addEventListener('contextmenu', handleContextMenu);
-      
-      return () => {
-        document.removeEventListener('mousemove', handleMouseMove);
-        document.removeEventListener('mouseup', handleMouseUp);
-        document.removeEventListener('contextmenu', handleContextMenu);
-      };
-    }
-  }, [handleMouseMove, onCellMoveEnd, handleMouseUp]);
-
   return (
     <View
       style={styles.grid}
-      // @ts-ignore - Web-specific attribute
+      // @ts-ignore 
       className={Platform.OS === 'web' ? 'cell-grid-container' : undefined}
       onTouchStart={handleTouchStart}
       onTouchMove={handleTouchMove}
@@ -152,11 +127,27 @@ export const Grid: React.FC<GridProps> = ({
           cellSize={cellSize}
           isSelected={selected?.x === cell.x && selected?.y === cell.y}
           isDimmed={isMoving && selected?.id === cell.id}
-          onPress={(cell) => cellService.selectCell(cell)}
-          onDoublePress={(cell) => showPopup(cell)}
+          onPress={handleCellPress}
+          onDoublePress={handleCellDoublePress}
           onLongPress={(cell) => handleCellLongPress(cell)}
         />
       ))}
+      {cells.map((cell) => {
+        if (minutesService.getDiligance(cell.id, 1)) {
+          return (
+            <FireAnimation
+              key={`fire-${cell.id}`}
+              cellX={cell.x}
+              cellY={cell.y}
+              cellSize={cellSize}
+              cellWidth={cellSize * cell.size.x}
+              cellHeight={cellSize * cell.size.y}
+            />
+          );
+        }
+        return null;
+      })}
+
       <PreviewCell
         previewCell={previewCell}
         selected={selected}
